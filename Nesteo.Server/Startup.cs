@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Nesteo.Server.Authentication.Configuration;
+using Nesteo.Server.Authentication;
 using Nesteo.Server.Authorization;
 using Nesteo.Server.BackgroundTasks;
 using Nesteo.Server.Configuration;

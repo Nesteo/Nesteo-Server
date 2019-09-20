@@ -10,7 +10,7 @@ using Nesteo.Server.Data.Identity;
 using ZNetCS.AspNetCore.Authentication.Basic;
 using ZNetCS.AspNetCore.Authentication.Basic.Events;
 
-namespace Nesteo.Server.Authentication.Configuration
+namespace Nesteo.Server.Authentication
 {
     public class BasicAuthenticationConfiguration : IConfigureNamedOptions<BasicAuthenticationOptions>
     {

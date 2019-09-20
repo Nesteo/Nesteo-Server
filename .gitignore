@@ -266,3 +266,6 @@ swagger.json
 # Config
 appsettings.json
 appsettings.Development.json
+
+# Compose env
+.env

@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 
-namespace Nesteo.Server.Authentication.Configuration
+namespace Nesteo.Server.Authentication
 {
     public class CookieAuthenticationConfiguration : IConfigureNamedOptions<CookieAuthenticationOptions>
     {

@@ -13,6 +13,8 @@ ProjectSection(SolutionItems) = preProject
 	LICENSE = LICENSE
 	README.md = README.md
 	docker-compose.yml = docker-compose.yml
+	database.sql = database.sql
+	sample.env = sample.env
 EndProjectSection
 EndProject
 Global
