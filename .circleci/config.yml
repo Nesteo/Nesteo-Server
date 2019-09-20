@@ -95,7 +95,7 @@ workflows:
           filters:
             branches:
               only: master
-      - publish-branch:
+      - publish-master:
           requires:
             - build
           filters:
