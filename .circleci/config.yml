@@ -106,15 +106,13 @@ workflows:
       - test:
           filters:
             branches:
-              only: /.*/
-              ignore: master
+              only: /^(?!master$).*/
       - build:
           requires:
             - test
           filters:
             branches:
-              only: /.*/
-              ignore: master
+              only: /^(?!master$).*/
       - publish-branch:
           requires:
             - build
