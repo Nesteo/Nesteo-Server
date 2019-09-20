@@ -104,6 +104,7 @@ The server, when started, serves different services at different URLs:
 - **/api-docs** - Fancy API documentation page
 - **/swagger** - Swagger API testing tool
 - **/swagger/v1/swagger.json** - Swagger API specification
+- **/health** - Endpoint for health checks
 
 ### Default login credentials
 
