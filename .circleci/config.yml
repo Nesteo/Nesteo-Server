@@ -29,7 +29,7 @@ jobs:
           root: .
           paths:
             - ./image.tar
-  publish-latest:
+  publish-master:
     executor: docker-instance
     steps:
       - attach_workspace:
@@ -42,9 +42,27 @@ jobs:
           name: Publish Docker image to Docker Hub
           command: |
             echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
-            IMAGE_TAG="build-${CIRCLE_BUILD_NUM}"
+            IMAGE_TAG="${CIRCLE_BRANCH}-${CIRCLE_SHA1}"
             docker tag $IMAGE_NAME:latest $IMAGE_NAME:$IMAGE_TAG
             docker push $IMAGE_NAME:latest
+            docker push $IMAGE_NAME:$IMAGE_TAG
+  publish-branch:
+    executor: docker-instance
+    steps:
+      - attach_workspace:
+          at: /tmp/workspace
+      - setup_remote_docker
+      - run:
+          name: Load archived Docker image
+          command: docker load -i /tmp/workspace/image.tar
+      - run:
+          name: Publish Docker image to Docker Hub
+          command: |
+            echo "$DOCKERHUB_PASS" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+            IMAGE_TAG="${CIRCLE_BRANCH}-${CIRCLE_SHA1}"
+            docker tag $IMAGE_NAME:latest $IMAGE_NAME:$CIRCLE_BRANCH
+            docker tag $IMAGE_NAME:latest $IMAGE_NAME:$IMAGE_TAG
+            docker push $IMAGE_NAME:$CIRCLE_BRANCH
             docker push $IMAGE_NAME:$IMAGE_TAG
   publish-tag:
     executor: docker-instance
@@ -67,22 +85,57 @@ workflows:
   version: 2
   build-master:
     jobs:
-      - build:
+      - test:
           filters:
             branches:
               only: master
-      - publish-latest:
+      - build:
+          requires:
+            - test
+          filters:
+            branches:
+              only: master
+      - publish-branch:
           requires:
             - build
           filters:
             branches:
               only: master
-  build-tags:
+  build-branch:
     jobs:
+      - test:
+          filters:
+            branches:
+              only: /.*/
+              ignore: master
       - build:
+          requires:
+            - test
+          filters:
+            branches:
+              only: /.*/
+              ignore: master
+      - publish-branch:
+          requires:
+            - build
+          filters:
+            branches:
+              only: /.*/
+              ignore: master
+  build-tag:
+    jobs:
+      - test:
           filters:
             tags:
-              only: /^v.*/
+              only: /.*/
+            branches:
+              ignore: /.*/
+      - build:
+          requires:
+            - test
+          filters:
+            tags:
+              only: /.*/
             branches:
               ignore: /.*/
       - publish-tag:
@@ -90,6 +143,6 @@ workflows:
             - build
           filters:
             tags:
-              only: /^v.*/
+              only: /.*/
             branches:
               ignore: /.*/
