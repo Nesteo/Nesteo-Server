@@ -12,6 +12,7 @@ ProjectSection(SolutionItems) = preProject
 	.circleci\config.yml = .circleci\config.yml
 	LICENSE = LICENSE
 	README.md = README.md
+	docker-compose.yml = docker-compose.yml
 EndProjectSection
 EndProject
 Global

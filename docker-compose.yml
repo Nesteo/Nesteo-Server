@@ -1,0 +1,24 @@
+version: '3.1'
+services:
+  nesteo-db:
+    image: mariadb
+    container_name: nesteo-db
+    restart: on-failure
+    environment:
+      # Change on first use. Also needs to be set in appsettings.json
+      MYSQL_ROOT_PASSWORD: Lzj8p5CNPcKg
+    volumes:
+      - /root/nesteo/db/data:/var/lib/mysql
+    ports:
+      - 3306:3306
+  nesteo-server:
+    # Change 'latest' to whatever tag you want to use: https://hub.docker.com/r/nesteo/server/tags
+    image: nesteo/server:latest
+    container_name: nesteo-server
+    restart: on-failure
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+    volumes:
+      - /root/nesteo/server/appsettings.json:/app/appsettings.json
+    ports:
+      - 80:80
