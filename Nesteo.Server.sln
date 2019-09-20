@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nesteo.Server", "Nesteo.Server\Nesteo.Server.csproj", "{56EDBF32-26ED-4956-B193-5AFE39C94945}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nesteo.Server.Tests", "Nesteo.Server.Tests\Nesteo.Server.Tests.csproj", "{A58836B0-4FCA-46A2-BDDF-4FB8D67C2162}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{49CE02D9-A606-4F53-BE07-848E7CAC2D78}"
+ProjectSection(SolutionItems) = preProject
+	.editorconfig = .editorconfig
+	.gitignore = .gitignore
+	Dockerfile = Dockerfile
+	.circleci\config.yml = .circleci\config.yml
+	LICENSE = LICENSE
+	README.md = README.md
+EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{56EDBF32-26ED-4956-B193-5AFE39C94945}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{56EDBF32-26ED-4956-B193-5AFE39C94945}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{56EDBF32-26ED-4956-B193-5AFE39C94945}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{56EDBF32-26ED-4956-B193-5AFE39C94945}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A58836B0-4FCA-46A2-BDDF-4FB8D67C2162}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A58836B0-4FCA-46A2-BDDF-4FB8D67C2162}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A58836B0-4FCA-46A2-BDDF-4FB8D67C2162}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A58836B0-4FCA-46A2-BDDF-4FB8D67C2162}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
