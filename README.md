@@ -82,6 +82,7 @@ docker-compose down
 Now pull the latest changes:
 ```
 git pull
+docker-compose pull
 ```
 
 And update your database:
@@ -99,7 +100,7 @@ docker-compose up -d
 ### Important URLs
 
 The server, when started, serves different services at different URLs:
-- **/** - 
+- **/** - Management website
 - **/api/v1** - The main API endpoint
 - **/api-docs** - Fancy API documentation page
 - **/swagger** - Swagger API testing tool
