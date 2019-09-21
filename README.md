@@ -116,7 +116,7 @@ These have been set to the following values on first server start:
 
 **Password:** Admin123
 
-## Setup a development environment
+## Setup of a development environment
 
 #### Install the .Net Core SDK
 
