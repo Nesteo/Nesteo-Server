@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
@@ -16,6 +18,12 @@ namespace Nesteo.Server.Services.Implementations
         {
             _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+        }
+
+        // TODO: Use IAsyncEnumerable<> after EF Core upgrade
+        public Task<ICollection<User>> GetAllUsersAsync()
+        {
+            return Task.FromResult(_mapper.Map<ICollection<User>>(_userManager.Users.ToList()));
         }
 
         public async Task<User> FindUserByIdAsync(string id)

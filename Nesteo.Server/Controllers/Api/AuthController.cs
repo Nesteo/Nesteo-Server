@@ -10,7 +10,6 @@ using Nesteo.Server.Services;
 namespace Nesteo.Server.Controllers.Api
 {
     [Route("api/v1/auth")]
-    [Produces("application/json")]
     public class AuthController : ApiControllerBase
     {
         private readonly IUserService _userService;
@@ -24,7 +23,6 @@ namespace Nesteo.Server.Controllers.Api
         /// Retrieves information about the currently authenticated user.
         /// </summary>
         [HttpGet]
-        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<User>> GetAuthenticatedUserAsync()
         {
             // Get the of the currently authenticated user
