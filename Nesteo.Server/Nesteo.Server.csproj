@@ -12,7 +12,6 @@
 
   <ItemGroup>
     <Folder Include="Models\InputModels" />
-    <Folder Include="Pages" />
     <Folder Include="Properties" />
     <Folder Include="wwwroot" />
   </ItemGroup>
@@ -32,6 +31,13 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.0.0-rc2" />
     <PackageReference Include="Swashbuckle.AspNetCore.ReDoc" Version="5.0.0-rc2" />
     <PackageReference Include="ZNetCS.AspNetCore.Authentication.Basic" Version="3.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Pages\.gitkeep">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>
