@@ -1,68 +1,47 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Nesteo.Server.Data.Enums;
 using Nesteo.Server.Models;
+using Nesteo.Server.Services;
 
 namespace Nesteo.Server.Controllers.Api
 {
     [Route("api/v1/nesting-boxes")]
     public class NestingBoxesController : ApiControllerBase
     {
+        private readonly INestingBoxService _nestingBoxService;
+
+        public NestingBoxesController(INestingBoxService nestingBoxService)
+        {
+            _nestingBoxService = nestingBoxService ?? throw new ArgumentNullException(nameof(nestingBoxService));
+        }
+
         /// <summary>
         /// Retrieves all nesting boxes
         /// </summary>
-        // TODO: Use IAsyncEnumerable<> after EF Core upgrade
         [HttpGet]
-        public Task<ActionResult<ICollection<NestingBox>>> GetNestingBoxesAsync()
+        public IAsyncEnumerable<NestingBox> GetNestingBoxesAsync()
         {
-            return Task.FromResult<ActionResult<ICollection<NestingBox>>>(new List<NestingBox> {
-                new NestingBox {
-                    Id = "F000001",
-                    Region = new Region { Id = 0, Name = "The only forest in germany", NestingBoxIdPrefix = "F" },
-                    OldId = null,
-                    ForeignId = "x234362",
-                    CoordinateLongitude = -97.142212,
-                    CoordinateLatitude = 30.081692,
-                    HangUpDate = new DateTime(2012, 12, 12, 12, 12, 12),
-                    HangUpUser = null,
-                    Owner = new Owner { Id = 0, Name = "He-who-must-not-be-named" },
-                    Material = Material.TreatedWood,
-                    HoleSize = HoleSize.Large,
-                    ImageFileName = null,
-                    Comment = "This is a test",
-                    LastUpdated = DateTime.UtcNow
-                }
-            });
+            return _nestingBoxService.GetAllAsync();
         }
 
         /// <summary>
         /// Retrieves a nesting box by id
         /// </summary>
         [HttpGet("{id}")]
-        public Task<ActionResult<NestingBox>> GetNestingBoxByIdAsync(string id)
+        public async Task<ActionResult<NestingBox>> GetNestingBoxByIdAsync(string id)
         {
-            if (id != "F000001")
-                return Task.FromResult<ActionResult<NestingBox>>(NotFound());
+            if (id == null)
+                throw new ArgumentNullException(nameof(id));
 
-            return Task.FromResult<ActionResult<NestingBox>>(new NestingBox {
-                Id = "F000001",
-                Region = new Region { Id = 0, Name = "The only forest in germany", NestingBoxIdPrefix = "F" },
-                OldId = null,
-                ForeignId = "x234362",
-                CoordinateLongitude = -97.142212,
-                CoordinateLatitude = 30.081692,
-                HangUpDate = new DateTime(2012, 12, 12, 12, 12, 12),
-                HangUpUser = null,
-                Owner = new Owner { Id = 0, Name = "He-who-must-not-be-named" },
-                Material = Material.TreatedWood,
-                HoleSize = HoleSize.Large,
-                ImageFileName = null,
-                Comment = "This is a test",
-                LastUpdated = DateTime.UtcNow
-            });
+            // Retrieve nesting box
+            NestingBox nestingBox = await _nestingBoxService.FindByIdAsync(id, HttpContext.RequestAborted).ConfigureAwait(false);
+            if (nestingBox == null)
+                return NotFound();
+
+            return nestingBox;
         }
     }
 }

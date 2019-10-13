@@ -1,13 +1,13 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Nesteo.Server.Data.Entities.Identity;
 using Nesteo.Server.Data.Enums;
-using Nesteo.Server.Data.Identity;
 
 namespace Nesteo.Server.Data.Entities
 {
     [Table("Inspections")]
-    public class InspectionEntity
+    public class InspectionEntity : IEntity<int>
     {
         [Key]
         [Required]
@@ -22,7 +22,7 @@ namespace Nesteo.Server.Data.Entities
         public DateTime InspectionDate { get; set; }
 
         [Required]
-        public NesteoUser InspectedByUser { get; set; }
+        public UserEntity InspectedByUser { get; set; }
 
         [Required]
         public bool HasBeenCleaned { get; set; }

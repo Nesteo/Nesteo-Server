@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Nesteo.Server.Models;
 using Nesteo.Server.Services;
@@ -31,7 +30,7 @@ namespace Nesteo.Server.Controllers.Api
                 return NotFound();
 
             // Retrieve user
-            User user = await _userService.FindUserByIdAsync(currentUserId).ConfigureAwait(false);
+            User user = await _userService.FindByIdAsync(currentUserId, HttpContext.RequestAborted).ConfigureAwait(false);
             if (user == null)
                 return NotFound();
 

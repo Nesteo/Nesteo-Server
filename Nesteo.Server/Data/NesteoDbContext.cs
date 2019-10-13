@@ -2,11 +2,11 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Nesteo.Server.Data.Entities;
-using Nesteo.Server.Data.Identity;
+using Nesteo.Server.Data.Entities.Identity;
 
 namespace Nesteo.Server.Data
 {
-    public class NesteoDbContext : IdentityDbContext<NesteoUser, NesteoRole, string>
+    public class NesteoDbContext : IdentityDbContext<UserEntity, RoleEntity, string>
     {
         public DbSet<RegionEntity> Regions { get; set; }
         public DbSet<OwnerEntity> Owners { get; set; }
@@ -22,8 +22,8 @@ namespace Nesteo.Server.Data
             base.OnModelCreating(builder);
 
             // Rename identity tables
-            builder.Entity<NesteoUser>().ToTable("Users");
-            builder.Entity<NesteoRole>().ToTable("Roles");
+            builder.Entity<UserEntity>().ToTable("Users");
+            builder.Entity<RoleEntity>().ToTable("Roles");
             builder.Entity<IdentityUserRole<string>>().ToTable("UserRoles");
             builder.Entity<IdentityUserClaim<string>>().ToTable("UserClaims");
             builder.Entity<IdentityUserLogin<string>>().ToTable("UserLogins");

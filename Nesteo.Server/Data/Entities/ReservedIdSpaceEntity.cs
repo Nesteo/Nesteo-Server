@@ -1,12 +1,12 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Nesteo.Server.Data.Identity;
+using Nesteo.Server.Data.Entities.Identity;
 
 namespace Nesteo.Server.Data.Entities
 {
     [Table("ReservedIdSpaces")]
-    public class ReservedIdSpaceEntity
+    public class ReservedIdSpaceEntity : IEntity<int>
     {
         [Key]
         [Required]
@@ -17,7 +17,7 @@ namespace Nesteo.Server.Data.Entities
         public RegionEntity Region { get; set; }
 
         [Required]
-        public NesteoUser Owner { get; set; }
+        public UserEntity Owner { get; set; }
 
         [Required]
         [DataType(DataType.DateTime)]

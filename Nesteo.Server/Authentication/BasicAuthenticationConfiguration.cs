@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Nesteo.Server.Data.Identity;
+using Nesteo.Server.Data.Entities.Identity;
 using ZNetCS.AspNetCore.Authentication.Basic;
 using ZNetCS.AspNetCore.Authentication.Basic.Events;
 
@@ -43,23 +43,23 @@ namespace Nesteo.Server.Authentication
         private async Task<SignInResult> SignInAsync(HttpContext httpContext, string userName, string password, bool lockoutOnFailure, string authenticationScheme)
         {
             // Get user manager
-            UserManager<NesteoUser> userManager = httpContext.RequestServices.GetRequiredService<UserManager<NesteoUser>>();
+            UserManager<UserEntity> userManager = httpContext.RequestServices.GetRequiredService<UserManager<UserEntity>>();
 
             // Get user
-            NesteoUser user = await userManager.FindByNameAsync(userName).ConfigureAwait(false);
-            if (user == null)
+            UserEntity userEntity = await userManager.FindByNameAsync(userName).ConfigureAwait(false);
+            if (userEntity == null)
                 return SignInResult.Failed;
 
             // Get sign in manager. We can't use most of it's methods, because they are quite cookie-specific, but a few of them are useful here.
-            SignInManager<NesteoUser> signInManager = httpContext.RequestServices.GetRequiredService<SignInManager<NesteoUser>>();
+            SignInManager<UserEntity> signInManager = httpContext.RequestServices.GetRequiredService<SignInManager<UserEntity>>();
 
             // Check password
-            SignInResult checkPasswordResult = await signInManager.CheckPasswordSignInAsync(user, password, lockoutOnFailure).ConfigureAwait(false);
+            SignInResult checkPasswordResult = await signInManager.CheckPasswordSignInAsync(userEntity, password, lockoutOnFailure).ConfigureAwait(false);
             if (!checkPasswordResult.Succeeded)
                 return checkPasswordResult;
 
             // Create user principal
-            ClaimsPrincipal userPrincipal = await signInManager.CreateUserPrincipalAsync(user).ConfigureAwait(false);
+            ClaimsPrincipal userPrincipal = await signInManager.CreateUserPrincipalAsync(userEntity).ConfigureAwait(false);
             userPrincipal.Identities.First().AddClaim(new Claim(ClaimTypes.AuthenticationMethod, authenticationScheme));
 
             // Sign the http context in

@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Nesteo.Server.Models;
 
@@ -12,7 +11,7 @@ namespace Nesteo.Server.Controllers.Api
         /// <summary>
         /// Retrieves all species
         /// </summary>
-        // TODO: Use IAsyncEnumerable<> after EF Core upgrade
+        // TODO: Use IAsyncEnumerable<>
         [HttpGet]
         public Task<ActionResult<ICollection<Species>>> GetSpeciesAsync()
         {

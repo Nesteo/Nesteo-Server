@@ -1,5 +1,6 @@
 using AutoMapper;
-using Nesteo.Server.Data.Identity;
+using Nesteo.Server.Data.Entities;
+using Nesteo.Server.Data.Entities.Identity;
 using Nesteo.Server.Models;
 
 namespace Nesteo.Server.MappingProfiles
@@ -8,7 +9,12 @@ namespace Nesteo.Server.MappingProfiles
     {
         public ModelMappingProfile()
         {
-            CreateMap<NesteoUser, User>();
+            CreateMap<UserEntity, User>();
+            CreateMap<RegionEntity, Region>();
+            CreateMap<OwnerEntity, Owner>();
+            CreateMap<SpeciesEntity, Species>();
+            CreateMap<NestingBoxEntity, NestingBox>();
+            CreateMap<InspectionEntity, Inspection>();
         }
     }
 }

@@ -1,35 +1,38 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Microsoft.AspNetCore.Identity;
-using Nesteo.Server.Data.Identity;
+using Microsoft.EntityFrameworkCore;
+using Nesteo.Server.Data.Entities.Identity;
 using Nesteo.Server.Models;
 
 namespace Nesteo.Server.Services.Implementations
 {
     public class UserService : IUserService
     {
-        private readonly UserManager<NesteoUser> _userManager;
+        private readonly UserManager<UserEntity> _userManager;
         private readonly IMapper _mapper;
 
-        public UserService(UserManager<NesteoUser> userManager, IMapper mapper)
+        public UserService(UserManager<UserEntity> userManager, IMapper mapper)
         {
             _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-        // TODO: Use IAsyncEnumerable<> after EF Core upgrade
-        public Task<ICollection<User>> GetAllUsersAsync()
+        public IAsyncEnumerable<User> GetAllAsync()
         {
-            return Task.FromResult(_mapper.Map<ICollection<User>>(_userManager.Users.ToList()));
+            return _userManager.Users.ProjectTo<User>(_mapper.ConfigurationProvider).AsAsyncEnumerable();
         }
 
-        public async Task<User> FindUserByIdAsync(string id)
+        public async Task<User> FindByIdAsync(string id, CancellationToken cancellationToken = default)
         {
-            NesteoUser identityUser = await _userManager.FindByIdAsync(id).ConfigureAwait(false);
-            return _mapper.Map<User>(identityUser);
+            if (id == null)
+                throw new ArgumentNullException(nameof(id));
+
+            return await _userManager.Users.ProjectTo<User>(_mapper.ConfigurationProvider).FirstOrDefaultAsync(u => u.Id == id, cancellationToken).ConfigureAwait(false);
         }
     }
 }
