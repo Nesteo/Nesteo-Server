@@ -11,7 +11,7 @@ namespace Nesteo.Server.Controllers.Api
     public class InspectionsController : ApiControllerBase
     {
         /// <summary>
-        /// Retrieves all inspections
+        /// Retrieve all inspections
         /// </summary>
         // TODO: Use IAsyncEnumerable<>
         [HttpGet]
@@ -59,7 +59,7 @@ namespace Nesteo.Server.Controllers.Api
         }
 
         /// <summary>
-        /// Retrieves an inspection by id
+        /// Retrieve an inspection by id
         /// </summary>
         [HttpGet("{id}")]
         public Task<ActionResult<Inspection>> GetInspectionByIdAsync(int id)

@@ -18,7 +18,7 @@ namespace Nesteo.Server.Controllers.Api
         }
 
         /// <summary>
-        /// Retrieves all regions
+        /// Retrieve all regions
         /// </summary>
         [HttpGet]
         public IAsyncEnumerable<Region> GetRegionsAsync()
@@ -27,7 +27,7 @@ namespace Nesteo.Server.Controllers.Api
         }
 
         /// <summary>
-        /// Retrieves a region by id
+        /// Retrieve a region by id
         /// </summary>
         [HttpGet("{id}")]
         public async Task<ActionResult<Region>> GetRegionByIdAsync(int id)

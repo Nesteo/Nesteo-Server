@@ -13,9 +13,7 @@ namespace Nesteo.Server.Swagger.OperationFilters
         {
             // Create response schemas
             OpenApiSchema validationProblemDetailsSchema = context.SchemaGenerator.GenerateSchema(typeof(ValidationProblemDetails), context.SchemaRepository);
-            // TODO: Try again when https://github.com/domaindrivendev/Swashbuckle.AspNetCore/issues/1202 is fixed
-            // OpenApiSchema exceptionProblemDetailsSchema = context.SchemaGenerator.GenerateSchema(typeof(ExceptionProblemDetails), context.SchemaRepository);
-            OpenApiSchema exceptionProblemDetailsSchema = context.SchemaGenerator.GenerateSchema(typeof(ProblemDetails), context.SchemaRepository);
+            OpenApiSchema exceptionProblemDetailsSchema = context.SchemaGenerator.GenerateSchema(typeof(ExceptionProblemDetails), context.SchemaRepository);
             OpenApiSchema statusCodeProblemDetailsSchema = context.SchemaGenerator.GenerateSchema(typeof(StatusCodeProblemDetails), context.SchemaRepository);
 
             // Add possible operation responses

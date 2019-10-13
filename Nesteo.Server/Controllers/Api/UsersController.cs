@@ -18,7 +18,7 @@ namespace Nesteo.Server.Controllers.Api
         }
 
         /// <summary>
-        /// Retrieves all users
+        /// Retrieve all users
         /// </summary>
         [HttpGet]
         public IAsyncEnumerable<User> GetUsersAsync()
@@ -27,7 +27,7 @@ namespace Nesteo.Server.Controllers.Api
         }
 
         /// <summary>
-        /// Retrieves a user by id
+        /// Retrieve a user by id
         /// </summary>
         [HttpGet("{id}")]
         public async Task<ActionResult<User>> GetUserByIdAsync(string id)

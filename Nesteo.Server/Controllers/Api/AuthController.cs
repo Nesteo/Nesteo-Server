@@ -19,7 +19,7 @@ namespace Nesteo.Server.Controllers.Api
         }
 
         /// <summary>
-        /// Retrieves information about the currently authenticated user.
+        /// Retrieve information about the currently authenticated user.
         /// </summary>
         [HttpGet]
         public async Task<ActionResult<User>> GetAuthenticatedUserAsync()

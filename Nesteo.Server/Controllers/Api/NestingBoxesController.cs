@@ -19,7 +19,7 @@ namespace Nesteo.Server.Controllers.Api
         }
 
         /// <summary>
-        /// Retrieves all nesting boxes
+        /// Retrieve all nesting boxes
         /// </summary>
         [HttpGet]
         public IAsyncEnumerable<NestingBox> GetNestingBoxesAsync()
@@ -28,7 +28,7 @@ namespace Nesteo.Server.Controllers.Api
         }
 
         /// <summary>
-        /// Retrieves a nesting box by id
+        /// Retrieve a nesting box by id
         /// </summary>
         [HttpGet("{id}")]
         public async Task<ActionResult<NestingBox>> GetNestingBoxByIdAsync(string id)
@@ -45,7 +45,7 @@ namespace Nesteo.Server.Controllers.Api
         }
 
         /// <summary>
-        /// Previews all nesting boxes with a reduced set of data
+        /// Preview all nesting boxes with a reduced set of data
         /// </summary>
         [HttpGet("previews")]
         public IAsyncEnumerable<NestingBoxPreview> GetNestingBoxPreviewsAsync()
@@ -54,7 +54,7 @@ namespace Nesteo.Server.Controllers.Api
         }
 
         /// <summary>
-        /// Previews a nesting box by id with a reduced set of data
+        /// Preview a nesting box by id with a reduced set of data
         /// </summary>
         [HttpGet("previews/{id}")]
         public async Task<ActionResult<NestingBoxPreview>> GetNestingBoxPreviewByIdAsync(string id)

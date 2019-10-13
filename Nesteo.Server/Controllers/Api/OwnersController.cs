@@ -18,7 +18,7 @@ namespace Nesteo.Server.Controllers.Api
         }
 
         /// <summary>
-        /// Retrieves all owners
+        /// Retrieve all owners
         /// </summary>
         [HttpGet]
         public IAsyncEnumerable<Owner> GetOwnersAsync()
@@ -27,7 +27,7 @@ namespace Nesteo.Server.Controllers.Api
         }
 
         /// <summary>
-        /// Retrieves an owner by id
+        /// Retrieve an owner by id
         /// </summary>
         [HttpGet("{id}")]
         public async Task<ActionResult<Owner>> GetOwnerByIdAsync(int id)

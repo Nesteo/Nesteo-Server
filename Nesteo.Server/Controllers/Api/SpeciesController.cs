@@ -9,7 +9,7 @@ namespace Nesteo.Server.Controllers.Api
     public class SpeciesController : ApiControllerBase
     {
         /// <summary>
-        /// Retrieves all species
+        /// Retrieve all species
         /// </summary>
         // TODO: Use IAsyncEnumerable<>
         [HttpGet]
@@ -19,7 +19,7 @@ namespace Nesteo.Server.Controllers.Api
         }
 
         /// <summary>
-        /// Retrieves a species by id
+        /// Retrieve a species by id
         /// </summary>
         [HttpGet("{id}")]
         public Task<ActionResult<Species>> GetSpeciesByIdAsync(int id)
