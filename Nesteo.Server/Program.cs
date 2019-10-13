@@ -26,10 +26,5 @@ namespace Nesteo.Server
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args).ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); });
-
-        // TODO: Required for the Entity Framework Core 2.X migration tool. This should be removed as soon as we can upgrade to EF core 3.0
-        // See https://github.com/PomeloFoundation/Pomelo.EntityFrameworkCore.MySql/issues/797
-        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-            WebHost.CreateDefaultBuilder(args).UseStartup<Startup>();
     }
 }
