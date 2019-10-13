@@ -1,34 +1,43 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Nesteo.Server.Models;
+using Nesteo.Server.Services;
 
 namespace Nesteo.Server.Controllers.Api
 {
     [Route("api/v1/owners")]
     public class OwnersController : ApiControllerBase
     {
-        /// <summary>
-        /// Retrieves all owners
-        /// </summary>
-        // TODO: Use IAsyncEnumerable<> after EF Core upgrade
-        [HttpGet]
-        public Task<ActionResult<ICollection<Owner>>> GetOwnersAsync()
+        private readonly IOwnerService _ownerService;
+
+        public OwnersController(IOwnerService ownerService)
         {
-            return Task.FromResult<ActionResult<ICollection<Owner>>>(new List<Owner> { new Owner { Id = 0, Name = "He-who-must-not-be-named" } });
+            _ownerService = ownerService ?? throw new ArgumentNullException(nameof(ownerService));
         }
 
         /// <summary>
-        /// Retrieves an owner by id
+        /// Retrieve all owners
+        /// </summary>
+        [HttpGet]
+        public IAsyncEnumerable<Owner> GetOwnersAsync()
+        {
+            return _ownerService.GetAllAsync();
+        }
+
+        /// <summary>
+        /// Retrieve an owner by id
         /// </summary>
         [HttpGet("{id}")]
-        public Task<ActionResult<Owner>> GetOwnerByIdAsync(int id)
+        public async Task<ActionResult<Owner>> GetOwnerByIdAsync(int id)
         {
-            if (id != 0)
-                return Task.FromResult<ActionResult<Owner>>(NotFound());
+            // Retrieve owner
+            Owner owner = await _ownerService.FindByIdAsync(id, HttpContext.RequestAborted).ConfigureAwait(false);
+            if (owner == null)
+                return NotFound();
 
-            return Task.FromResult<ActionResult<Owner>>(new Owner { Id = 0, Name = "He-who-must-not-be-named" });
+            return owner;
         }
     }
 }

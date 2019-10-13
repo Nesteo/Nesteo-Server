@@ -74,5 +74,15 @@ namespace Nesteo.Server.Models
         /// The time this data entry has last been updated
         /// </summary>
         public DateTime LastUpdated { get; set; }
+
+        /// <summary>
+        /// How often this box has been inspected
+        /// </summary>
+        public int InspectionsCount { get; set; }
+
+        /// <summary>
+        /// The last time this box has been inspected
+        /// </summary>
+        public DateTime LastInspected { get; set; }
     }
 }

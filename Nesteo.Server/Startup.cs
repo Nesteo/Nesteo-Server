@@ -16,7 +16,7 @@ using Nesteo.Server.Authorization;
 using Nesteo.Server.BackgroundTasks;
 using Nesteo.Server.Configuration;
 using Nesteo.Server.Data;
-using Nesteo.Server.Data.Identity;
+using Nesteo.Server.Data.Entities.Identity;
 using Nesteo.Server.Services;
 using Nesteo.Server.Services.Implementations;
 using Nesteo.Server.Swagger;
@@ -49,8 +49,8 @@ namespace Nesteo.Server
             });
 
             // Add itentity system
-            services.AddIdentityCore<NesteoUser>().AddRoles<NesteoRole>().AddDefaultTokenProviders().AddEntityFrameworkStores<NesteoDbContext>();
-            services.AddScoped<SignInManager<NesteoUser>>();
+            services.AddIdentityCore<UserEntity>().AddRoles<RoleEntity>().AddDefaultTokenProviders().AddEntityFrameworkStores<NesteoDbContext>();
+            services.AddScoped<SignInManager<UserEntity>>();
 
             // Add authentication
             AuthenticationBuilder authenticationBuilder = services.AddAuthentication(options => {
@@ -113,6 +113,11 @@ namespace Nesteo.Server
 
             // Add service implementations
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IRegionService, RegionService>();
+            services.AddScoped<IOwnerService, OwnerService>();
+            // TODO: services.AddScoped<ISpeciesService, SpeciesService>();
+            services.AddScoped<INestingBoxService, NestingBoxService>();
+            // TODO: services.AddScoped<IInspectionService, InspectionService>();
         }
 
         // This method gets called by the runtime and configures the HTTP request pipeline.

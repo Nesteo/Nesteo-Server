@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Nesteo.Server.Data.Identity;
+using Nesteo.Server.Data.Entities.Identity;
 
 namespace Nesteo.Server.BackgroundTasks
 {
@@ -32,7 +32,7 @@ namespace Nesteo.Server.BackgroundTasks
             using IServiceScope scope = _serviceProvider.CreateScope();
 
             // Get user manager
-            UserManager<NesteoUser> userManager = scope.ServiceProvider.GetRequiredService<UserManager<NesteoUser>>();
+            UserManager<UserEntity> userManager = scope.ServiceProvider.GetRequiredService<UserManager<UserEntity>>();
 
             // Check if any users exist.
             if (!await userManager.Users.AnyAsync(cancellationToken).ConfigureAwait(false))
@@ -40,7 +40,7 @@ namespace Nesteo.Server.BackgroundTasks
                 _logger.LogInformation("Database doesn't contain any registered users. A new default user will be created.");
 
                 // Create a new default user
-                await userManager.CreateAsync(new NesteoUser { UserName = DefaultUserName, FirstName = DefaultFirstName, LastName = DefaultLastName }, DefaultPassword)
+                await userManager.CreateAsync(new UserEntity { UserName = DefaultUserName, FirstName = DefaultFirstName, LastName = DefaultLastName }, DefaultPassword)
                                  .ConfigureAwait(false);
             }
         }

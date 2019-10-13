@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Nesteo.Server.Models;
 using Nesteo.Server.Services;
@@ -19,23 +18,22 @@ namespace Nesteo.Server.Controllers.Api
         }
 
         /// <summary>
-        /// Retrieves all users
+        /// Retrieve all users
         /// </summary>
-        // TODO: Use IAsyncEnumerable<> after EF Core upgrade
         [HttpGet]
-        public async Task<ActionResult<ICollection<User>>> GetUsersAsync()
+        public IAsyncEnumerable<User> GetUsersAsync()
         {
-            return Ok(await _userService.GetAllUsersAsync().ConfigureAwait(false));
+            return _userService.GetAllAsync();
         }
 
         /// <summary>
-        /// Retrieves a user by id
+        /// Retrieve a user by id
         /// </summary>
         [HttpGet("{id}")]
         public async Task<ActionResult<User>> GetUserByIdAsync(string id)
         {
             // Retrieve user
-            User user = await _userService.FindUserByIdAsync(id).ConfigureAwait(false);
+            User user = await _userService.FindByIdAsync(id, HttpContext.RequestAborted).ConfigureAwait(false);
             if (user == null)
                 return NotFound();
 

@@ -1,13 +1,14 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Nesteo.Server.Data.Entities.Identity;
 using Nesteo.Server.Data.Enums;
-using Nesteo.Server.Data.Identity;
 
 namespace Nesteo.Server.Data.Entities
 {
     [Table("NestingBoxes")]
-    public class NestingBoxEntity
+    public class NestingBoxEntity : IEntity<string>
     {
         [Key]
         [Required]
@@ -33,7 +34,7 @@ namespace Nesteo.Server.Data.Entities
         [DataType(DataType.DateTime)]
         public DateTime? HangUpDate { get; set; }
 
-        public NesteoUser HangUpUser { get; set; }
+        public UserEntity HangUpUser { get; set; }
 
         [Required]
         public OwnerEntity Owner { get; set; }
@@ -53,5 +54,7 @@ namespace Nesteo.Server.Data.Entities
         [Timestamp]
         [DataType(DataType.DateTime)]
         public DateTime LastUpdated { get; set; }
+
+        public ICollection<InspectionEntity> Inspections { get; set; }
     }
 }

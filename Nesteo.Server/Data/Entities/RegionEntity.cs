@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Nesteo.Server.Data.Entities
 {
     [Table("Regions")]
-    public class RegionEntity
+    public class RegionEntity : IEntity<int>
     {
         [Key]
         [Required]
