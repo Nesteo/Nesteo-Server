@@ -43,5 +43,31 @@ namespace Nesteo.Server.Controllers.Api
 
             return nestingBox;
         }
+
+        /// <summary>
+        /// Previews all nesting boxes with a reduced set of data
+        /// </summary>
+        [HttpGet("previews")]
+        public IAsyncEnumerable<NestingBoxPreview> GetNestingBoxPreviewsAsync()
+        {
+            return _nestingBoxService.GetAllPreviewsAsync();
+        }
+
+        /// <summary>
+        /// Previews a nesting box by id with a reduced set of data
+        /// </summary>
+        [HttpGet("previews/{id}")]
+        public async Task<ActionResult<NestingBoxPreview>> GetNestingBoxPreviewByIdAsync(string id)
+        {
+            if (id == null)
+                throw new ArgumentNullException(nameof(id));
+
+            // Retrieve nesting box preview
+            NestingBoxPreview nestingBoxPreview = await _nestingBoxService.FindPreviewByIdAsync(id, HttpContext.RequestAborted).ConfigureAwait(false);
+            if (nestingBoxPreview == null)
+                return NotFound();
+
+            return nestingBoxPreview;
+        }
     }
 }

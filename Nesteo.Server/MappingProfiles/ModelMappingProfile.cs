@@ -14,6 +14,7 @@ namespace Nesteo.Server.MappingProfiles
             CreateMap<OwnerEntity, Owner>();
             CreateMap<SpeciesEntity, Species>();
             CreateMap<NestingBoxEntity, NestingBox>();
+            CreateMap<NestingBoxEntity, NestingBoxPreview>();
             CreateMap<InspectionEntity, Inspection>();
         }
     }
