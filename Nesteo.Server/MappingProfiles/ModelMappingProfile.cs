@@ -1,3 +1,4 @@
+using System.Linq;
 using AutoMapper;
 using Nesteo.Server.Data.Entities;
 using Nesteo.Server.Data.Entities.Identity;
@@ -13,8 +14,17 @@ namespace Nesteo.Server.MappingProfiles
             CreateMap<RegionEntity, Region>();
             CreateMap<OwnerEntity, Owner>();
             CreateMap<SpeciesEntity, Species>();
-            CreateMap<NestingBoxEntity, NestingBox>();
-            CreateMap<NestingBoxEntity, NestingBoxPreview>();
+            CreateMap<NestingBoxEntity, NestingBox>().ForMember(dest => dest.InspectionsCount, options => options.MapFrom(nestingBox => nestingBox.Inspections.Count)).ForMember(
+                dest => dest.LastInspected,
+                options => options.MapFrom(nestingBox => nestingBox
+                                                         .Inspections.OrderByDescending(inspection => inspection.InspectionDate)
+                                                         .FirstOrDefault().InspectionDate));
+            CreateMap<NestingBoxEntity, NestingBoxPreview>().ForMember(dest => dest.InspectionsCount, options => options.MapFrom(nestingBox => nestingBox.Inspections.Count))
+                                                            .ForMember(dest => dest.LastInspected,
+                                                                       options => options.MapFrom(nestingBox => nestingBox
+                                                                                                                .Inspections
+                                                                                                                .OrderByDescending(inspection => inspection.InspectionDate)
+                                                                                                                .FirstOrDefault().InspectionDate));
             CreateMap<InspectionEntity, Inspection>();
         }
     }

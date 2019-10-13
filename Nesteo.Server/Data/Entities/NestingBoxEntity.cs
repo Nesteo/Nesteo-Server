@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Nesteo.Server.Data.Entities.Identity;
@@ -53,5 +54,7 @@ namespace Nesteo.Server.Data.Entities
         [Timestamp]
         [DataType(DataType.DateTime)]
         public DateTime LastUpdated { get; set; }
+
+        public ICollection<InspectionEntity> Inspections { get; set; }
     }
 }

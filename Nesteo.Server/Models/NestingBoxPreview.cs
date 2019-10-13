@@ -1,3 +1,5 @@
+using System;
+
 namespace Nesteo.Server.Models
 {
     public class NestingBoxPreview
@@ -21,5 +23,15 @@ namespace Nesteo.Server.Models
         /// Decimal coordinate latitude
         /// </summary>
         public double? CoordinateLatitude { get; set; }
+
+        /// <summary>
+        /// How often this box has been inspected
+        /// </summary>
+        public int InspectionsCount { get; set; }
+
+        /// <summary>
+        /// The last time this box has been inspected
+        /// </summary>
+        public DateTime LastInspected { get; set; }
     }
 }
