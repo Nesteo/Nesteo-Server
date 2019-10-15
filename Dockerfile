@@ -11,7 +11,7 @@ COPY . .
 RUN dotnet publish /src/Nesteo.Server/Nesteo.Server.csproj -c Release -o /app --self-contained --runtime debian-x64
 
 # Compile and pack sample data generation tool as self contained app
-RUN dotnet publish /src/Nesteo.Server.SampleDataGenerator/Nesteo.Server.SampleDataGenerator.csproj -c Release -o /app --self-contained --runtime debian-x64
+RUN dotnet publish /src/Nesteo.Server.SampleDataGenerator/Nesteo.Server.SampleDataGenerator.csproj -c Release -o /app --runtime debian-x64
 
 
 ### Build final image
