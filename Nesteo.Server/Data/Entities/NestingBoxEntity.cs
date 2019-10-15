@@ -19,11 +19,9 @@ namespace Nesteo.Server.Data.Entities
         [Required]
         public RegionEntity Region { get; set; }
 
-        [Required]
         [StringLength(100, MinimumLength = 2)]
         public string OldId { get; set; }
 
-        [Required]
         [StringLength(100, MinimumLength = 2)]
         public string ForeignId { get; set; }
 

@@ -6,8 +6,8 @@ namespace Nesteo.Server.Data.Enums
     [JsonConverter(typeof(StringEnumConverter))]
     public enum Condition
     {
-        Good,
-        NeedsRepair,
-        NeedsReplacement
+        Good = 0,
+        NeedsRepair = 1,
+        NeedsReplacement = 2
     }
 }
