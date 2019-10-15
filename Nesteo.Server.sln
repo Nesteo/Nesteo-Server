@@ -17,6 +17,8 @@ ProjectSection(SolutionItems) = preProject
 	sample.env = sample.env
 EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nesteo.Server.SampleDataGenerator", "Nesteo.Server.SampleDataGenerator\Nesteo.Server.SampleDataGenerator.csproj", "{CB1814DC-8726-4158-8C7C-D7B86F93ABE8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,5 +33,9 @@ Global
 		{A58836B0-4FCA-46A2-BDDF-4FB8D67C2162}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A58836B0-4FCA-46A2-BDDF-4FB8D67C2162}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A58836B0-4FCA-46A2-BDDF-4FB8D67C2162}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CB1814DC-8726-4158-8C7C-D7B86F93ABE8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CB1814DC-8726-4158-8C7C-D7B86F93ABE8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CB1814DC-8726-4158-8C7C-D7B86F93ABE8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CB1814DC-8726-4158-8C7C-D7B86F93ABE8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

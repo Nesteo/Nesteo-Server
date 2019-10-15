@@ -13,12 +13,8 @@ namespace Nesteo.Server
         {
             IHost host = CreateHostBuilder(args).Build();
 
-            // Validate and prepare the AutoMapper configuration
-            IConfigurationProvider mapperConfigurationProvider = host.Services.GetRequiredService<IConfigurationProvider>();
-#if DEBUG
-            mapperConfigurationProvider.AssertConfigurationIsValid();
-#endif
-            mapperConfigurationProvider.CompileMappings();
+            // Prepare host
+            await PrepareHostAsync(host).ConfigureAwait(false);
 
             // Run application
             await host.RunAsync().ConfigureAwait(false);
@@ -26,5 +22,17 @@ namespace Nesteo.Server
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args).ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); });
+
+        public static Task PrepareHostAsync(IHost host)
+        {
+            // Validate and prepare the AutoMapper configuration
+            IConfigurationProvider mapperConfigurationProvider = host.Services.GetRequiredService<IConfigurationProvider>();
+#if DEBUG
+            mapperConfigurationProvider.AssertConfigurationIsValid();
+#endif
+            mapperConfigurationProvider.CompileMappings();
+
+            return Task.CompletedTask;
+        }
     }
 }
