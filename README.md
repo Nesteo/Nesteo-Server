@@ -116,6 +116,13 @@ These have been set to the following values on first server start:
 
 **Password:** Admin123
 
+### Sample data generation
+
+You can use the following command to fill the database with generated sample data:
+```
+docker-compose exec nesteo-server /app/Nesteo.Server.SampleDataGenerator
+```
+
 ## Setup of a development environment
 
 #### Install the .Net Core SDK
