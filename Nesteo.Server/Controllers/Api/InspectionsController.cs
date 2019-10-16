@@ -2,108 +2,67 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Nesteo.Server.Data.Entities;
 using Nesteo.Server.Data.Enums;
 using Nesteo.Server.Models;
+using Nesteo.Server.Services;
 
 namespace Nesteo.Server.Controllers.Api
 {
     [Route("api/v1/inspections")]
     public class InspectionsController : ApiControllerBase
     {
+        private readonly IInspectionService _inspectionService;
+
+        public InspectionsController(IInspectionService inspectionService)
+        {
+            _inspectionService = inspectionService ?? throw new ArgumentNullException(nameof(inspectionService));
+        }
+
         /// <summary>
         /// Retrieve all inspections
         /// </summary>
-        // TODO: Use IAsyncEnumerable<>
         [HttpGet]
-        public Task<ActionResult<ICollection<Inspection>>> GetInspectionsAsync()
+        public IAsyncEnumerable<Inspection> GetInspectionsAsync()
         {
-            return Task.FromResult<ActionResult<ICollection<Inspection>>>(new List<Inspection> {
-                new Inspection {
-                    Id = 0,
-                    NestingBox =
-                        new NestingBox {
-                            Id = "F000001",
-                            Region = new Region { Id = 0, Name = "The only forest in germany", NestingBoxIdPrefix = "F" },
-                            OldId = null,
-                            ForeignId = "x234362",
-                            CoordinateLongitude = -97.142212,
-                            CoordinateLatitude = 30.081692,
-                            HangUpDate = new DateTime(2012, 12, 12, 12, 12, 12),
-                            HangUpUser = null,
-                            Owner = new Owner { Id = 0, Name = "He-who-must-not-be-named" },
-                            Material = Material.TreatedWood,
-                            HoleSize = HoleSize.Large,
-                            ImageFileName = null,
-                            Comment = "This is a test",
-                            LastUpdated = DateTime.UtcNow
-                        },
-                    InspectionDate = new DateTime(2013, 12, 12, 12, 12, 12),
-                    InspectedByUser = null,
-                    HasBeenCleaned = false,
-                    Condition = Condition.Good,
-                    JustRepaired = false,
-                    Occupied = true,
-                    ContainsEggs = true,
-                    EggCount = 0,
-                    ChickCount = 5,
-                    RingedChickCount = 4,
-                    AgeInDays = 6,
-                    FemaleParentBirdDiscovery = ParentBirdDiscovery.AlreadyRinged,
-                    MaleParentBirdDiscovery = ParentBirdDiscovery.NewlyRinged,
-                    Species = new Species { Id = 0, Name = "Dodo" },
-                    ImageFileName = null,
-                    Comment = "It has been a great inspection! It's true! Trust me! It has been the greatest inspection ever! It's true!",
-                    LastUpdated = DateTime.UtcNow
-                }
-            });
+            return _inspectionService.GetAllAsync();
         }
 
         /// <summary>
         /// Retrieve an inspection by id
         /// </summary>
         [HttpGet("{id}")]
-        public Task<ActionResult<Inspection>> GetInspectionByIdAsync(int id)
+        public async Task<ActionResult<Inspection>> GetInspectionByIdAsync(int id)
         {
-            if (id != 0)
-                return Task.FromResult<ActionResult<Inspection>>(NotFound());
+            // Retrieve inspection
+            Inspection inspection = await _inspectionService.FindByIdAsync(id, HttpContext.RequestAborted).ConfigureAwait(false);
+            if (inspection == null)
+                return NotFound();
 
-            return Task.FromResult<ActionResult<Inspection>>(new Inspection {
-                Id = 0,
-                NestingBox =
-                    new NestingBox {
-                        Id = "F000001",
-                        Region = new Region { Id = 0, Name = "The only forest in germany", NestingBoxIdPrefix = "F" },
-                        OldId = null,
-                        ForeignId = "x234362",
-                        CoordinateLongitude = -97.142212,
-                        CoordinateLatitude = 30.081692,
-                        HangUpDate = new DateTime(2012, 12, 12, 12, 12, 12),
-                        HangUpUser = null,
-                        Owner = new Owner { Id = 0, Name = "He-who-must-not-be-named" },
-                        Material = Material.TreatedWood,
-                        HoleSize = HoleSize.Large,
-                        ImageFileName = null,
-                        Comment = "This is a test",
-                        LastUpdated = DateTime.UtcNow
-                    },
-                InspectionDate = new DateTime(2013, 12, 12, 12, 12, 12),
-                InspectedByUser = null,
-                HasBeenCleaned = false,
-                Condition = Condition.Good,
-                JustRepaired = false,
-                Occupied = true,
-                ContainsEggs = true,
-                EggCount = 0,
-                ChickCount = 5,
-                RingedChickCount = 4,
-                AgeInDays = 6,
-                FemaleParentBirdDiscovery = ParentBirdDiscovery.AlreadyRinged,
-                MaleParentBirdDiscovery = ParentBirdDiscovery.NewlyRinged,
-                Species = new Species { Id = 0, Name = "Dodo" },
-                ImageFileName = null,
-                Comment = "It has been a great inspection! It's true! Trust me! It has been the greatest inspection ever! It's true!",
-                LastUpdated = DateTime.UtcNow
-            });
+            return inspection;
+        }
+
+        /// <summary>
+        /// Preview all inspections with a reduced set of data
+        /// </summary>
+        [HttpGet("previews")]
+        public IAsyncEnumerable<InspectionPreview> GetInspectionPreviewsAsync()
+        {
+            return _inspectionService.GetAllPreviewsAsync();
+        }
+
+        /// <summary>
+        /// Preview an inspection by id with a reduced set of data
+        /// </summary>
+        [HttpGet("previews/{id}")]
+        public async Task<ActionResult<InspectionPreview>> GetInspectionPreviewByIdAsync(int id)
+        {
+            // Retrieve inspection preview
+            InspectionPreview inspectionPreview = await _inspectionService.FindPreviewByIdAsync(id, HttpContext.RequestAborted).ConfigureAwait(false);
+            if (inspectionPreview == null)
+                return NotFound();
+
+            return inspectionPreview;
         }
     }
 }

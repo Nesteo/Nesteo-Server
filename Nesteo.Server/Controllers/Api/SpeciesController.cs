@@ -1,33 +1,43 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Nesteo.Server.Models;
+using Nesteo.Server.Services;
 
 namespace Nesteo.Server.Controllers.Api
 {
     [Route("api/v1/species")]
     public class SpeciesController : ApiControllerBase
     {
+        private readonly ISpeciesService _speciesService;
+
+        public SpeciesController(ISpeciesService speciesService)
+        {
+            _speciesService = speciesService ?? throw new ArgumentNullException(nameof(speciesService));
+        }
+
         /// <summary>
         /// Retrieve all species
         /// </summary>
-        // TODO: Use IAsyncEnumerable<>
         [HttpGet]
-        public Task<ActionResult<ICollection<Species>>> GetSpeciesAsync()
+        public IAsyncEnumerable<Species> GetSpeciesAsync()
         {
-            return Task.FromResult<ActionResult<ICollection<Species>>>(new List<Species> { new Species { Id = 0, Name = "Dodo" } });
+            return _speciesService.GetAllAsync();
         }
 
         /// <summary>
         /// Retrieve a species by id
         /// </summary>
         [HttpGet("{id}")]
-        public Task<ActionResult<Species>> GetSpeciesByIdAsync(int id)
+        public async Task<ActionResult<Species>> GetSpeciesByIdAsync(int id)
         {
-            if (id != 0)
-                return Task.FromResult<ActionResult<Species>>(NotFound());
+            // Retrieve species
+            Species species = await _speciesService.FindByIdAsync(id, HttpContext.RequestAborted).ConfigureAwait(false);
+            if (species == null)
+                return NotFound();
 
-            return Task.FromResult<ActionResult<Species>>(new Species { Id = 0, Name = "Dodo" });
+            return species;
         }
     }
 }
