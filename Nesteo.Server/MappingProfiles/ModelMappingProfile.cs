@@ -26,6 +26,7 @@ namespace Nesteo.Server.MappingProfiles
                                                                                                                 .OrderByDescending(inspection => inspection.InspectionDate)
                                                                                                                 .FirstOrDefault().InspectionDate));
             CreateMap<InspectionEntity, Inspection>();
+            CreateMap<InspectionEntity, InspectionPreview>();
         }
     }
 }

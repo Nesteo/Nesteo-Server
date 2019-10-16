@@ -115,9 +115,9 @@ namespace Nesteo.Server
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IRegionService, RegionService>();
             services.AddScoped<IOwnerService, OwnerService>();
-            // TODO: services.AddScoped<ISpeciesService, SpeciesService>();
+            services.AddScoped<ISpeciesService, SpeciesService>();
             services.AddScoped<INestingBoxService, NestingBoxService>();
-            // TODO: services.AddScoped<IInspectionService, InspectionService>();
+            services.AddScoped<IInspectionService, InspectionService>();
         }
 
         // This method gets called by the runtime and configures the HTTP request pipeline.
