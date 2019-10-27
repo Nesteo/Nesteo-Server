@@ -28,9 +28,9 @@ namespace Nesteo.Server.Services.Implementations
             return Entities.Where(entity => entity.Id.Equals(id)).ProjectTo<InspectionPreview>(Mapper.ConfigurationProvider).FirstOrDefaultAsync(cancellationToken);
         }
 
-        public IAsyncEnumerable<Inspection> FindByNestingBoxIdAsync(string id)
+        public IAsyncEnumerable<Inspection> GetAllForNestingBoxIdAsync(string nestingBoxId)
         {
-           return Entities.Where(entity => entity.NestingBox.Id.Equals(id)).ProjectTo<Inspection>(Mapper.ConfigurationProvider).AsAsyncEnumerable();
+           return Entities.Where(entity => entity.NestingBox.Id.Equals(nestingBoxId)).ProjectTo<Inspection>(Mapper.ConfigurationProvider).AsAsyncEnumerable();
         }
     }
 }
