@@ -76,9 +76,9 @@ namespace Nesteo.Server.Controllers.Api
         /// Return all inspections for a nesting box
         /// </summary>
         [HttpGet("{id}/inspections")]
-        public IAsyncEnumerable<Inspection> GetInspectionsByBoxIdAsync(string id)
+        public IAsyncEnumerable<Inspection> GetInspectionsByNestingBoxIdAsync(string id)
         {
-            return  _inspectionService.FindByBoxIdAsync(id);
+            return  _inspectionService.FindByNestingBoxIdAsync(id);
         }
     }
 }
