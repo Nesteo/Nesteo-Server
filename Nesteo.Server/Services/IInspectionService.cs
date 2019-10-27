@@ -10,8 +10,10 @@ namespace Nesteo.Server.Services
     {
         IAsyncEnumerable<InspectionPreview> GetAllPreviewsAsync();
 
+        IAsyncEnumerable<Inspection> GetAllForNestingBoxIdAsync(string nestingBoxId);
+
         Task<InspectionPreview> FindPreviewByIdAsync(int id, CancellationToken cancellationToken = default);
 
-        IAsyncEnumerable<Inspection> GetAllForNestingBoxIdAsync(string nestingBoxId);
+        IAsyncEnumerable<InspectionPreview> GetAllPreviewsForNestingBoxIdAsync(string nestingBoxId);
     }
 }
