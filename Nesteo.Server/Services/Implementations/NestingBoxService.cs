@@ -14,8 +14,6 @@ namespace Nesteo.Server.Services.Implementations
 {
     public class NestingBoxService : CrudServiceBase<NestingBoxEntity, NestingBox, string>, INestingBoxService
     {
-        protected override DbSet<NestingBoxEntity> Entities => DbContext.NestingBoxes;
-
         public NestingBoxService(NesteoDbContext dbContext, IMapper mapper) : base(dbContext, mapper) { }
 
         public IAsyncEnumerable<NestingBoxPreview> GetAllPreviewsAsync()
@@ -28,7 +26,7 @@ namespace Nesteo.Server.Services.Implementations
             if (id == null)
                 throw new ArgumentNullException(nameof(id));
 
-            return Entities.Where(entity => entity.Id.Equals(id)).ProjectTo<NestingBoxPreview>(Mapper.ConfigurationProvider).FirstOrDefaultAsync(cancellationToken);
+            return Entities.Where(entity => entity.Id == id).ProjectTo<NestingBoxPreview>(Mapper.ConfigurationProvider).FirstOrDefaultAsync(cancellationToken);
         }
     }
 }

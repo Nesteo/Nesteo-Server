@@ -9,5 +9,9 @@ namespace Nesteo.Server.Services
         IAsyncEnumerable<TModel> GetAllAsync();
 
         Task<TModel> FindByIdAsync(TKey id, CancellationToken cancellationToken = default);
+
+        Task<TModel> InsertOrUpdateAsync(TModel entry, CancellationToken cancellationToken = default);
+
+        Task DeleteAsync(TKey id, CancellationToken cancellationToken = default);
     }
 }

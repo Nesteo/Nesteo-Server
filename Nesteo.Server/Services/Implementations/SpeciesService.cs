@@ -8,8 +8,6 @@ namespace Nesteo.Server.Services.Implementations
 {
     public class SpeciesService : CrudServiceBase<SpeciesEntity, Species, int>, ISpeciesService
     {
-        protected override DbSet<SpeciesEntity> Entities => DbContext.Species;
-
         public SpeciesService(NesteoDbContext dbContext, IMapper mapper) : base(dbContext, mapper) { }
     }
 }
