@@ -39,9 +39,16 @@ namespace Nesteo.Server.BackgroundTasks
             {
                 _logger.LogInformation("Database doesn't contain any registered users. A new default user will be created.");
 
-                // Create a new default user
-                await userManager.CreateAsync(new UserEntity { UserName = DefaultUserName, FirstName = DefaultFirstName, LastName = DefaultLastName }, DefaultPassword)
-                                 .ConfigureAwait(false);
+                try
+                {
+                    // Create a new default user
+                    await userManager.CreateAsync(new UserEntity { UserName = DefaultUserName, FirstName = DefaultFirstName, LastName = DefaultLastName }, DefaultPassword)
+                                     .ConfigureAwait(false);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning("Creating default user failed.", ex);
+                }
             }
         }
 
