@@ -18,7 +18,7 @@ jobs:
           name: Run tests
           command: dotnet test
           environment:
-            ConnectionStrings__DefaultConnection: asdf
+            ConnectionStrings__DefaultConnection: "Server=localhost;Database=test;User=root;Password=root"
   build:
     executor: docker-instance
     steps:

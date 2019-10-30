@@ -18,7 +18,7 @@ namespace Nesteo.Server.IntegrationTests
             builder.ConfigureAppConfiguration((context, conf) => {
                 // Use another appsettings file for these integration tests
                 string configFilePath = Path.Combine(Directory.GetCurrentDirectory(), "appsettings.json");
-                conf.AddJsonFile(configFilePath);
+                conf.AddJsonFile(configFilePath, true);
             });
 
             builder.ConfigureServices(services => {
