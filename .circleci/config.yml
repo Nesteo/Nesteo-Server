@@ -14,9 +14,12 @@ jobs:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
     steps:
       - checkout
-      - run:
+      - build:
+          name: Build
+          command: dotnet build
+      - test:
           name: Run Tests
-          command: dotnet test
+          command: dotnet test --no-build --verbosity detailed
           environment:
             ConnectionStrings__DefaultConnection: Server=localhost;Database=test;User=root
   build:
