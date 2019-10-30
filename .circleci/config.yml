@@ -11,14 +11,14 @@ jobs:
       - image: mcr.microsoft.com/dotnet/core/sdk:3.0
       - image: circleci/mariadb
         environment:
-          MYSQL_ROOT_PASSWORD: root
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
     steps:
       - checkout
       - run:
           name: Run Tests
-          command: dotnet test
+          command: dotnet test --verbosity normal
           environment:
-            ConnectionStrings__DefaultConnection: Server=localhost;Database=test;User=root;Password=root
+            ConnectionStrings__DefaultConnection: Server=localhost;Database=test;User=root
   build:
     executor: docker-instance
     steps:
