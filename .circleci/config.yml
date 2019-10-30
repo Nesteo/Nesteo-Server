@@ -16,7 +16,7 @@ jobs:
       - checkout
       - run:
           name: Run Tests
-          command: dotnet test --verbosity normal
+          command: dotnet test
           environment:
             ConnectionStrings__DefaultConnection: Server=localhost;Database=test;User=root
   build:
