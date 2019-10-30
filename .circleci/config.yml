@@ -14,10 +14,10 @@ jobs:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
     steps:
       - checkout
-      - build:
+      - run:
           name: Build
           command: dotnet build
-      - test:
+      - run:
           name: Run Tests
           command: dotnet test --no-build --verbosity detailed
           environment:
