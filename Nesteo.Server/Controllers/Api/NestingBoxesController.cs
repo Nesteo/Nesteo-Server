@@ -12,10 +12,12 @@ namespace Nesteo.Server.Controllers.Api
     public class NestingBoxesController : ApiControllerBase
     {
         private readonly INestingBoxService _nestingBoxService;
+        private readonly IInspectionService _inspectionService;
 
-        public NestingBoxesController(INestingBoxService nestingBoxService)
+        public NestingBoxesController(INestingBoxService nestingBoxService, IInspectionService inspectionService)
         {
             _nestingBoxService = nestingBoxService ?? throw new ArgumentNullException(nameof(nestingBoxService));
+            _inspectionService = inspectionService ?? throw new ArgumentNullException(nameof(inspectionService));
         }
 
         /// <summary>
@@ -68,6 +70,24 @@ namespace Nesteo.Server.Controllers.Api
                 return NotFound();
 
             return nestingBoxPreview;
+        }
+
+        /// <summary>
+        /// Return all inspections for a nesting box
+        /// </summary>
+        [HttpGet("{id}/inspections")]
+        public IAsyncEnumerable<Inspection> GetInspectionsByNestingBoxIdAsync(string id)
+        {
+            return  _inspectionService.GetAllForNestingBoxIdAsync(id);
+        }
+
+        /// <summary>
+        /// Return all inspection previews for a nesting box
+        /// </summary>
+        [HttpGet("{id}/inspections/previews")]
+        public IAsyncEnumerable<InspectionPreview> GetInspectionPreviewsByNestingBoxIdAsync(string id)
+        {
+            return  _inspectionService.GetAllPreviewsForNestingBoxIdAsync(id);
         }
     }
 }
