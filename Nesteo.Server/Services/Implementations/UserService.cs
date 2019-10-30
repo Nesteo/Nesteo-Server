@@ -34,5 +34,9 @@ namespace Nesteo.Server.Services.Implementations
 
             return await _userManager.Users.ProjectTo<User>(_mapper.ConfigurationProvider).FirstOrDefaultAsync(u => u.Id == id, cancellationToken).ConfigureAwait(false);
         }
+
+        public Task<User> InsertOrUpdateAsync(User entry, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+
+        public Task DeleteAsync(string id, CancellationToken cancellationToken = default) => throw new NotImplementedException();
     }
 }

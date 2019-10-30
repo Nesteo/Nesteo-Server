@@ -8,8 +8,6 @@ namespace Nesteo.Server.Services.Implementations
 {
     public class RegionService : CrudServiceBase<RegionEntity, Region, int>, IRegionService
     {
-        protected override DbSet<RegionEntity> Entities => DbContext.Regions;
-
         public RegionService(NesteoDbContext dbContext, IMapper mapper) : base(dbContext, mapper) { }
     }
 }

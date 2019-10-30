@@ -12,10 +12,10 @@ namespace Nesteo.Server.BackgroundTasks
 {
     public class CreateDefaultUserTask : IHostedService
     {
-        private const string DefaultUserName = "Admin";
-        private const string DefaultFirstName = "Default";
-        private const string DefaultLastName = "Admin";
-        private const string DefaultPassword = "Admin123";
+        public const string DefaultUserName = "Admin";
+        public const string DefaultFirstName = "Default";
+        public const string DefaultLastName = "Admin";
+        public const string DefaultPassword = "Admin123";
 
         private readonly IServiceProvider _serviceProvider;
         private readonly ILogger<CreateDefaultUserTask> _logger;
@@ -26,7 +26,7 @@ namespace Nesteo.Server.BackgroundTasks
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task StartAsync(CancellationToken cancellationToken)
+        public async Task StartAsync(CancellationToken cancellationToken = default)
         {
             // Create a new scope so we can consume scoped services
             using IServiceScope scope = _serviceProvider.CreateScope();
@@ -39,13 +39,20 @@ namespace Nesteo.Server.BackgroundTasks
             {
                 _logger.LogInformation("Database doesn't contain any registered users. A new default user will be created.");
 
-                // Create a new default user
-                await userManager.CreateAsync(new UserEntity { UserName = DefaultUserName, FirstName = DefaultFirstName, LastName = DefaultLastName }, DefaultPassword)
-                                 .ConfigureAwait(false);
+                try
+                {
+                    // Create a new default user
+                    await userManager.CreateAsync(new UserEntity { UserName = DefaultUserName, FirstName = DefaultFirstName, LastName = DefaultLastName }, DefaultPassword)
+                                     .ConfigureAwait(false);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning("Creating default user failed.", ex);
+                }
             }
         }
 
-        public Task StopAsync(CancellationToken cancellationToken)
+        public Task StopAsync(CancellationToken cancellationToken = default)
         {
             return Task.CompletedTask;
         }

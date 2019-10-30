@@ -8,8 +8,6 @@ namespace Nesteo.Server.Services.Implementations
 {
     public class OwnerService : CrudServiceBase<OwnerEntity, Owner, int>, IOwnerService
     {
-        protected override DbSet<OwnerEntity> Entities => DbContext.Owners;
-
         public OwnerService(NesteoDbContext dbContext, IMapper mapper) : base(dbContext, mapper) { }
     }
 }

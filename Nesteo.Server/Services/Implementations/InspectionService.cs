@@ -14,8 +14,6 @@ namespace Nesteo.Server.Services.Implementations
 {
     public class InspectionService : CrudServiceBase<InspectionEntity, Inspection, int>, IInspectionService
     {
-        protected override DbSet<InspectionEntity> Entities => DbContext.Inspections;
-
         public InspectionService(NesteoDbContext dbContext, IMapper mapper) : base(dbContext, mapper) { }
 
         public IAsyncEnumerable<InspectionPreview> GetAllPreviewsAsync()
@@ -37,7 +35,5 @@ namespace Nesteo.Server.Services.Implementations
         {
             return Entities.Where(entity => entity.NestingBox.Id == nestingBoxId).ProjectTo<InspectionPreview>(Mapper.ConfigurationProvider).AsAsyncEnumerable();
         }
-
-
     }
 }
