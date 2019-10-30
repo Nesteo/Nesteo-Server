@@ -5,30 +5,45 @@ using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using AutoMapper.Configuration;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
 using MySql.Data.MySqlClient;
 using Nesteo.Server.Data.Entities;
 using Nesteo.Server.Services.Implementations;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using Xunit;
+using IConfiguration = Microsoft.Extensions.Configuration.IConfiguration;
 
 namespace Nesteo.Server.IntegrationTests.ServiceTests
 {
-    public class CrudServiceBaseTests
+    public class CrudServiceBaseTests : IClassFixture<NesteoWebApplicationFactory<Startup>>
     {
+        private readonly NesteoWebApplicationFactory<Startup> _webApplicationFactory;
+
+        public CrudServiceBaseTests(NesteoWebApplicationFactory<Startup> webApplicationFactory)
+        {
+            _webApplicationFactory = webApplicationFactory ?? throw new ArgumentNullException(nameof(webApplicationFactory));
+        }
+
         [Fact]
         public async Task ManagesEntityWithGeneratedKeyCorrectly()
         {
-            IMapper mapper = new MapperConfiguration(cfg => cfg.CreateMap<EntityWithGeneratedKey, Model>().ReverseMap()).CreateMapper();
+            // Retrieve connection string
+            string connectionString = _webApplicationFactory.Services.GetRequiredService<IConfiguration>().GetConnectionString("DefaultConnection");
 
-            string connectionString = new MySqlConnectionStringBuilder { Server = "localhost", Database = $"test-{Guid.NewGuid()}", UserID = "root", Password = "Lzj8p5CNPcKg" }
-                .ConnectionString;
+            // Use another database for this test
+            connectionString = new MySqlConnectionStringBuilder(connectionString) { Database = $"test-{Guid.NewGuid()}" }.ConnectionString;
+
             DbContextOptions<TestDbContext> dbContextOptions = new DbContextOptionsBuilder<TestDbContext>().UseMySql(connectionString,
                                                                                                                      mySqlOptions => {
                                                                                                                          mySqlOptions.ServerVersion(
                                                                                                                              new Version(10, 3),
                                                                                                                              ServerType.MariaDb);
                                                                                                                      }).Options;
+
+            IMapper mapper = new MapperConfiguration(cfg => cfg.CreateMap<EntityWithGeneratedKey, Model>().ReverseMap()).CreateMapper();
 
             await using (var dbContext = new TestDbContext(dbContextOptions))
             {
