@@ -6,13 +6,13 @@ using Nesteo.Server.Models;
 
 namespace Nesteo.Server.Services
 {
-    public interface IInspectionService: ICrudService<Inspection, int>
+    public interface IInspectionService : ICrudService<Inspection, int>
     {
         IAsyncEnumerable<InspectionPreview> GetAllPreviewsAsync();
 
-        IAsyncEnumerable<Inspection> GetAllForNestingBoxIdAsync(string nestingBoxId);
-
         Task<InspectionPreview> FindPreviewByIdAsync(int id, CancellationToken cancellationToken = default);
+
+        IAsyncEnumerable<Inspection> GetAllForNestingBoxIdAsync(string nestingBoxId);
 
         IAsyncEnumerable<InspectionPreview> GetAllPreviewsForNestingBoxIdAsync(string nestingBoxId);
     }

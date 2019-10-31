@@ -21,14 +21,14 @@ namespace Nesteo.Server.Services.Implementations
             return Entities.ProjectTo<InspectionPreview>(Mapper.ConfigurationProvider).AsAsyncEnumerable();
         }
 
-        public IAsyncEnumerable<Inspection> GetAllForNestingBoxIdAsync(string nestingBoxId)
-        {
-            return Entities.Where(entity => entity.NestingBox.Id == nestingBoxId).ProjectTo<Inspection>(Mapper.ConfigurationProvider).AsAsyncEnumerable();
-        }
-
         public Task<InspectionPreview> FindPreviewByIdAsync(int id, CancellationToken cancellationToken = default)
         {
             return Entities.Where(entity => entity.Id == id).ProjectTo<InspectionPreview>(Mapper.ConfigurationProvider).FirstOrDefaultAsync(cancellationToken);
+        }
+
+        public IAsyncEnumerable<Inspection> GetAllForNestingBoxIdAsync(string nestingBoxId)
+        {
+            return Entities.Where(entity => entity.NestingBox.Id == nestingBoxId).ProjectTo<Inspection>(Mapper.ConfigurationProvider).AsAsyncEnumerable();
         }
 
         public IAsyncEnumerable<InspectionPreview> GetAllPreviewsForNestingBoxIdAsync(string nestingBoxId)
