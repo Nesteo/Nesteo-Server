@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing.Printing;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -18,73 +19,78 @@ namespace Nesteo.Server.DataImport
     public static class Program
     {
 
+        public class Demo
+        {
+            [Index(0)]
+            public int id { get; set; }
+
+            [Index(1)]
+            public string ort { get; set; }
+        }
+
         public class Stammdaten
         {
             [Index(0)]
-            public int nistkasten_nummer { get; set; }
+            public int nistkastenNummer { get; set; }
 
             [Index(1)]
-            public int nummer_fremd { get; set; }
+            public int nummerFremd { get; set; }
 
             [Index(2)]
             public string ort { get; set; }
 
             [Index(3)]
-            public string ort_detailliert { get; set; }
+            public string ortDetailliert { get; set; }
 
             [Index(4)]
-            public int v0 { get; set; }
+            public string koordinate { get; set; }
 
             [Index(5)]
-            public int v1 { get; set; }
+            public int v0 { get; set; }
 
             [Index(6)]
-            public int v2 { get; set; }
+            public int v1 { get; set; }
 
             [Index(7)]
-            public int v3 { get; set; }
+            public int v2 { get; set; }
 
             [Index(8)]
-            public int v4 { get; set; }
+            public int v3 { get; set; }
 
             [Index(9)]
-            public int v5 { get; set; }
+            public int v4 { get; set; }
 
             [Index(10)]
-            public int v6 { get; set; }
+            public int v5 { get; set; }
 
             [Index(11)]
-            public int v7 { get; set; }
+            public int v6 { get; set; }
 
             [Index(12)]
-            public string aufhang_datum { get; set; }
+            public int v7 { get; set; }
 
             [Index(13)]
-            public string elgentumer { get; set; }
+            public string aufhangDatum { get; set; }
 
             [Index(14)]
-            public string material { get; set; }
+            public string eigentumer { get; set; }
 
             [Index(15)]
-            public string loch { get; set; }
+            public string material { get; set; }
 
             [Index(16)]
-            public string bemerkungen { get; set; }
+            public string loch { get; set; }
 
             [Index(17)]
-            public string nistkasten_nummer_alt { get; set; }
+            public string bemerkungen { get; set; }
+
+            [Index(18)]
+            public string nistkastenNummerAlt { get; set; }
         }
 
         public static async Task Main(string[] args)
         {
 
-            using (var reader = new StreamReader("Data\\Stammdaten-2016_gesamt_0.csv"))
-            using (var csv = new CsvReader(reader))
-            {
-                csv.Configuration.PrepareHeaderForMatch = (string header, int index) => header.ToLower();
-                var records = csv.GetRecords<Stammdaten>();
-            }
-            /*
             // Create host
             IHost host = Server.Program.CreateHostBuilder(args).Build();
             await Server.Program.PrepareHostAsync(host).ConfigureAwait(false);
@@ -93,15 +99,24 @@ namespace Nesteo.Server.DataImport
             NesteoDbContext dbContext = host.Services.GetRequiredService<NesteoDbContext>();
 
             // Safety check
-            Console.Write("Do you want to fill the database with sample data? Please type 'yes': ");
-            if (Console.ReadLine()?.ToLower() != "yes")
-                return;
-            Console.Write("Do you really want to do this? This will DELETE all existing data! Please type 'yes': ");
-            if (Console.ReadLine()?.ToLower() != "yes")
-                return;
+//            Console.Write("Do you want to fill the database with sample data? Please type 'yes': ");
+//            if (Console.ReadLine()?.ToLower() != "yes")
+//                return;
+//            Console.Write("Do you really want to do this? This will DELETE all existing data! Please type 'yes': ");
+//            if (Console.ReadLine()?.ToLower() != "yes")
+//                return;
 
             // Clear database
             await clearDatabase(dbContext);
+
+            // Generate regions
+            await generateRegions(dbContext);
+
+            // Generate owners
+            await generateOwners(dbContext);
+
+            // Generate species
+            await generateSpecies(dbContext);
 
             var random = new Random();
             UserEntity user = await dbContext.Users.FirstOrDefaultAsync().ConfigureAwait(false);
@@ -110,6 +125,21 @@ namespace Nesteo.Server.DataImport
                 Console.WriteLine("Please run the server first to make sure that at least one user exists.");
                 return;
             }
+
+            using (var reader = new StreamReader("/home/randy/Nesteo-Server/Nesteo.Server.DataImport/Data/Stammdaten-2016_gesamt_0.csv"))
+            using (var csv = new CsvReader(reader))
+            {
+                var records = csv.GetRecords<Stammdaten>();
+                foreach (var record in records)
+                {
+//                    Console.WriteLine($"ID:{record.nistkastenNummer} \tMaterial:{record.material}");
+                    generateNestingBoxes(dbContext, record, random, user);
+                }
+            }
+
+            Console.Write("saving");
+            await dbContext.SaveChangesAsync().ConfigureAwait(false);
+            /*
 
             // Generate regions
             await generateRegions(dbContext);
@@ -147,7 +177,6 @@ namespace Nesteo.Server.DataImport
             dbContext.Inspections.RemoveRange(dbContext.Inspections);
             await dbContext.SaveChangesAsync().ConfigureAwait(false);
 
-            Console.WriteLine("Generating sample data...");
         }
 
         private static async Task generateRegions(NesteoDbContext dbContext)
@@ -174,30 +203,26 @@ namespace Nesteo.Server.DataImport
                            .ConfigureAwait(false);
         }
 
-        private static async Task generateNestingBoxes(NesteoDbContext dbContext, Random random, UserEntity user)
+        private static async Task generateNestingBoxes(NesteoDbContext dbContext, Stammdaten record, Random random, UserEntity user)
         {
             Console.WriteLine("Generating nesting boxes...");
-            await dbContext.NestingBoxes.AddRangeAsync(Enumerable.Range(1, 400).Select(i =>
-            {
-                RegionEntity region = dbContext.Regions.Local.GetRandomOrDefault();
-
-                return new NestingBoxEntity
-                {
-                    Id = $"{region.NestingBoxIdPrefix}{i:00000}",
-                    Region = region,
-                    OldId = random.Next(10) >= 5 ? "Old ID" : null,
-                    ForeignId = random.Next(10) >= 5 ? "Foreign ID" : null,
-                    CoordinateLongitude = 9.724372 + region.Id + (random.NextDouble() - 0.5) / 100,
-                    CoordinateLatitude = 52.353092 + (random.NextDouble() - 0.5) / 100,
-                    HangUpDate = DateTime.UtcNow.AddMonths(-6 - random.Next(24)),
-                    HangUpUser = user,
-                    Owner = dbContext.Owners.Local.GetRandomOrDefault(),
-                    Material = (Material) random.Next(4),
-                    HoleSize = (HoleSize) random.Next(7),
-                    ImageFileName = null,
-                    Comment = "This is a generated nesting box for testing purposes."
-                };
-            })).ConfigureAwait(false);
+            RegionEntity region = dbContext.Regions.Local.GetRandomOrDefault();
+            NestingBoxEntity nb = new NestingBoxEntity {
+                Id = $"{record.nistkastenNummer}",
+                Region = region,
+                OldId = record.nistkastenNummerAlt,
+                ForeignId = record.nummerFremd.ToString(),
+                CoordinateLongitude = null,
+                CoordinateLatitude = null,
+                HangUpDate = Convert.ToDateTime(record.aufhangDatum),
+                HangUpUser = user,
+                Owner = dbContext.Owners.Local.GetRandomOrDefault(),
+                Material = (Material)random.Next(4),
+                HoleSize = (HoleSize)random.Next(7),
+                ImageFileName = null,
+                Comment = record.bemerkungen
+            };
+            dbContext.NestingBoxes.Add(nb);
         }
 
         private static async Task generateInspections(NesteoDbContext dbContext, Random random, UserEntity user)
