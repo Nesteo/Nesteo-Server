@@ -29,7 +29,7 @@ namespace Nesteo.Server.Services.Implementations
         public IAsyncEnumerable<TModel> GetAllAsync()
         {
             // Map all entries to the model type and retrieve them as async stream
-            return Entities.ProjectTo<TModel>(Mapper.ConfigurationProvider).AsAsyncEnumerable();
+            return Entities.OrderBy(entity => entity.Id).ProjectTo<TModel>(Mapper.ConfigurationProvider).AsAsyncEnumerable();
         }
 
         public Task<TModel> FindByIdAsync(TKey id, CancellationToken cancellationToken = default)
