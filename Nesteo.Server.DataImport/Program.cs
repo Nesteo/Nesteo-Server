@@ -19,22 +19,13 @@ namespace Nesteo.Server.DataImport
     public static class Program
     {
 
-        public class Demo
-        {
-            [Index(0)]
-            public int id { get; set; }
-
-            [Index(1)]
-            public string ort { get; set; }
-        }
-
         public class Stammdaten
         {
             [Index(0)]
-            public int nistkastenNummer { get; set; }
+            public string nistkastenNummer { get; set; }
 
             [Index(1)]
-            public int nummerFremd { get; set; }
+            public string nummerFremd { get; set; }
 
             [Index(2)]
             public string ort { get; set; }
@@ -43,49 +34,64 @@ namespace Nesteo.Server.DataImport
             public string ortDetailliert { get; set; }
 
             [Index(4)]
-            public string koordinate { get; set; }
+            public int utmHoch { get; set; }
 
             [Index(5)]
-            public int v0 { get; set; }
+            public int utmRechts { get; set; }
 
             [Index(6)]
-            public int v1 { get; set; }
+            public DateTime aufhangDatum { get; set; }
 
             [Index(7)]
-            public int v2 { get; set; }
+            public string eigentumer{ get; set; }
 
             [Index(8)]
-            public int v3 { get; set; }
-
-            [Index(9)]
-            public int v4 { get; set; }
-
-            [Index(10)]
-            public int v5 { get; set; }
-
-            [Index(11)]
-            public int v6 { get; set; }
-
-            [Index(12)]
-            public int v7 { get; set; }
-
-            [Index(13)]
-            public string aufhangDatum { get; set; }
-
-            [Index(14)]
-            public string eigentumer { get; set; }
-
-            [Index(15)]
             public string material { get; set; }
 
-            [Index(16)]
+            [Index(9)]
             public string loch { get; set; }
 
-            [Index(17)]
+            [Index(10)]
             public string bemerkungen { get; set; }
 
-            [Index(18)]
-            public string nistkastenNummerAlt { get; set; }
+            [Index(11)]
+            public DateTime aktualisiertDatum { get; set; }
+        }
+
+        public class Kontrolldaten
+        {
+            [Index(0)]
+            public string nistkastenNummer { get; set; }
+
+            [Index(1)]
+            public DateTime datum { get; set; }
+
+            [Index(2)]
+            public  string zustandKasten { get; set; }
+
+            [Index(3)]
+            public string gereinigt { get; set; }
+
+            [Index (4)]
+            public string besetzt { get; set; }
+
+            [Index(5)]
+            public string anzahlEier { get; set; }
+
+            [Index(6)]
+            public int anzahlJungvogel { get; set; }
+
+            [Index(7)]
+            public int alterJungvogel { get; set; }
+
+            [Index(8)]
+            public string vogelart { get; set; }
+
+            [Index(9)]
+            public int berignt { get; set; }
+
+            [Index(10)]
+            public string bemerkungen { get; set; }
         }
 
         public static async Task Main(string[] args)
