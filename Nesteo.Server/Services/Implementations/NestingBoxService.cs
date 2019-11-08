@@ -33,5 +33,10 @@ namespace Nesteo.Server.Services.Implementations
         {
             return Entities.OrderBy(entity => entity.Id).Select(entity => entity.Id).AsAsyncEnumerable();
         }
+
+        public IAsyncEnumerable<string> GetAllTakenIdsInRegionAsync(int regionId)
+        {
+            return Entities.Where(entity => entity.Region.Id == regionId).OrderBy(entity => entity.Id).Select(entity => entity.Id).AsAsyncEnumerable();
+        }
     }
 }

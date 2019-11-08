@@ -12,5 +12,7 @@ namespace Nesteo.Server.Services
         Task<NestingBoxPreview> FindPreviewByIdAsync(string id, CancellationToken cancellationToken = default);
 
         IAsyncEnumerable<string> GetAllTakenIdsAsync();
+
+        IAsyncEnumerable<string> GetAllTakenIdsInRegionAsync(int regionId);
     }
 }

@@ -13,7 +13,7 @@ namespace Nesteo.Server.Data.Entities
         [Key]
         [Required]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        [StringLength(6, MinimumLength = 6)]
+        [StringLength(Constants.NestingBoxIdLength, MinimumLength = Constants.NestingBoxIdLength)]
         public string Id { get; set; }
 
         [Required]
