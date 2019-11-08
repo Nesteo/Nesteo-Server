@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Data;
 using System.Drawing.Printing;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Castle.Core.Internal;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.DependencyInjection;
@@ -34,13 +37,13 @@ namespace Nesteo.Server.DataImport
             public string ortDetailliert { get; set; }
 
             [Index(4)]
-            public int utmHoch { get; set; }
+            public string utmHoch { get; set; }
 
             [Index(5)]
-            public int utmRechts { get; set; }
+            public string utmRechts { get; set; }
 
             [Index(6)]
-            public DateTime aufhangDatum { get; set; }
+            public string aufhangDatum { get; set; }
 
             [Index(7)]
             public string eigentumer{ get; set; }
@@ -55,7 +58,7 @@ namespace Nesteo.Server.DataImport
             public string bemerkungen { get; set; }
 
             [Index(11)]
-            public DateTime aktualisiertDatum { get; set; }
+            public string aktualisiertDatum { get; set; }
         }
 
         public class Kontrolldaten
@@ -113,16 +116,17 @@ namespace Nesteo.Server.DataImport
 //                return;
 
             // Clear database
-            await clearDatabase(dbContext);
+//            await ClearDatabase(dbContext);
 
             // Generate regions
-            await generateRegions(dbContext);
+//            await GenerateRegions(dbContext);
 
             // Generate owners
-            await generateOwners(dbContext);
+//            await GenerateOwners(dbContext);
 
             // Generate species
-            await generateSpecies(dbContext);
+//            await GenerateSpecies(dbContext);
+
 
             var random = new Random();
             UserEntity user = await dbContext.Users.FirstOrDefaultAsync().ConfigureAwait(false);
@@ -132,46 +136,71 @@ namespace Nesteo.Server.DataImport
                 return;
             }
 
-            using (var reader = new StreamReader("/home/randy/Nesteo-Server/Nesteo.Server.DataImport/Data/Stammdaten-2016_gesamt_0.csv"))
+
+
+            using (var reader = new StreamReader("/home/randy/Nesteo-Server/Nesteo.Server.DataImport/Data/Stammdaten-9.csv"))
             using (var csv = new CsvReader(reader))
             {
+
                 var records = csv.GetRecords<Stammdaten>();
                 foreach (var record in records)
                 {
-//                    Console.WriteLine($"ID:{record.nistkastenNummer} \tMaterial:{record.material}");
-                    generateNestingBoxes(dbContext, record, random, user);
+                    // Search for ownerId
+//                    if (record.eigentumer != " ")
+//                    {
+//                        OwnerEntity ownerEntity = (from o in dbContext.Owners where o.Name == record.eigentumer select o).FirstOrDefault();
+//                        Console.WriteLine(ownerEntity.Id);
+//                    }
+//                    else
+//                    {
+//                        Console.WriteLine("Blank");
+//                    }
+
+                    // Search for regionId
+                    if (record.ort != " ")
+                    {
+                        RegionEntity regionEntity = (from r in dbContext.Regions where r.Name == record.ort select r).FirstOrDefault();
+
+                        Console.WriteLine(regionEntity.Id);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Blank");
+                    }
+
+
                 }
+
+//                foreach (var record in records)
+//                {
+////                    GenerateRegions(dbContext, record);
+//                    GenerateNestingBoxes(dbContext, record, random, user);
+//                }
             }
 
-            Console.Write("saving");
+//             ReadKontrollDaten(dbContext, random, user);
+
+
+            Console.WriteLine("saving");
             await dbContext.SaveChangesAsync().ConfigureAwait(false);
-            /*
-
-            // Generate regions
-            await generateRegions(dbContext);
-
-            // Generate owners
-            await generateOwners(dbContext);
-
-            // Generate species
-            await generateSpecies(dbContext);
-
-            // Generate nesting boxes
-            await generateNestingBoxes(dbContext, random, user);
-
-            // Generate inspections
-            await generateInspections(dbContext, random, user);
-
-            Console.WriteLine("Saving sample data...");
-
-            // Save changes
-            await dbContext.SaveChangesAsync().ConfigureAwait(false);
-
             Console.WriteLine("Done.");
-            */
         }
 
-        private static async Task clearDatabase(NesteoDbContext dbContext)
+        private static void ReadKontrollDaten(NesteoDbContext dbContext, Random random, UserEntity user)
+        {
+            using (var reader = new StreamReader("/home/randy/Nesteo-Server/Nesteo.Server.DataImport/Data/Kontrolldaten.csv"))
+            using (var csv = new CsvReader(reader))
+            {
+                Console.WriteLine("Generating inspections...");
+                var records = csv.GetRecords<Kontrolldaten>();
+                foreach (var record in records)
+                {
+                    GenerateInspections(dbContext, record, random, user);
+                }
+            }
+        }
+
+        private static async Task ClearDatabase(NesteoDbContext dbContext)
         {
             Console.WriteLine("Clearing database...");
 
@@ -185,23 +214,64 @@ namespace Nesteo.Server.DataImport
 
         }
 
-        private static async Task generateRegions(NesteoDbContext dbContext)
+        private static async Task GenerateRegions(NesteoDbContext dbContext)
         {
-            Console.WriteLine("Generating regions...");
-            await dbContext.Regions.AddRangeAsync(
-                               Enumerable.Range(1, 20).Select(i => new RegionEntity
-                                                                  {Name = $"Owner {i}", NestingBoxIdPrefix = ((char) ('A' + (i - 1))).ToString()}))
-                           .ConfigureAwait(false);
+//            Console.WriteLine("Generating regions...");
+//            bool contains = dbContext.Regions.AsEnumerable().Any(row => record.ort == row.Name);//("Name = '" + record.ort + "'");
+////            var existing = dbContext.Regions.Find(record.ort);
+//            if (contains)
+//            {
+//                Console.WriteLine("Old");
+////                dbContext.Regions.Add(new RegionEntity { Name = record.ort, NestingBoxIdPrefix = "X" });
+//            }
+//            else
+//            {
+//                Console.WriteLine("New");
+////                Console.WriteLine("Old");//dbContext.Regions.Update(new RegionEntity { NestingBoxIdPrefix = "Y" });
+//            }
+
+//            dbContext.Regions.Add(new RegionEntity { Name = "oythe", NestingBoxIdPrefix = "X" });
+//            dbContext.Regions.Add(new RegionEntity{Name = "Bergstrup", NestingBoxIdPrefix = "X"});
+//            dbContext.Regions.Add(new RegionEntity{Name = "Holzhausen", NestingBoxIdPrefix = "X"});
+//            dbContext.Regions.Add(new RegionEntity{Name = "Vechta", NestingBoxIdPrefix = "X"});
+//            dbContext.Regions.Add(new RegionEntity{Name = "Stoppelmarkt", NestingBoxIdPrefix = "X"});
+//            dbContext.Regions.Add(new RegionEntity{Name = "Langförden", NestingBoxIdPrefix = "X"});
+//            dbContext.Regions.Add(new RegionEntity{Name = "Holtrup", NestingBoxIdPrefix = "X"});
+//            dbContext.Regions.Add(new RegionEntity{Name = "Langförden-Nord", NestingBoxIdPrefix = "X"});
         }
 
-        private static async Task generateOwners(NesteoDbContext dbContext)
+        private static async Task GenerateOwners(NesteoDbContext dbContext)
         {
             Console.WriteLine("Generating owners...");
-            await dbContext.Owners.AddRangeAsync(Enumerable.Range(1, 15).Select(i => new OwnerEntity {Name = $"Owner {i}"}))
-                           .ConfigureAwait(false);
-        }
+            int nextId = 136;
+            dbContext.Owners.Add(new OwnerEntity{Id = nextId, Name = "NABU Vechta"});
+            nextId++;
+            dbContext.Owners.Add(new OwnerEntity{Id = nextId, Name = "unbekannt"});
+            nextId++;
+            dbContext.Owners.Add(new OwnerEntity{Id = nextId, Name = "Kreisjägerschaft Vechta"});
+            nextId++;
+            dbContext.Owners.Add(new OwnerEntity{Id = nextId, Name = "Ludger Nerkamp"});
+            nextId++;
+            dbContext.Owners.Add(new OwnerEntity{Id = nextId, Name = "Daniel Cobold"});
+            nextId++;
+            dbContext.Owners.Add(new OwnerEntity{Id = nextId, Name = "Wilhelm Rieken"});
+            nextId++;
+            dbContext.Owners.Add(new OwnerEntity{Id = nextId, Name = "Ursula Wilmering"});
+            nextId++;
+            dbContext.Owners.Add(new OwnerEntity{Id = nextId, Name = "Kolleg St. Thomas"});
+            nextId++;
+            dbContext.Owners.Add(new OwnerEntity{Id = nextId, Name = "Beringergemeinschaft Landkreis Vechta"});
+            nextId++;
+            dbContext.Owners.Add(new OwnerEntity{Id = nextId, Name = "Beringergemeinschaft LK Vechta"});
+            nextId++;
+            dbContext.Owners.Add(new OwnerEntity{Id = nextId, Name = "NABU Lohne"});
+            nextId++;
+            dbContext.Owners.Add(new OwnerEntity{Id = nextId, Name = "von Frydag"});
+            nextId++;
+            dbContext.Owners.Add(new OwnerEntity{Id = nextId, Name = "Ludger Ellert"});
+    }
 
-        private static async Task generateSpecies(NesteoDbContext dbContext)
+        private static async Task GenerateSpecies(NesteoDbContext dbContext)
         {
             Console.WriteLine("Generating species...");
             await dbContext.Species
@@ -209,31 +279,47 @@ namespace Nesteo.Server.DataImport
                            .ConfigureAwait(false);
         }
 
-        private static async Task generateNestingBoxes(NesteoDbContext dbContext, Stammdaten record, Random random, UserEntity user)
+        private static async Task GenerateNestingBoxes(NesteoDbContext dbContext, Stammdaten record, Random random, UserEntity user)
         {
             Console.WriteLine("Generating nesting boxes...");
+//            var existing = dbContext.NestingBoxes.Find(record.nistkastenNummer);
+//            OwnerEntity owner = dbContext.Owners.Local.GetRandomOrDefault();
             RegionEntity region = dbContext.Regions.Local.GetRandomOrDefault();
             NestingBoxEntity nb = new NestingBoxEntity {
                 Id = $"{record.nistkastenNummer}",
                 Region = region,
-                OldId = record.nistkastenNummerAlt,
-                ForeignId = record.nummerFremd.ToString(),
-                CoordinateLongitude = null,
-                CoordinateLatitude = null,
-                HangUpDate = Convert.ToDateTime(record.aufhangDatum),
+                OldId = random.Next(10) >= 5 ? "Old ID" : null,
+                ForeignId = random.Next(10) >= 5 ? "Foreign ID" : null,
+                CoordinateLongitude = 9.724372 + region.Id + (random.NextDouble() - 0.5) / 100,
+                CoordinateLatitude = 52.353092 + (random.NextDouble() - 0.5) / 100,
+                HangUpDate = DateTime.UtcNow.AddMonths(-6 - random.Next(24)),
                 HangUpUser = user,
                 Owner = dbContext.Owners.Local.GetRandomOrDefault(),
                 Material = (Material)random.Next(4),
                 HoleSize = (HoleSize)random.Next(7),
                 ImageFileName = null,
-                Comment = record.bemerkungen
+                Comment = "This is a generated nesting box for testing purposes."
             };
+//                new NestingBoxEntity {
+//                    Id = $"{record.nistkastenNummer}",
+//                Region = region,
+//                OldId = null,
+//                ForeignId = null,//$"{record.nummerFremd}",
+//                CoordinateLongitude = null,
+//                CoordinateLatitude = null,
+//                HangUpDate = null,//Convert.ToDateTime(record.aufhangDatum),
+//                HangUpUser = user,
+//                Owner = dbContext.Owners.Local.GetRandomOrDefault(),
+//                Material = (Material)random.Next(4),
+//                HoleSize = (HoleSize)random.Next(7),
+//                ImageFileName = null,
+//                Comment = null//record.bemerkungen
+//            };
             dbContext.NestingBoxes.Add(nb);
         }
 
-        private static async Task generateInspections(NesteoDbContext dbContext, Random random, UserEntity user)
+        private static async Task GenerateInspections(NesteoDbContext dbContext, Kontrolldaten record, Random random, UserEntity user)
         {
-            Console.WriteLine("Generating inspections...");
             await dbContext.Inspections.AddRangeAsync(Enumerable.Range(1, 2000).Select(i =>
             {
                 NestingBoxEntity nestingBox = dbContext.NestingBoxes.Local.GetRandomOrDefault();
