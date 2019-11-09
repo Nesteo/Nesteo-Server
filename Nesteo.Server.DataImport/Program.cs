@@ -68,10 +68,10 @@ namespace Nesteo.Server.DataImport
             public string nistkastenNummer { get; set; }
 
             [Index(1)]
-            public DateTime datum { get; set; }
+            public string datum { get; set; }
 
             [Index(2)]
-            public  string zustandKasten { get; set; }
+            public string zustandKasten { get; set; }
 
             [Index(3)]
             public string gereinigt { get; set; }
@@ -83,16 +83,16 @@ namespace Nesteo.Server.DataImport
             public string anzahlEier { get; set; }
 
             [Index(6)]
-            public int anzahlJungvogel { get; set; }
+            public string anzahlJungvogel { get; set; }
 
             [Index(7)]
-            public int alterJungvogel { get; set; }
+            public string alterJungvogel { get; set; }
 
             [Index(8)]
             public string vogelart { get; set; }
 
             [Index(9)]
-            public int berignt { get; set; }
+            public string berignt { get; set; }
 
             [Index(10)]
             public string bemerkungen { get; set; }
@@ -139,7 +139,7 @@ namespace Nesteo.Server.DataImport
 
 //            ReadStammDaten(dbContext, user);
 
-//            ReadKontrollDaten(dbContext, random, user);
+            ReadKontrollDaten(dbContext, random, user);
 
 
             Console.WriteLine("saving");
@@ -386,18 +386,18 @@ namespace Nesteo.Server.DataImport
             }
 
             inspectionEntity = new InspectionEntity {
-                NestingBox = nestingBox,
+                NestingBox = nestingBox.Equals(null) ? new NestingBoxEntity{Id = "0"} : nestingBox,
                 InspectionDate = Convert.ToDateTime(record.datum),
                 InspectedByUser = user,
                 HasBeenCleaned = record.gereinigt.ToLower() == "ja",
                 Condition = condition,
                 JustRepaired = false,
                 Occupied = record.besetzt.ToLower() == "ja",
-                ContainsEggs = record.anzahlEier != null,
-                EggCount = Convert.ToInt32(record.anzahlEier),
-                ChickCount = Convert.ToInt32(record.anzahlJungvogel),
-                RingedChickCount = Convert.ToInt32(record.berignt),
-                AgeInDays = Convert.ToInt32(record.alterJungvogel),
+                ContainsEggs = record.anzahlEier != " ",
+                EggCount = record.anzahlEier == " "? 0 : Convert.ToInt32(record.anzahlEier),
+                ChickCount = record.anzahlJungvogel == " "? 0 : Convert.ToInt32(record.anzahlJungvogel),
+                RingedChickCount = record.berignt == " "? 0 : Convert.ToInt32(record.berignt),
+                AgeInDays = record.alterJungvogel == " "? 0 : Convert.ToInt32(record.alterJungvogel),
                 FemaleParentBirdDiscovery = ParentBirdDiscovery.None,
                 MaleParentBirdDiscovery = ParentBirdDiscovery.None,
                 Species = speciesEntity,
