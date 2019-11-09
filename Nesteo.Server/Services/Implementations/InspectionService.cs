@@ -18,22 +18,22 @@ namespace Nesteo.Server.Services.Implementations
 
         public IAsyncEnumerable<InspectionPreview> GetAllPreviewsAsync()
         {
-            return Entities.OrderBy(entity => entity.Id).ProjectTo<InspectionPreview>(Mapper.ConfigurationProvider).AsAsyncEnumerable();
+            return Entities.AsQueryable().OrderBy(entity => entity.Id).ProjectTo<InspectionPreview>(Mapper.ConfigurationProvider).AsAsyncEnumerable();
         }
 
         public Task<InspectionPreview> FindPreviewByIdAsync(int id, CancellationToken cancellationToken = default)
         {
-            return Entities.Where(entity => entity.Id == id).ProjectTo<InspectionPreview>(Mapper.ConfigurationProvider).FirstOrDefaultAsync(cancellationToken);
+            return Entities.AsQueryable().Where(entity => entity.Id == id).ProjectTo<InspectionPreview>(Mapper.ConfigurationProvider).FirstOrDefaultAsync(cancellationToken);
         }
 
         public IAsyncEnumerable<Inspection> GetAllForNestingBoxIdAsync(string nestingBoxId)
         {
-            return Entities.OrderBy(entity => entity.Id).Where(entity => entity.NestingBox.Id == nestingBoxId).ProjectTo<Inspection>(Mapper.ConfigurationProvider).AsAsyncEnumerable();
+            return Entities.AsQueryable().OrderBy(entity => entity.Id).Where(entity => entity.NestingBox.Id == nestingBoxId).ProjectTo<Inspection>(Mapper.ConfigurationProvider).AsAsyncEnumerable();
         }
 
         public IAsyncEnumerable<InspectionPreview> GetAllPreviewsForNestingBoxIdAsync(string nestingBoxId)
         {
-            return Entities.OrderBy(entity => entity.Id).Where(entity => entity.NestingBox.Id == nestingBoxId).ProjectTo<InspectionPreview>(Mapper.ConfigurationProvider).AsAsyncEnumerable();
+            return Entities.AsQueryable().OrderBy(entity => entity.Id).Where(entity => entity.NestingBox.Id == nestingBoxId).ProjectTo<InspectionPreview>(Mapper.ConfigurationProvider).AsAsyncEnumerable();
         }
     }
 }

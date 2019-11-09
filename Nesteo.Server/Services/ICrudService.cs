@@ -10,6 +10,8 @@ namespace Nesteo.Server.Services
 
         Task<TModel> FindByIdAsync(TKey id, CancellationToken cancellationToken = default);
 
+        Task<bool> ExistsIdAsync(TKey id, CancellationToken cancellationToken = default);
+
         Task<TModel> InsertOrUpdateAsync(TModel entry, CancellationToken cancellationToken = default);
 
         Task DeleteAsync(TKey id, CancellationToken cancellationToken = default);

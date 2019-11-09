@@ -26,22 +26,30 @@ namespace Nesteo.Server.Services.Implementations
             Entities = dbContext.Set<TEntity>();
         }
 
-        public IAsyncEnumerable<TModel> GetAllAsync()
+        public virtual IAsyncEnumerable<TModel> GetAllAsync()
         {
             // Map all entries to the model type and retrieve them as async stream
-            return Entities.OrderBy(entity => entity.Id).ProjectTo<TModel>(Mapper.ConfigurationProvider).AsAsyncEnumerable();
+            return Entities.AsQueryable().OrderBy(entity => entity.Id).ProjectTo<TModel>(Mapper.ConfigurationProvider).AsAsyncEnumerable();
         }
 
-        public Task<TModel> FindByIdAsync(TKey id, CancellationToken cancellationToken = default)
+        public virtual Task<TModel> FindByIdAsync(TKey id, CancellationToken cancellationToken = default)
         {
             if (id == null)
                 throw new ArgumentNullException(nameof(id));
 
             // Search for the entry with the given ID and map it to the model type
-            return Entities.Where(entity => entity.Id.Equals(id)).ProjectTo<TModel>(Mapper.ConfigurationProvider).FirstOrDefaultAsync(cancellationToken);
+            return Entities.AsQueryable().Where(entity => entity.Id.Equals(id)).ProjectTo<TModel>(Mapper.ConfigurationProvider).FirstOrDefaultAsync(cancellationToken);
         }
 
-        public async Task<TModel> InsertOrUpdateAsync(TModel entry, CancellationToken cancellationToken = default)
+        public virtual Task<bool> ExistsIdAsync(TKey id, CancellationToken cancellationToken = default)
+        {
+            if (id == null)
+                throw new ArgumentNullException(nameof(id));
+
+            return Entities.AsQueryable().AnyAsync(entity => entity.Id.Equals(id), cancellationToken);
+        }
+
+        public virtual async Task<TModel> InsertOrUpdateAsync(TModel entry, CancellationToken cancellationToken = default)
         {
             if (entry == null)
                 throw new ArgumentNullException(nameof(entry));
@@ -56,7 +64,7 @@ namespace Nesteo.Server.Services.Implementations
             return Mapper.Map<TModel>(entity);
         }
 
-        public async Task DeleteAsync(TKey id, CancellationToken cancellationToken = default)
+        public virtual async Task DeleteAsync(TKey id, CancellationToken cancellationToken = default)
         {
             if (id == null)
                 throw new ArgumentNullException(nameof(id));
@@ -89,7 +97,7 @@ namespace Nesteo.Server.Services.Implementations
                     throw new InvalidOperationException("Non auto-generated entry IDs need to be set manually and must not be null.");
 
                 // The database won't generate any keys, so we can decide whether to do an insert or an update based on if the entry already exists in the database.
-                TEntity existingEntity = await Entities.FindAsync(new { entity.Id }, cancellationToken).ConfigureAwait(false);
+                TEntity existingEntity = await Entities.FindAsync(new object[] { entity.Id }, cancellationToken).ConfigureAwait(false);
 
                 // Insert or update based on if the entity has been found
                 if (existingEntity == null)
