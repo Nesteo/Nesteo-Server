@@ -137,9 +137,9 @@ namespace Nesteo.Server.DataImport
                 return;
             }
 
-            ReadStammDaten(dbContext, user);
+//            ReadStammDaten(dbContext, user);
 
-//             ReadKontrollDaten(dbContext, random, user);
+//            ReadKontrollDaten(dbContext, random, user);
 
 
             Console.WriteLine("saving");
@@ -236,9 +236,32 @@ namespace Nesteo.Server.DataImport
         private static async Task GenerateSpecies(NesteoDbContext dbContext)
         {
             Console.WriteLine("Generating species...");
-            await dbContext.Species
-                           .AddRangeAsync(Enumerable.Range(1, 50).Select(i => new SpeciesEntity {Name = $"Species {i}"}))
-                           .ConfigureAwait(false);
+            dbContext.Species.Add(new SpeciesEntity { Name = "Amsel" });
+            dbContext.Species.Add(new SpeciesEntity { Name = "Bachstelze" });
+            dbContext.Species.Add(new SpeciesEntity { Name = "Baumläufer" });
+            dbContext.Species.Add(new SpeciesEntity { Name = "Blaumeise" });
+            dbContext.Species.Add(new SpeciesEntity { Name = "Buntspecht" });
+            dbContext.Species.Add(new SpeciesEntity { Name = "Dohle" });
+            dbContext.Species.Add(new SpeciesEntity { Name = "Feldsperling" });
+            dbContext.Species.Add(new SpeciesEntity { Name = "Gartenbaumläufer" });
+            dbContext.Species.Add(new SpeciesEntity { Name = "Gartenrotschwanz" });
+            dbContext.Species.Add(new SpeciesEntity { Name = "Grauschnäpper" });
+            dbContext.Species.Add(new SpeciesEntity { Name = "Haussperling" });
+            dbContext.Species.Add(new SpeciesEntity { Name = "Hohltaube" });
+            dbContext.Species.Add(new SpeciesEntity { Name = "Kleiber" });
+            dbContext.Species.Add(new SpeciesEntity { Name = "Kohlmeise" });
+            dbContext.Species.Add(new SpeciesEntity { Name = "Kohlmeise x Blaumeise" });
+            dbContext.Species.Add(new SpeciesEntity { Name = "Meise" });
+            dbContext.Species.Add(new SpeciesEntity { Name = "Meise unbestimmt" });
+            dbContext.Species.Add(new SpeciesEntity { Name = "Rotkehlchen" });
+            dbContext.Species.Add(new SpeciesEntity { Name = "Star" });
+            dbContext.Species.Add(new SpeciesEntity { Name = "Sumpfmeise" });
+            dbContext.Species.Add(new SpeciesEntity { Name = "Tannenmeise" });
+            dbContext.Species.Add(new SpeciesEntity { Name = "Trauerschnäpper" });
+            dbContext.Species.Add(new SpeciesEntity { Name = "Zaunkönig" });
+            dbContext.Species.Add(new SpeciesEntity { Name = "unbestimmt" });
+            dbContext.Species.Add(new SpeciesEntity { Name = "unbekannt" });
+
         }
 
         private static async Task GenerateNestingBoxes(NesteoDbContext dbContext, Stammdaten record, UserEntity user)
@@ -336,31 +359,52 @@ namespace Nesteo.Server.DataImport
 
         private static async Task GenerateInspections(NesteoDbContext dbContext, Kontrolldaten record, Random random, UserEntity user)
         {
-            await dbContext.Inspections.AddRangeAsync(Enumerable.Range(1, 2000).Select(i =>
-            {
-                NestingBoxEntity nestingBox = dbContext.NestingBoxes.Local.GetRandomOrDefault();
+            NestingBoxEntity nestingBox;
+            SpeciesEntity speciesEntity;
+            Condition condition;
+            InspectionEntity inspectionEntity;
 
-                return new InspectionEntity
-                {
-                    NestingBox = nestingBox,
-                    InspectionDate = nestingBox.HangUpDate.GetValueOrDefault().AddMonths(random.Next(6)),
-                    InspectedByUser = user,
-                    HasBeenCleaned = false,
-                    Condition = (Condition) random.Next(3),
-                    JustRepaired = false,
-                    Occupied = true,
-                    ContainsEggs = true,
-                    EggCount = random.Next(6),
-                    ChickCount = random.Next(1, 4),
-                    RingedChickCount = 1,
-                    AgeInDays = random.Next(6),
-                    FemaleParentBirdDiscovery = (ParentBirdDiscovery) random.Next(4),
-                    MaleParentBirdDiscovery = (ParentBirdDiscovery) random.Next(4),
-                    Species = dbContext.Species.Local.GetRandomOrDefault(),
-                    ImageFileName = null,
-                    Comment = "This is a generated inspection for testing purposes."
-                };
-            })).ConfigureAwait(false);
+
+            // Get nestingBoxId
+            nestingBox = (from n in dbContext.NestingBoxes where n.Id == record.nistkastenNummer select n).FirstOrDefault();
+
+            // Get speciesEntity
+            speciesEntity = (from s in dbContext.Species where s.Name == record.vogelart select s).FirstOrDefault();
+
+            // Get Condition Value
+            if (record.zustandKasten.StartsWith("Repariert") || record.zustandKasten.StartsWith("in Ordnung"))
+            {
+                condition = Condition.Good;
+            }
+            else if (record.zustandKasten.StartsWith("leicht defekt"))
+            {
+                condition = Condition.NeedsRepair;
+            }
+            else
+            {
+                condition = Condition.NeedsReplacement;
+            }
+
+            inspectionEntity = new InspectionEntity {
+                NestingBox = nestingBox,
+                InspectionDate = Convert.ToDateTime(record.datum),
+                InspectedByUser = user,
+                HasBeenCleaned = record.gereinigt.ToLower() == "ja",
+                Condition = condition,
+                JustRepaired = false,
+                Occupied = record.besetzt.ToLower() == "ja",
+                ContainsEggs = record.anzahlEier != null,
+                EggCount = Convert.ToInt32(record.anzahlEier),
+                ChickCount = Convert.ToInt32(record.anzahlJungvogel),
+                RingedChickCount = Convert.ToInt32(record.berignt),
+                AgeInDays = Convert.ToInt32(record.alterJungvogel),
+                FemaleParentBirdDiscovery = ParentBirdDiscovery.None,
+                MaleParentBirdDiscovery = ParentBirdDiscovery.None,
+                Species = speciesEntity,
+                ImageFileName = null,
+                Comment = record.bemerkungen
+            };
+            dbContext.Inspections.Add(inspectionEntity);
         }
 
         private static T GetRandomOrDefault<T>(this LocalView<T> localView) where T : class => localView.OrderBy(r => Guid.NewGuid()).FirstOrDefault();
