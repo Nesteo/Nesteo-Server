@@ -15,17 +15,18 @@ namespace Nesteo.Server.MappingProfiles
             CreateMap<OwnerEntity, Owner>().ReverseMap();
             CreateMap<SpeciesEntity, Species>().ReverseMap();
             CreateMap<NestingBoxEntity, NestingBox>().ForMember(dest => dest.InspectionsCount, options => options.MapFrom(nestingBox => nestingBox.Inspections.Count)).ForMember(
-                dest => dest.LastInspected,
-                options => options.MapFrom(nestingBox => nestingBox
-                                                         .Inspections.OrderByDescending(inspection => inspection.InspectionDate)
-                                                         .FirstOrDefault().InspectionDate));
+                                                         dest => dest.LastInspected,
+                                                         options => options.MapFrom(nestingBox => nestingBox
+                                                                                                  .Inspections.OrderByDescending(inspection => inspection.InspectionDate)
+                                                                                                  .FirstOrDefault().InspectionDate))
+                                                     .ForMember(dest => dest.HasImage, options => options.MapFrom(nestingBox => nestingBox.ImageFileName != null));
             CreateMap<NestingBoxEntity, NestingBoxPreview>().ForMember(dest => dest.InspectionsCount, options => options.MapFrom(nestingBox => nestingBox.Inspections.Count))
                                                             .ForMember(dest => dest.LastInspected,
                                                                        options => options.MapFrom(nestingBox => nestingBox
                                                                                                                 .Inspections
                                                                                                                 .OrderByDescending(inspection => inspection.InspectionDate)
                                                                                                                 .FirstOrDefault().InspectionDate));
-            CreateMap<InspectionEntity, Inspection>();
+            CreateMap<InspectionEntity, Inspection>().ForMember(dest => dest.HasImage, options => options.MapFrom(inspection => inspection.ImageFileName != null));
             CreateMap<InspectionEntity, InspectionPreview>();
         }
     }

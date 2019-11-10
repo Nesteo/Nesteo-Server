@@ -15,5 +15,9 @@ namespace Nesteo.Server.Services
         IAsyncEnumerable<Inspection> GetAllForNestingBoxIdAsync(string nestingBoxId);
 
         IAsyncEnumerable<InspectionPreview> GetAllPreviewsForNestingBoxIdAsync(string nestingBoxId);
+
+        Task<Inspection> AddAsync(Inspection inspection, CancellationToken cancellationToken = default);
+
+        Task<Inspection> UpdateAsync(Inspection inspection, CancellationToken cancellationToken = default);
     }
 }

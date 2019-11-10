@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Nesteo.Server.Data.Entities;
 using Nesteo.Server.Data.Enums;
@@ -40,6 +41,47 @@ namespace Nesteo.Server.Controllers.Api
                 return NotFound();
 
             return inspection;
+        }
+
+        /// <summary>
+        /// Create a new inspection
+        /// </summary>
+        /// <remarks>
+        /// No ID should be set, because it will get generated automatically.
+        /// </remarks>
+        /// <param name="inspection">The inspection to create</param>
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        public async Task<ActionResult<Inspection>> CreateInspectionAsync([FromBody] Inspection inspection)
+        {
+            // Create inspection
+            inspection = await _inspectionService.AddAsync(inspection, HttpContext.RequestAborted).ConfigureAwait(false);
+            if (inspection == null)
+                return Conflict();
+
+            return CreatedAtAction(nameof(GetInspectionByIdAsync), new { id = inspection.Id }, inspection);
+        }
+
+        /// <summary>
+        /// Edit an existing inspection
+        /// </summary>
+        /// <param name="id">Inspection id</param>
+        /// <param name="inspection">The modified inspection</param>
+        [HttpPatch("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public async Task<ActionResult> EditInspectionAsync(int id, [FromBody] Inspection inspection)
+        {
+            if (inspection.Id == null)
+                inspection.Id = id;
+            else if (inspection.Id != id)
+                return BadRequest();
+
+            // Edit inspection
+            inspection = await _inspectionService.UpdateAsync(inspection, HttpContext.RequestAborted).ConfigureAwait(false);
+            if (inspection == null)
+                return Conflict();
+
+            return NoContent();
         }
 
         /// <summary>

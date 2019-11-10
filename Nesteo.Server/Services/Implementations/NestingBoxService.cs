@@ -47,19 +47,19 @@ namespace Nesteo.Server.Services.Implementations
                            .AsAsyncEnumerable();
         }
 
-        public async Task<NestingBox> AddNestingBoxAsync(NestingBox nestingBox, CancellationToken cancellationToken = default)
+        public async Task<NestingBox> AddAsync(NestingBox nestingBox, CancellationToken cancellationToken = default)
         {
-            if (nestingBox.Id != null)
-            {
-                // When an ID has been set, make sure it doesn't exist yet. Otherwise we would accidentally overwrite an existing entry
-                if (await ExistsIdAsync(nestingBox.Id, cancellationToken).ConfigureAwait(false))
-                    return null;
-            }
-            else
+            if (nestingBox.Id == null)
             {
                 // Generate a new ID
                 nestingBox.Id = await _nestingBoxIdGenerator.GetNextIdsAsync(this, nestingBox.Region, 1, cancellationToken).SingleOrDefaultAsync(cancellationToken)
                                                             .ConfigureAwait(false);
+            }
+            else
+            {
+                // When an ID has been set, make sure it doesn't exist yet.
+                if (await ExistsIdAsync(nestingBox.Id, cancellationToken).ConfigureAwait(false))
+                    return null;
             }
 
             // Add or update related entities
@@ -82,7 +82,6 @@ namespace Nesteo.Server.Services.Implementations
                 Owner = ownerEntity,
                 Material = nestingBox.Material,
                 HoleSize = nestingBox.HoleSize.GetValueOrDefault(),
-                ImageFileName = nestingBox.ImageFileName,
                 Comment = nestingBox.Comment
             }).Entity;
 
@@ -92,7 +91,7 @@ namespace Nesteo.Server.Services.Implementations
             return Mapper.Map<NestingBox>(nestingBoxEntity);
         }
 
-        public async Task<NestingBox> UpdateNestingBoxAsync(NestingBox nestingBox, CancellationToken cancellationToken = default)
+        public async Task<NestingBox> UpdateAsync(NestingBox nestingBox, CancellationToken cancellationToken = default)
         {
             if (nestingBox.Id == null)
                 return null;
@@ -118,7 +117,6 @@ namespace Nesteo.Server.Services.Implementations
             nestingBoxEntity.Owner = ownerEntity;
             nestingBoxEntity.Material = nestingBox.Material;
             nestingBoxEntity.HoleSize = nestingBox.HoleSize.GetValueOrDefault();
-            nestingBoxEntity.ImageFileName = nestingBox.ImageFileName;
             nestingBoxEntity.Comment = nestingBox.Comment;
 
             // Save changes

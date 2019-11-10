@@ -72,7 +72,7 @@ namespace Nesteo.Server.Controllers.Api
         public async Task<ActionResult<NestingBox>> CreateNestingBoxAsync([FromBody] NestingBox nestingBox)
         {
             // Create nesting box
-            nestingBox = await _nestingBoxService.AddNestingBoxAsync(nestingBox, HttpContext.RequestAborted).ConfigureAwait(false);
+            nestingBox = await _nestingBoxService.AddAsync(nestingBox, HttpContext.RequestAborted).ConfigureAwait(false);
             if (nestingBox == null)
                 return Conflict();
 
@@ -94,7 +94,7 @@ namespace Nesteo.Server.Controllers.Api
                 return BadRequest();
 
             // Edit nesting box
-            nestingBox = await _nestingBoxService.UpdateNestingBoxAsync(nestingBox, HttpContext.RequestAborted).ConfigureAwait(false);
+            nestingBox = await _nestingBoxService.UpdateAsync(nestingBox, HttpContext.RequestAborted).ConfigureAwait(false);
             if (nestingBox == null)
                 return Conflict();
 

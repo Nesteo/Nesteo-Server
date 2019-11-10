@@ -71,12 +71,6 @@ namespace Nesteo.Server.Models
         public HoleSize? HoleSize { get; set; }
 
         /// <summary>
-        /// Name of the image of this nesting box (if any)
-        /// </summary>
-        [MaxLength(Constants.MaxImageFileNameLength)]
-        public string ImageFileName { get; set; }
-
-        /// <summary>
         /// Comment
         /// </summary>
         public string Comment { get; set; }
@@ -85,6 +79,11 @@ namespace Nesteo.Server.Models
         /// The time this data entry has last been updated
         /// </summary>
         public DateTime LastUpdated { get; set; }
+
+        /// <summary>
+        /// Whether an image for this nesting box exists
+        /// </summary>
+        public bool? HasImage { get; set; }
 
         /// <summary>
         /// How often this box has been inspected
