@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Hellang.Middleware.ProblemDetails;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Nesteo.Server.Data;
 using Nesteo.Server.Data.Enums;
@@ -59,7 +60,7 @@ namespace Nesteo.Server.Controllers.Api
         }
 
         /// <summary>
-        /// Creates a new nesting box
+        /// Create a new nesting box
         /// </summary>
         /// <remarks>
         /// In case no ID is specified, a new one will be calculated automatically. You can get the generated ID from the response.
@@ -67,6 +68,7 @@ namespace Nesteo.Server.Controllers.Api
         /// </remarks>
         /// <param name="nestingBox">The nesting box to create</param>
         [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
         public async Task<ActionResult<NestingBox>> CreateNestingBoxAsync([FromBody] NestingBox nestingBox)
         {
             // Create nesting box
@@ -75,6 +77,28 @@ namespace Nesteo.Server.Controllers.Api
                 return Conflict();
 
             return CreatedAtAction(nameof(GetNestingBoxByIdAsync), new { id = nestingBox.Id }, nestingBox);
+        }
+
+        /// <summary>
+        /// Edit an existing nesting box
+        /// </summary>
+        /// <param name="id">Nesting box id</param>
+        /// <param name="nestingBox">The modified nesting box</param>
+        [HttpPatch("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public async Task<ActionResult> EditNestingBoxAsync(string id, [FromBody] NestingBox nestingBox)
+        {
+            if (nestingBox.Id == null)
+                nestingBox.Id = id;
+            else if (nestingBox.Id != id)
+                return BadRequest();
+
+            // Edit nesting box
+            nestingBox = await _nestingBoxService.UpdateNestingBoxAsync(nestingBox, HttpContext.RequestAborted).ConfigureAwait(false);
+            if (nestingBox == null)
+                return Conflict();
+
+            return NoContent();
         }
 
         /// <summary>

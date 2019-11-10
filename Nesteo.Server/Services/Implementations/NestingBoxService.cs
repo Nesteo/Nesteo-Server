@@ -70,7 +70,7 @@ namespace Nesteo.Server.Services.Implementations
             UserEntity hangUpUserEntity = await DbContext.Users.FindAsync(new object[] { nestingBox.HangUpUser.Id }, cancellationToken).ConfigureAwait(false);
 
             // Create nesting box entry
-            NestingBoxEntity nestingBoxEntity = DbContext.NestingBoxes.Add(new NestingBoxEntity {
+            NestingBoxEntity nestingBoxEntity = Entities.Add(new NestingBoxEntity {
                 Id = nestingBox.Id,
                 Region = regionEntity,
                 OldId = nestingBox.OldId,
@@ -85,6 +85,41 @@ namespace Nesteo.Server.Services.Implementations
                 ImageFileName = nestingBox.ImageFileName,
                 Comment = nestingBox.Comment
             }).Entity;
+
+            // Save changes
+            await DbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+
+            return Mapper.Map<NestingBox>(nestingBoxEntity);
+        }
+
+        public async Task<NestingBox> UpdateNestingBoxAsync(NestingBox nestingBox, CancellationToken cancellationToken = default)
+        {
+            if (nestingBox.Id == null)
+                return null;
+
+            // Add or update related entities
+            RegionEntity regionEntity = DbContext.Regions.Update(Mapper.Map<RegionEntity>(nestingBox.Region)).Entity;
+            OwnerEntity ownerEntity = DbContext.Owners.Update(Mapper.Map<OwnerEntity>(nestingBox.Owner)).Entity;
+
+            // Retrieve existing user entity. Updating users this way is not supported.
+            UserEntity hangUpUserEntity = await DbContext.Users.FindAsync(new object[] { nestingBox.HangUpUser.Id }, cancellationToken).ConfigureAwait(false);
+
+            // Get existing nesting box entity
+            NestingBoxEntity nestingBoxEntity = await Entities.FindAsync(new object[] { nestingBox.Id }, cancellationToken).ConfigureAwait(false);
+
+            // Update values
+            nestingBoxEntity.Region = regionEntity;
+            nestingBoxEntity.OldId = nestingBox.OldId;
+            nestingBoxEntity.ForeignId = nestingBox.ForeignId;
+            nestingBoxEntity.CoordinateLongitude = nestingBox.CoordinateLongitude;
+            nestingBoxEntity.CoordinateLatitude = nestingBox.CoordinateLatitude;
+            nestingBoxEntity.HangUpDate = nestingBox.HangUpDate;
+            nestingBoxEntity.HangUpUser = hangUpUserEntity;
+            nestingBoxEntity.Owner = ownerEntity;
+            nestingBoxEntity.Material = nestingBox.Material;
+            nestingBoxEntity.HoleSize = nestingBox.HoleSize.GetValueOrDefault();
+            nestingBoxEntity.ImageFileName = nestingBox.ImageFileName;
+            nestingBoxEntity.Comment = nestingBox.Comment;
 
             // Save changes
             await DbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
