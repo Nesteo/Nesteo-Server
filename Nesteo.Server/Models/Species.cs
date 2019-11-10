@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace Nesteo.Server.Models
 {
     public class Species
@@ -10,6 +12,8 @@ namespace Nesteo.Server.Models
         /// <summary>
         /// Name of the species
         /// </summary>
+        [Required]
+        [MaxLength(Constants.MaxSpeciesNameLength)]
         public string Name { get; set; }
     }
 }

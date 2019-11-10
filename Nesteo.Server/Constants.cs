@@ -8,6 +8,10 @@ namespace Nesteo.Server
 
         public const int MaxRegionNameLength = 255;
 
+        public const int MaxSpeciesNameLength = 255;
+
         public const int NestingBoxIdLength = 6;
+
+        public const int MaxImageFileNameLength = 100;
     }
 }

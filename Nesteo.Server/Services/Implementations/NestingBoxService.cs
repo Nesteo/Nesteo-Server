@@ -81,7 +81,7 @@ namespace Nesteo.Server.Services.Implementations
                 HangUpUser = hangUpUserEntity,
                 Owner = ownerEntity,
                 Material = nestingBox.Material,
-                HoleSize = nestingBox.HoleSize,
+                HoleSize = nestingBox.HoleSize.GetValueOrDefault(),
                 ImageFileName = nestingBox.ImageFileName,
                 Comment = nestingBox.Comment
             }).Entity;

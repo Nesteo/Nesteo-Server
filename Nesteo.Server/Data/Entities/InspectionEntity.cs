@@ -61,7 +61,7 @@ namespace Nesteo.Server.Data.Entities
 
         public SpeciesEntity Species { get; set; }
 
-        [MaxLength(100)]
+        [MaxLength(Constants.MaxImageFileNameLength)]
         public string ImageFileName { get; set; }
 
         public string Comment { get; set; }

@@ -13,7 +13,7 @@ namespace Nesteo.Server.Data.Entities
         public int? Id { get; set; }
 
         [Required]
-        [MaxLength(Constants.MaxOwnerNameLength)]
+        [MaxLength(Constants.MaxSpeciesNameLength)]
         public string Name { get; set; }
 
         public ICollection<InspectionEntity> Inspections { get; set; }

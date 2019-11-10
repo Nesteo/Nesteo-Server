@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace Nesteo.Server.Models
 {
     public class Owner
@@ -10,6 +12,8 @@ namespace Nesteo.Server.Models
         /// <summary>
         /// Name of the owner
         /// </summary>
+        [Required]
+        [MaxLength(Constants.MaxOwnerNameLength)]
         public string Name { get; set; }
     }
 }
