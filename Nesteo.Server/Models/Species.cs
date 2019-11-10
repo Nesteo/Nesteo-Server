@@ -5,7 +5,7 @@ namespace Nesteo.Server.Models
         /// <summary>
         /// Species-ID
         /// </summary>
-        public int Id { get; set; }
+        public int? Id { get; set; }
 
         /// <summary>
         /// Name of the species

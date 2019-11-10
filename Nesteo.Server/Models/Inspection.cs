@@ -8,7 +8,7 @@ namespace Nesteo.Server.Models
         /// <summary>
         /// Inspection-ID
         /// </summary>
-        public int Id { get; set; }
+        public int? Id { get; set; }
 
         /// <summary>
         /// The inspected nesting box

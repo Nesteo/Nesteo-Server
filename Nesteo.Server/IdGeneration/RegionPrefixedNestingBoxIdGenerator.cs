@@ -11,17 +11,10 @@ namespace Nesteo.Server.IdGeneration
 {
     public class RegionPrefixedNestingBoxIdGenerator : INestingBoxIdGenerator
     {
-        private readonly INestingBoxService _nestingBoxService;
-
-        public RegionPrefixedNestingBoxIdGenerator(INestingBoxService nestingBoxService)
+        public async IAsyncEnumerable<string> GetNextIdsAsync(INestingBoxService nestingBoxService, Region region, int count, CancellationToken cancellationToken = default)
         {
-            _nestingBoxService = nestingBoxService ?? throw new ArgumentNullException(nameof(nestingBoxService));
-        }
-
-        public async IAsyncEnumerable<string> GetNextIdsAsync(User user, Region region, int count, CancellationToken cancellationToken = default)
-        {
-            if (user == null)
-                throw new ArgumentNullException(nameof(user));
+            if (nestingBoxService == null)
+                throw new ArgumentNullException(nameof(nestingBoxService));
             if (region == null)
                 throw new ArgumentNullException(nameof(region));
 
@@ -40,7 +33,7 @@ namespace Nesteo.Server.IdGeneration
             cancellationToken.ThrowIfCancellationRequested();
 
             // Query taken nesting box ids and get the enumerator for more efficient manual iteration
-            await using IAsyncEnumerator<string> takenNestingBoxIds = _nestingBoxService.GetAllTakenIdsInRegionAsync(region.Id).GetAsyncEnumerator(cancellationToken);
+            await using IAsyncEnumerator<string> takenNestingBoxIds = nestingBoxService.GetAllTakenIdsWithPrefixAsync(region.NestingBoxIdPrefix).GetAsyncEnumerator(cancellationToken);
             await takenNestingBoxIds.MoveNextAsync().ConfigureAwait(false);
 
             // Find next IDs

@@ -5,12 +5,12 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Nesteo.Server.Data.Entities
 {
     [Table("Regions")]
-    public class RegionEntity : IEntity<int>
+    public class RegionEntity : IEntity<int?>
     {
         [Key]
         [Required]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
+        public int? Id { get; set; }
 
         [Required]
         [MaxLength(Constants.MaxRegionNameLength)]

@@ -5,7 +5,7 @@ namespace Nesteo.Server.Models
         /// <summary>
         /// Region-ID
         /// </summary>
-        public int Id { get; set; }
+        public int? Id { get; set; }
 
         /// <summary>
         /// Name or description of the region's location

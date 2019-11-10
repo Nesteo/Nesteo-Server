@@ -21,7 +21,12 @@ namespace Nesteo.Server
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args).ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); });
+            Host.CreateDefaultBuilder(args).ConfigureWebHostDefaults(webBuilder => {
+                webBuilder.ConfigureKestrel(options => {
+                    options.Limits.MaxRequestBodySize = null;
+                });
+                webBuilder.UseStartup<Startup>();
+            });
 
         public static Task PrepareHostAsync(IHost host)
         {

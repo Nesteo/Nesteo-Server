@@ -12,28 +12,28 @@ using Nesteo.Server.Models;
 
 namespace Nesteo.Server.Services.Implementations
 {
-    public class InspectionService : CrudServiceBase<InspectionEntity, Inspection, int>, IInspectionService
+    public class InspectionService : CrudServiceBase<InspectionEntity, Inspection, int?>, IInspectionService
     {
         public InspectionService(NesteoDbContext dbContext, IMapper mapper) : base(dbContext, mapper) { }
 
         public IAsyncEnumerable<InspectionPreview> GetAllPreviewsAsync()
         {
-            return Entities.AsQueryable().OrderBy(entity => entity.Id).ProjectTo<InspectionPreview>(Mapper.ConfigurationProvider).AsAsyncEnumerable();
+            return Entities.AsNoTracking().OrderBy(entity => entity.Id).ProjectTo<InspectionPreview>(Mapper.ConfigurationProvider).AsAsyncEnumerable();
         }
 
         public Task<InspectionPreview> FindPreviewByIdAsync(int id, CancellationToken cancellationToken = default)
         {
-            return Entities.AsQueryable().Where(entity => entity.Id == id).ProjectTo<InspectionPreview>(Mapper.ConfigurationProvider).FirstOrDefaultAsync(cancellationToken);
+            return Entities.AsNoTracking().Where(entity => entity.Id == id).ProjectTo<InspectionPreview>(Mapper.ConfigurationProvider).FirstOrDefaultAsync(cancellationToken);
         }
 
         public IAsyncEnumerable<Inspection> GetAllForNestingBoxIdAsync(string nestingBoxId)
         {
-            return Entities.AsQueryable().OrderBy(entity => entity.Id).Where(entity => entity.NestingBox.Id == nestingBoxId).ProjectTo<Inspection>(Mapper.ConfigurationProvider).AsAsyncEnumerable();
+            return Entities.AsNoTracking().OrderBy(entity => entity.Id).Where(entity => entity.NestingBox.Id == nestingBoxId).ProjectTo<Inspection>(Mapper.ConfigurationProvider).AsAsyncEnumerable();
         }
 
         public IAsyncEnumerable<InspectionPreview> GetAllPreviewsForNestingBoxIdAsync(string nestingBoxId)
         {
-            return Entities.AsQueryable().OrderBy(entity => entity.Id).Where(entity => entity.NestingBox.Id == nestingBoxId).ProjectTo<InspectionPreview>(Mapper.ConfigurationProvider).AsAsyncEnumerable();
+            return Entities.AsNoTracking().OrderBy(entity => entity.Id).Where(entity => entity.NestingBox.Id == nestingBoxId).ProjectTo<InspectionPreview>(Mapper.ConfigurationProvider).AsAsyncEnumerable();
         }
     }
 }

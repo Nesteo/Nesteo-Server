@@ -18,11 +18,11 @@ namespace Nesteo.Server.Tests
         public async Task ReturnsCorrectIds(string prefix, int count, string[] takenIds, string[] expectedNextIds)
         {
             var nestingBoxServiceMock = new Mock<INestingBoxService>(MockBehavior.Strict);
-            nestingBoxServiceMock.Setup(service => service.GetAllTakenIdsInRegionAsync(0)).Returns(takenIds.ToAsyncEnumerable);
+            nestingBoxServiceMock.Setup(service => service.GetAllTakenIdsWithPrefixAsync(prefix)).Returns(takenIds.ToAsyncEnumerable);
 
-            var generator = new RegionPrefixedNestingBoxIdGenerator(nestingBoxServiceMock.Object);
+            var generator = new RegionPrefixedNestingBoxIdGenerator();
 
-            List<string> ids = await generator.GetNextIdsAsync(new User(), new Region { Id = 0, Name = "Test Region", NestingBoxIdPrefix = prefix }, count).ToListAsync()
+            List<string> ids = await generator.GetNextIdsAsync(nestingBoxServiceMock.Object, new Region { Id = 0, Name = "Test Region", NestingBoxIdPrefix = prefix }, count).ToListAsync()
                                               .ConfigureAwait(false);
             Assert.Equal(expectedNextIds, ids);
         }

@@ -11,9 +11,9 @@ namespace Nesteo.Server.MappingProfiles
         public ModelMappingProfile()
         {
             CreateMap<UserEntity, User>();
-            CreateMap<RegionEntity, Region>();
-            CreateMap<OwnerEntity, Owner>();
-            CreateMap<SpeciesEntity, Species>();
+            CreateMap<RegionEntity, Region>().ReverseMap();
+            CreateMap<OwnerEntity, Owner>().ReverseMap();
+            CreateMap<SpeciesEntity, Species>().ReverseMap();
             CreateMap<NestingBoxEntity, NestingBox>().ForMember(dest => dest.InspectionsCount, options => options.MapFrom(nestingBox => nestingBox.Inspections.Count)).ForMember(
                 dest => dest.LastInspected,
                 options => options.MapFrom(nestingBox => nestingBox

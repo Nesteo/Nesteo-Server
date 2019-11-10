@@ -45,7 +45,7 @@ namespace Nesteo.Server.SampleDataGenerator
             Console.WriteLine("Generating sample data...");
 
             var random = new Random();
-            UserEntity user = await dbContext.Users.FirstOrDefaultAsync().ConfigureAwait(false);
+            UserEntity user = await dbContext.Users.AsQueryable().FirstOrDefaultAsync().ConfigureAwait(false);
             if (user == null)
             {
                 Console.WriteLine("Please run the server first to make sure that at least one user exists.");

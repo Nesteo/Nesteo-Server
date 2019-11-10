@@ -13,6 +13,8 @@ namespace Nesteo.Server.Services
 
         IAsyncEnumerable<string> GetAllTakenIdsAsync();
 
-        IAsyncEnumerable<string> GetAllTakenIdsInRegionAsync(int regionId);
+        IAsyncEnumerable<string> GetAllTakenIdsWithPrefixAsync(string regionPrefix);
+
+        Task<NestingBox> AddNestingBoxAsync(NestingBox nestingBox, CancellationToken cancellationToken = default);
     }
 }
