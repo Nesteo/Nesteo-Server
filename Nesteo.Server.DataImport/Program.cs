@@ -26,76 +26,76 @@ namespace Nesteo.Server.DataImport
         public class Stammdaten
         {
             [Index(0)]
-            public string nistkastenNummer { get; set; }
+            public string NistkastenNummer { get; set; }
 
             [Index(1)]
-            public string nummerFremd { get; set; }
+            public string NummerFremd { get; set; }
 
             [Index(2)]
-            public string ort { get; set; }
+            public string Ort { get; set; }
 
             [Index(3)]
-            public string ortDetailliert { get; set; }
+            public string OrtDetailliert { get; set; }
 
             [Index(4)]
-            public string utmHoch { get; set; }
+            public string UTMHoch { get; set; }
 
             [Index(5)]
-            public string utmRechts { get; set; }
+            public string UTMRechts { get; set; }
 
             [Index(6)]
-            public string aufhangDatum { get; set; }
+            public string AufhangDatum { get; set; }
 
             [Index(7)]
-            public string eigentumer{ get; set; }
+            public string Eigentumer{ get; set; }
 
             [Index(8)]
-            public string material { get; set; }
+            public string Material { get; set; }
 
             [Index(9)]
-            public string loch { get; set; }
+            public string Loch { get; set; }
 
             [Index(10)]
-            public string bemerkungen { get; set; }
+            public string Bemerkungen { get; set; }
 
             [Index(11)]
-            public string aktualisiertDatum { get; set; }
+            public string AktualisiertDatum { get; set; }
         }
 
         public class Kontrolldaten
         {
             [Index(0)]
-            public string nistkastenNummer { get; set; }
+            public string NistkastenNummer { get; set; }
 
             [Index(1)]
-            public string datum { get; set; }
+            public string Datum { get; set; }
 
             [Index(2)]
-            public string zustandKasten { get; set; }
+            public string ZustandKasten { get; set; }
 
             [Index(3)]
-            public string gereinigt { get; set; }
+            public string Gereinigt { get; set; }
 
             [Index (4)]
-            public string besetzt { get; set; }
+            public string Besetzt { get; set; }
 
             [Index(5)]
-            public string anzahlEier { get; set; }
+            public string AnzahlEier { get; set; }
 
             [Index(6)]
-            public string anzahlJungvogel { get; set; }
+            public string AnzahlJungvogel { get; set; }
 
             [Index(7)]
-            public string alterJungvogel { get; set; }
+            public string AlterJungvogel { get; set; }
 
             [Index(8)]
-            public string vogelart { get; set; }
+            public string Vogelart { get; set; }
 
             [Index(9)]
-            public string berignt { get; set; }
+            public string Berignt { get; set; }
 
             [Index(10)]
-            public string bemerkungen { get; set; }
+            public string Bemerkungen { get; set; }
         }
 
         public static async Task Main(string[] args)
@@ -119,17 +119,6 @@ namespace Nesteo.Server.DataImport
             // Clear database
 //            await ClearDatabase(dbContext);
 
-            // Generate regions
-//            await GenerateRegions(dbContext);
-
-            // Generate owners
-//            await GenerateOwners(dbContext);
-
-            // Generate species
-//            await GenerateSpecies(dbContext);
-
-
-            var random = new Random();
             UserEntity user = await dbContext.Users.FirstOrDefaultAsync().ConfigureAwait(false);
             if (user == null)
             {
@@ -137,17 +126,21 @@ namespace Nesteo.Server.DataImport
                 return;
             }
 
-//            ReadStammDaten(dbContext, user);
+            ReadStammDaten(dbContext, user);
+            await SaveDatabase(dbContext);
 
-            ReadKontrollDaten(dbContext, random, user);
+            ReadKontrollDaten(dbContext, user);
+            await SaveDatabase(dbContext);
+        }
 
-
-            Console.WriteLine("saving");
+        private static async Task SaveDatabase(NesteoDbContext dbContext)
+        {
+            Console.WriteLine("Saving");
             await dbContext.SaveChangesAsync().ConfigureAwait(false);
             Console.WriteLine("Done.");
         }
 
-        private static void ReadStammDaten(NesteoDbContext dbContext, UserEntity user)
+        private static async void ReadStammDaten(NesteoDbContext dbContext, UserEntity user)
         {
             using (var reader = new StreamReader("/home/randy/Nesteo-Server/Nesteo.Server.DataImport/Data/Stammdaten-9.csv"))
             using (var csv = new CsvReader(reader))
@@ -156,12 +149,18 @@ namespace Nesteo.Server.DataImport
 
                 foreach (var record in records)
                 {
+                    // Generate regions
+                    await GenerateRegions(dbContext, record);
+
+                    // Generate owners
+                    await GenerateOwners(dbContext, record);
+
                     GenerateNestingBoxes(dbContext, record, user);
                 }
             }
         }
 
-        private static void ReadKontrollDaten(NesteoDbContext dbContext, Random random, UserEntity user)
+        private static void ReadKontrollDaten(NesteoDbContext dbContext, UserEntity user)
         {
             using (var reader = new StreamReader("/home/randy/Nesteo-Server/Nesteo.Server.DataImport/Data/Kontrolldaten.csv"))
             using (var csv = new CsvReader(reader))
@@ -170,7 +169,10 @@ namespace Nesteo.Server.DataImport
                 var records = csv.GetRecords<Kontrolldaten>();
                 foreach (var record in records)
                 {
-                    GenerateInspections(dbContext, record, random, user);
+                    // Generate species
+                    GenerateSpecies(dbContext, record);
+
+                    GenerateInspections(dbContext, record, user);
                 }
             }
         }
@@ -189,78 +191,83 @@ namespace Nesteo.Server.DataImport
 
         }
 
-        private static async Task GenerateRegions(NesteoDbContext dbContext)
+        private static async Task GenerateRegions(NesteoDbContext dbContext, Stammdaten record)
         {
-//            Console.WriteLine("Generating regions...");
-//            bool contains = dbContext.Regions.AsEnumerable().Any(row => record.ort == row.Name);//("Name = '" + record.ort + "'");
-////            var existing = dbContext.Regions.Find(record.ort);
-//            if (contains)
-//            {
-//                Console.WriteLine("Old");
-////                dbContext.Regions.Add(new RegionEntity { Name = record.ort, NestingBoxIdPrefix = "X" });
-//            }
-//            else
-//            {
-//                Console.WriteLine("New");
-////                Console.WriteLine("Old");//dbContext.Regions.Update(new RegionEntity { NestingBoxIdPrefix = "Y" });
-//            }
 
-            dbContext.Regions.Add(new RegionEntity{Name = "oythe", NestingBoxIdPrefix = "X" });
-            dbContext.Regions.Add(new RegionEntity{Name = "Bergstrup", NestingBoxIdPrefix = "X"});
-            dbContext.Regions.Add(new RegionEntity{Name = "Holzhausen", NestingBoxIdPrefix = "X"});
-            dbContext.Regions.Add(new RegionEntity{Name = "Vechta", NestingBoxIdPrefix = "X"});
-            dbContext.Regions.Add(new RegionEntity{Name = "Stoppelmarkt", NestingBoxIdPrefix = "X"});
-            dbContext.Regions.Add(new RegionEntity{Name = "Langförden", NestingBoxIdPrefix = "X"});
-            dbContext.Regions.Add(new RegionEntity{Name = "Holtrup", NestingBoxIdPrefix = "X"});
-            dbContext.Regions.Add(new RegionEntity{Name = "Langförden-Nord", NestingBoxIdPrefix = "X"});
+            if (!dbContext.Regions.AsEnumerable().Any(row => record.Ort == row.Name))
+            {
+                dbContext.Regions.Add(new RegionEntity { Name = record.Ort, NestingBoxIdPrefix = record.Ort[0].ToString() });
+                await SaveDatabase(dbContext);
+            }
+
+//            dbContext.Regions.Add(new RegionEntity{Name = "oythe", NestingBoxIdPrefix = "O" });
+//            dbContext.Regions.Add(new RegionEntity{Name = "Bergstrup", NestingBoxIdPrefix = "B"});
+//            dbContext.Regions.Add(new RegionEntity{Name = "Holzhausen", NestingBoxIdPrefix = "H"});
+//            dbContext.Regions.Add(new RegionEntity{Name = "Vechta", NestingBoxIdPrefix = "V"});
+//            dbContext.Regions.Add(new RegionEntity{Name = "Stoppelmarkt", NestingBoxIdPrefix = "S"});
+//            dbContext.Regions.Add(new RegionEntity{Name = "Langförden", NestingBoxIdPrefix = "L"});
+//            dbContext.Regions.Add(new RegionEntity{Name = "Holtrup", NestingBoxIdPrefix = "H"});
+//            dbContext.Regions.Add(new RegionEntity{Name = "Langförden-Nord", NestingBoxIdPrefix = "L"});
         }
 
-        private static async Task GenerateOwners(NesteoDbContext dbContext)
+        private static async Task GenerateOwners(NesteoDbContext dbContext, Stammdaten record)
         {
-            Console.WriteLine("Generating owners...");
-            dbContext.Owners.Add(new OwnerEntity{Name = "NABU Vechta"});
-            dbContext.Owners.Add(new OwnerEntity{Name = "unbekannt"});
-            dbContext.Owners.Add(new OwnerEntity{Name = "Kreisjägerschaft Vechta"});
-            dbContext.Owners.Add(new OwnerEntity{Name = "Ludger Nerkamp"});
-            dbContext.Owners.Add(new OwnerEntity{Name = "Daniel Cobold"});
-            dbContext.Owners.Add(new OwnerEntity{Name = "Wilhelm Rieken"});
-            dbContext.Owners.Add(new OwnerEntity{Name = "Ursula Wilmering"});
-            dbContext.Owners.Add(new OwnerEntity{Name = "Kolleg St. Thomas"});
-            dbContext.Owners.Add(new OwnerEntity{Name = "Beringergemeinschaft Landkreis Vechta"});
-            dbContext.Owners.Add(new OwnerEntity{Name = "Beringergemeinschaft LK Vechta"});
-            dbContext.Owners.Add(new OwnerEntity{Name = "NABU Lohne"});
-            dbContext.Owners.Add(new OwnerEntity{Name = "von Frydag"});
-            dbContext.Owners.Add(new OwnerEntity{Name = "Ludger Ellert"});
+            if (!dbContext.Owners.AsEnumerable().Any(row => record.Eigentumer == row.Name))
+            {
+                dbContext.Owners.Add(new OwnerEntity { Name = record.Eigentumer });
+                await SaveDatabase(dbContext);
+            }
+
+//            Console.WriteLine("Generating owners...");
+//            dbContext.Owners.Add(new OwnerEntity{Name = "NABU Vechta"});
+//            dbContext.Owners.Add(new OwnerEntity{Name = "unbekannt"});
+//            dbContext.Owners.Add(new OwnerEntity{Name = "Kreisjägerschaft Vechta"});
+//            dbContext.Owners.Add(new OwnerEntity{Name = "Ludger Nerkamp"});
+//            dbContext.Owners.Add(new OwnerEntity{Name = "Daniel Cobold"});
+//            dbContext.Owners.Add(new OwnerEntity{Name = "Wilhelm Rieken"});
+//            dbContext.Owners.Add(new OwnerEntity{Name = "Ursula Wilmering"});
+//            dbContext.Owners.Add(new OwnerEntity{Name = "Kolleg St. Thomas"});
+//            dbContext.Owners.Add(new OwnerEntity{Name = "Beringergemeinschaft Landkreis Vechta"});
+//            dbContext.Owners.Add(new OwnerEntity{Name = "Beringergemeinschaft LK Vechta"});
+//            dbContext.Owners.Add(new OwnerEntity{Name = "NABU Lohne"});
+//            dbContext.Owners.Add(new OwnerEntity{Name = "von Frydag"});
+//            dbContext.Owners.Add(new OwnerEntity{Name = "Ludger Ellert"});
     }
 
-        private static async Task GenerateSpecies(NesteoDbContext dbContext)
+        private static async Task GenerateSpecies(NesteoDbContext dbContext, Kontrolldaten record)
         {
-            Console.WriteLine("Generating species...");
-            dbContext.Species.Add(new SpeciesEntity { Name = "Amsel" });
-            dbContext.Species.Add(new SpeciesEntity { Name = "Bachstelze" });
-            dbContext.Species.Add(new SpeciesEntity { Name = "Baumläufer" });
-            dbContext.Species.Add(new SpeciesEntity { Name = "Blaumeise" });
-            dbContext.Species.Add(new SpeciesEntity { Name = "Buntspecht" });
-            dbContext.Species.Add(new SpeciesEntity { Name = "Dohle" });
-            dbContext.Species.Add(new SpeciesEntity { Name = "Feldsperling" });
-            dbContext.Species.Add(new SpeciesEntity { Name = "Gartenbaumläufer" });
-            dbContext.Species.Add(new SpeciesEntity { Name = "Gartenrotschwanz" });
-            dbContext.Species.Add(new SpeciesEntity { Name = "Grauschnäpper" });
-            dbContext.Species.Add(new SpeciesEntity { Name = "Haussperling" });
-            dbContext.Species.Add(new SpeciesEntity { Name = "Hohltaube" });
-            dbContext.Species.Add(new SpeciesEntity { Name = "Kleiber" });
-            dbContext.Species.Add(new SpeciesEntity { Name = "Kohlmeise" });
-            dbContext.Species.Add(new SpeciesEntity { Name = "Kohlmeise x Blaumeise" });
-            dbContext.Species.Add(new SpeciesEntity { Name = "Meise" });
-            dbContext.Species.Add(new SpeciesEntity { Name = "Meise unbestimmt" });
-            dbContext.Species.Add(new SpeciesEntity { Name = "Rotkehlchen" });
-            dbContext.Species.Add(new SpeciesEntity { Name = "Star" });
-            dbContext.Species.Add(new SpeciesEntity { Name = "Sumpfmeise" });
-            dbContext.Species.Add(new SpeciesEntity { Name = "Tannenmeise" });
-            dbContext.Species.Add(new SpeciesEntity { Name = "Trauerschnäpper" });
-            dbContext.Species.Add(new SpeciesEntity { Name = "Zaunkönig" });
-            dbContext.Species.Add(new SpeciesEntity { Name = "unbestimmt" });
-            dbContext.Species.Add(new SpeciesEntity { Name = "unbekannt" });
+            if (!dbContext.Species.AsEnumerable().Any(row => record.Vogelart == row.Name))
+            {
+                dbContext.Species.Add(new SpeciesEntity { Name = record.Vogelart });
+                await SaveDatabase(dbContext);
+            }
+
+//            Console.WriteLine("Generating species...");
+//            dbContext.Species.Add(new SpeciesEntity { Name = "Amsel" });
+//            dbContext.Species.Add(new SpeciesEntity { Name = "Bachstelze" });
+//            dbContext.Species.Add(new SpeciesEntity { Name = "Baumläufer" });
+//            dbContext.Species.Add(new SpeciesEntity { Name = "Blaumeise" });
+//            dbContext.Species.Add(new SpeciesEntity { Name = "Buntspecht" });
+//            dbContext.Species.Add(new SpeciesEntity { Name = "Dohle" });
+//            dbContext.Species.Add(new SpeciesEntity { Name = "Feldsperling" });
+//            dbContext.Species.Add(new SpeciesEntity { Name = "Gartenbaumläufer" });
+//            dbContext.Species.Add(new SpeciesEntity { Name = "Gartenrotschwanz" });
+//            dbContext.Species.Add(new SpeciesEntity { Name = "Grauschnäpper" });
+//            dbContext.Species.Add(new SpeciesEntity { Name = "Haussperling" });
+//            dbContext.Species.Add(new SpeciesEntity { Name = "Hohltaube" });
+//            dbContext.Species.Add(new SpeciesEntity { Name = "Kleiber" });
+//            dbContext.Species.Add(new SpeciesEntity { Name = "Kohlmeise" });
+//            dbContext.Species.Add(new SpeciesEntity { Name = "Kohlmeise x Blaumeise" });
+//            dbContext.Species.Add(new SpeciesEntity { Name = "Meise" });
+//            dbContext.Species.Add(new SpeciesEntity { Name = "Meise unbestimmt" });
+//            dbContext.Species.Add(new SpeciesEntity { Name = "Rotkehlchen" });
+//            dbContext.Species.Add(new SpeciesEntity { Name = "Star" });
+//            dbContext.Species.Add(new SpeciesEntity { Name = "Sumpfmeise" });
+//            dbContext.Species.Add(new SpeciesEntity { Name = "Tannenmeise" });
+//            dbContext.Species.Add(new SpeciesEntity { Name = "Trauerschnäpper" });
+//            dbContext.Species.Add(new SpeciesEntity { Name = "Zaunkönig" });
+//            dbContext.Species.Add(new SpeciesEntity { Name = "unbestimmt" });
+//            dbContext.Species.Add(new SpeciesEntity { Name = "unbekannt" });
 
         }
 
@@ -272,9 +279,9 @@ namespace Nesteo.Server.DataImport
             HoleSize holeSize;
 
             // Search for ownerId
-            if (record.eigentumer != " ")
+            if (record.Eigentumer != " ")
             {
-                ownerEntity = (from o in dbContext.Owners where o.Name == record.eigentumer select o).FirstOrDefault();
+                ownerEntity = (from o in dbContext.Owners where o.Name == record.Eigentumer select o).FirstOrDefault();
             }
             else
             {
@@ -282,9 +289,9 @@ namespace Nesteo.Server.DataImport
             }
 
             // Search for regionId
-            if (record.ort != " ")
+            if (record.Ort != " ")
             {
-                regionEntity = (from r in dbContext.Regions where r.Name == record.ort select r).FirstOrDefault();
+                regionEntity = (from r in dbContext.Regions where r.Name == record.Ort select r).FirstOrDefault();
             }
             else
             {
@@ -292,15 +299,15 @@ namespace Nesteo.Server.DataImport
             }
 
             // Get Material Value
-            if (record.material.StartsWith("Holbeton"))
+            if (record.Material.StartsWith("Holbeton"))
             {
                 material = Material.WoodConcrete;
             }
-            else if (record.material == "Holz unbeschicht")
+            else if (record.Material == "Holz unbeschicht")
             {
                 material = Material.UntreatedWood;
             }
-            else if (record.material == "Holz beschicht")
+            else if (record.Material == "Holz beschicht")
             {
                 material = Material.TreatedWood;
             }
@@ -310,23 +317,23 @@ namespace Nesteo.Server.DataImport
             }
 
             // Get HoleSize Value
-            if (record.loch == "sehr groß")
+            if (record.Loch == "sehr groß")
             {
                 holeSize = HoleSize.VeryLarge;
             }
-            else if (record.loch == "groß")
+            else if (record.Loch == "groß")
             {
                 holeSize = HoleSize.Large;
             }
-            else if (record.loch == "mittel")
+            else if (record.Loch == "mittel")
             {
                 holeSize = HoleSize.Medium;
             }
-            else if (record.loch == "klein")
+            else if (record.Loch == "klein")
             {
                 holeSize = HoleSize.Small;
             }
-            else if (record.loch == "Halbhöhle")
+            else if (record.Loch == "Halbhöhle")
             {
                 // TODO This may be wrong translation
                 holeSize = HoleSize.Oval;
@@ -339,25 +346,25 @@ namespace Nesteo.Server.DataImport
             //TODO Id is 6 digits while existing data is 1 letter and 5 digits
 //            var existing = dbContext.NestingBoxes.Find($"{regionEntity.NestingBoxIdPrefix}{record.nistkastenNummer}");
             NestingBoxEntity nb = new NestingBoxEntity {
-                Id = $"{record.nistkastenNummer}",
+                Id = $"{record.NistkastenNummer}",
 //                Id = $"{regionEntity.NestingBoxIdPrefix}{record.nistkastenNummer}",
                 Region = regionEntity,
                 OldId = null,
-                ForeignId = record.nummerFremd,
-                CoordinateLongitude = Convert.ToInt32(record.utmHoch)/100000.0,
-                CoordinateLatitude = Convert.ToInt32(record.utmRechts)/100000.0,
-                HangUpDate = Convert.ToDateTime(record.aufhangDatum),
+                ForeignId = record.NummerFremd == " "? null: record.NummerFremd,
+                CoordinateLongitude = Convert.ToInt32(record.UTMHoch)/100000.0,
+                CoordinateLatitude = Convert.ToInt32(record.UTMRechts)/100000.0,
+                HangUpDate = Convert.ToDateTime(record.AufhangDatum),
                 HangUpUser = user,
                 Owner = ownerEntity,
                 Material = material,
                 HoleSize = holeSize,
                 ImageFileName = null,
-                Comment = record.bemerkungen
+                Comment = record.Bemerkungen
             };
             dbContext.NestingBoxes.Add(nb);
         }
 
-        private static async Task GenerateInspections(NesteoDbContext dbContext, Kontrolldaten record, Random random, UserEntity user)
+        private static async Task GenerateInspections(NesteoDbContext dbContext, Kontrolldaten record, UserEntity user)
         {
             NestingBoxEntity nestingBox;
             SpeciesEntity speciesEntity;
@@ -366,17 +373,17 @@ namespace Nesteo.Server.DataImport
 
 
             // Get nestingBoxId
-            nestingBox = (from n in dbContext.NestingBoxes where n.Id == record.nistkastenNummer select n).FirstOrDefault();
+            nestingBox = (from n in dbContext.NestingBoxes where n.Id == record.NistkastenNummer select n).FirstOrDefault();
 
             // Get speciesEntity
-            speciesEntity = (from s in dbContext.Species where s.Name == record.vogelart select s).FirstOrDefault();
+            speciesEntity = (from s in dbContext.Species where s.Name == record.Vogelart select s).FirstOrDefault();
 
             // Get Condition Value
-            if (record.zustandKasten.StartsWith("Repariert") || record.zustandKasten.StartsWith("in Ordnung"))
+            if (record.ZustandKasten.StartsWith("Repariert") || record.ZustandKasten.StartsWith("in Ordnung"))
             {
                 condition = Condition.Good;
             }
-            else if (record.zustandKasten.StartsWith("leicht defekt"))
+            else if (record.ZustandKasten.StartsWith("leicht defekt"))
             {
                 condition = Condition.NeedsRepair;
             }
@@ -387,22 +394,23 @@ namespace Nesteo.Server.DataImport
 
             inspectionEntity = new InspectionEntity {
                 NestingBox = nestingBox.Equals(null) ? new NestingBoxEntity{Id = "0"} : nestingBox,
-                InspectionDate = Convert.ToDateTime(record.datum),
+                InspectionDate = Convert.ToDateTime(record.Datum),
                 InspectedByUser = user,
-                HasBeenCleaned = record.gereinigt.ToLower() == "ja",
+                HasBeenCleaned = record.Gereinigt.ToLower() == "ja",
                 Condition = condition,
                 JustRepaired = false,
-                Occupied = record.besetzt.ToLower() == "ja",
-                ContainsEggs = record.anzahlEier != " ",
-                EggCount = record.anzahlEier == " "? 0 : Convert.ToInt32(record.anzahlEier),
-                ChickCount = record.anzahlJungvogel == " "? 0 : Convert.ToInt32(record.anzahlJungvogel),
-                RingedChickCount = record.berignt == " "? 0 : Convert.ToInt32(record.berignt),
-                AgeInDays = record.alterJungvogel == " "? 0 : Convert.ToInt32(record.alterJungvogel),
+                Occupied = record.Besetzt.ToLower() == "ja",
+                ContainsEggs = record.AnzahlEier != " " && record.AnzahlEier != "0",
+                EggCount = record.AnzahlEier == " "? 0 : Convert.ToInt32(record.AnzahlEier),
+                ChickCount = record.AnzahlJungvogel == " "? 0 : Convert.ToInt32(record.AnzahlJungvogel),
+                RingedChickCount = record.Berignt == " "? 0 : Convert.ToInt32(record.Berignt),
+                AgeInDays = record.AlterJungvogel == " "? 0 : Convert.ToInt32(record.AlterJungvogel),
                 FemaleParentBirdDiscovery = ParentBirdDiscovery.None,
                 MaleParentBirdDiscovery = ParentBirdDiscovery.None,
                 Species = speciesEntity,
                 ImageFileName = null,
-                Comment = record.bemerkungen
+                Comment = record.Bemerkungen == " "? null: record.Bemerkungen
+
             };
             dbContext.Inspections.Add(inspectionEntity);
         }
