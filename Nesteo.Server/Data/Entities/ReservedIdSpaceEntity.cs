@@ -6,12 +6,12 @@ using Nesteo.Server.Data.Entities.Identity;
 namespace Nesteo.Server.Data.Entities
 {
     [Table("ReservedIdSpaces")]
-    public class ReservedIdSpaceEntity : IEntity<int>
+    public class ReservedIdSpaceEntity : IEntity<int?>
     {
         [Key]
         [Required]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
+        public int? Id { get; set; }
 
         [Required]
         public RegionEntity Region { get; set; }

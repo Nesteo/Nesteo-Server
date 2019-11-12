@@ -6,7 +6,7 @@ using Nesteo.Server.Models;
 
 namespace Nesteo.Server.Services.Implementations
 {
-    public class OwnerService : CrudServiceBase<OwnerEntity, Owner, int>, IOwnerService
+    public class OwnerService : CrudServiceBase<OwnerEntity, Owner, int?>, IOwnerService
     {
         public OwnerService(NesteoDbContext dbContext, IMapper mapper) : base(dbContext, mapper) { }
     }

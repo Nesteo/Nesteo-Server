@@ -24,7 +24,7 @@ namespace Nesteo.Server.Services.Implementations
 
         public IAsyncEnumerable<User> GetAllAsync()
         {
-            return _userManager.Users.ProjectTo<User>(_mapper.ConfigurationProvider).AsAsyncEnumerable();
+            return _userManager.Users.AsNoTracking().ProjectTo<User>(_mapper.ConfigurationProvider).AsAsyncEnumerable();
         }
 
         public async Task<User> FindByIdAsync(string id, CancellationToken cancellationToken = default)
@@ -32,11 +32,16 @@ namespace Nesteo.Server.Services.Implementations
             if (id == null)
                 throw new ArgumentNullException(nameof(id));
 
-            return await _userManager.Users.ProjectTo<User>(_mapper.ConfigurationProvider).FirstOrDefaultAsync(u => u.Id == id, cancellationToken).ConfigureAwait(false);
+            return await _userManager.Users.AsNoTracking().ProjectTo<User>(_mapper.ConfigurationProvider).FirstOrDefaultAsync(u => u.Id == id, cancellationToken)
+                                     .ConfigureAwait(false);
         }
 
-        public Task<User> InsertOrUpdateAsync(User entry, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+        public Task<bool> ExistsIdAsync(string id, CancellationToken cancellationToken = default)
+        {
+            if (id == null)
+                throw new ArgumentNullException(nameof(id));
 
-        public Task DeleteAsync(string id, CancellationToken cancellationToken = default) => throw new NotImplementedException();
+            return _userManager.Users.AsNoTracking().AnyAsync(u => u.Id == id, cancellationToken);
+        }
     }
 }

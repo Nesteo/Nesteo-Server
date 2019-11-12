@@ -17,6 +17,7 @@ using Nesteo.Server.BackgroundTasks;
 using Nesteo.Server.Configuration;
 using Nesteo.Server.Data;
 using Nesteo.Server.Data.Entities.Identity;
+using Nesteo.Server.IdGeneration;
 using Nesteo.Server.Services;
 using Nesteo.Server.Services.Implementations;
 using Nesteo.Server.Swagger;
@@ -46,6 +47,7 @@ namespace Nesteo.Server
                                  mySqlOptions => {
                                      mySqlOptions.ServerVersion(new Version(10, 3), ServerType.MariaDb);
                                  });
+                options.EnableSensitiveDataLogging();
             });
 
             // Add itentity system
@@ -84,7 +86,11 @@ namespace Nesteo.Server
             services.AddProblemDetails();
 
             // Add support for API controllers
-            services.AddControllers();
+            services.AddControllers(options => {
+                // TODO: Temporary fix to make CreatedAtAction work
+                // See: https://github.com/aspnet/AspNetCore/issues/15316
+                options.SuppressAsyncSuffixInActionNames = false;
+            });
 
             // Add support for razor pages
             services.AddRazorPages();
@@ -118,6 +124,9 @@ namespace Nesteo.Server
             services.AddScoped<ISpeciesService, SpeciesService>();
             services.AddScoped<INestingBoxService, NestingBoxService>();
             services.AddScoped<IInspectionService, InspectionService>();
+
+            // Add helper classes
+            services.AddTransient<INestingBoxIdGenerator, RegionPrefixedNestingBoxIdGenerator>();
         }
 
         // This method gets called by the runtime and configures the HTTP request pipeline.

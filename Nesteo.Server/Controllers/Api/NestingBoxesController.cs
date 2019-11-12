@@ -1,8 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using Hellang.Middleware.ProblemDetails;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Nesteo.Server.Data;
 using Nesteo.Server.Data.Enums;
+using Nesteo.Server.IdGeneration;
 using Nesteo.Server.Models;
 using Nesteo.Server.Services;
 
@@ -13,11 +19,18 @@ namespace Nesteo.Server.Controllers.Api
     {
         private readonly INestingBoxService _nestingBoxService;
         private readonly IInspectionService _inspectionService;
+        private readonly INestingBoxIdGenerator _nestingBoxIdGenerator;
+        private readonly IUserService _userService;
 
-        public NestingBoxesController(INestingBoxService nestingBoxService, IInspectionService inspectionService)
+        public NestingBoxesController(INestingBoxService nestingBoxService,
+                                      IInspectionService inspectionService,
+                                      INestingBoxIdGenerator nestingBoxIdGenerator,
+                                      IUserService userService)
         {
             _nestingBoxService = nestingBoxService ?? throw new ArgumentNullException(nameof(nestingBoxService));
             _inspectionService = inspectionService ?? throw new ArgumentNullException(nameof(inspectionService));
+            _nestingBoxIdGenerator = nestingBoxIdGenerator ?? throw new ArgumentNullException(nameof(nestingBoxIdGenerator));
+            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         }
 
         /// <summary>
@@ -44,6 +57,48 @@ namespace Nesteo.Server.Controllers.Api
                 return NotFound();
 
             return nestingBox;
+        }
+
+        /// <summary>
+        /// Create a new nesting box
+        /// </summary>
+        /// <remarks>
+        /// In case no ID is specified, a new one will be calculated automatically. You can get the generated ID from the response.
+        /// Other entries included in this nesting box entry will be automatically created or updated as needed.
+        /// </remarks>
+        /// <param name="nestingBox">The nesting box to create</param>
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        public async Task<ActionResult<NestingBox>> CreateNestingBoxAsync([FromBody] NestingBox nestingBox)
+        {
+            // Create nesting box
+            nestingBox = await _nestingBoxService.AddAsync(nestingBox, HttpContext.RequestAborted).ConfigureAwait(false);
+            if (nestingBox == null)
+                return Conflict();
+
+            return CreatedAtAction(nameof(GetNestingBoxByIdAsync), new { id = nestingBox.Id }, nestingBox);
+        }
+
+        /// <summary>
+        /// Edit an existing nesting box
+        /// </summary>
+        /// <param name="id">Nesting box id</param>
+        /// <param name="nestingBox">The modified nesting box</param>
+        [HttpPatch("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public async Task<ActionResult> EditNestingBoxAsync(string id, [FromBody] NestingBox nestingBox)
+        {
+            if (nestingBox.Id == null)
+                nestingBox.Id = id;
+            else if (nestingBox.Id != id)
+                return BadRequest();
+
+            // Edit nesting box
+            nestingBox = await _nestingBoxService.UpdateAsync(nestingBox, HttpContext.RequestAborted).ConfigureAwait(false);
+            if (nestingBox == null)
+                return Conflict();
+
+            return NoContent();
         }
 
         /// <summary>
@@ -78,7 +133,7 @@ namespace Nesteo.Server.Controllers.Api
         [HttpGet("{id}/inspections")]
         public IAsyncEnumerable<Inspection> GetInspectionsByNestingBoxIdAsync(string id)
         {
-            return  _inspectionService.GetAllForNestingBoxIdAsync(id);
+            return _inspectionService.GetAllForNestingBoxIdAsync(id);
         }
 
         /// <summary>
@@ -87,7 +142,7 @@ namespace Nesteo.Server.Controllers.Api
         [HttpGet("{id}/inspections/previews")]
         public IAsyncEnumerable<InspectionPreview> GetInspectionPreviewsByNestingBoxIdAsync(string id)
         {
-            return  _inspectionService.GetAllPreviewsForNestingBoxIdAsync(id);
+            return _inspectionService.GetAllPreviewsForNestingBoxIdAsync(id);
         }
     }
 }
