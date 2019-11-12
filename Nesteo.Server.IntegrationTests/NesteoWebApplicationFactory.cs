@@ -1,8 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -29,7 +31,7 @@ namespace Nesteo.Server.IntegrationTests
                 NesteoDbContext dbContext = scope.ServiceProvider.GetRequiredService<NesteoDbContext>();
 
                 // Ensure the database is created
-                dbContext.Database.EnsureCreated();
+                dbContext.Database.Migrate();
             });
         }
     }
