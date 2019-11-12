@@ -14,11 +14,12 @@ jobs:
           MYSQL_ROOT_PASSWORD: root
     steps:
       - checkout
-#      - run:
-#          name: Run tests
-#          command: dotnet test
-#          environment:
-#            ConnectionStrings__DefaultConnection: "Server=localhost;Database=test;User=root;Password=root"
+      - run:
+          name: Run tests
+          command: dotnet test
+          environment:
+            ConnectionStrings__DefaultConnection: "Server=localhost;Database=test;User=root;Password=root"
+            Storage__ImageUploadsDirectoryPath: "/tmp/nesteo-uploads"
   build:
     executor: docker-instance
     steps:
