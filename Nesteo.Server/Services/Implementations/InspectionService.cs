@@ -55,9 +55,11 @@ namespace Nesteo.Server.Services.Implementations
 
             // Retrieve existing user entity and nesting box. Updating these this way is not supported.
             NestingBoxEntity nestingBoxEntity = await DbContext.NestingBoxes.FindAsync(new object[] { inspection.NestingBox.Id }, cancellationToken).ConfigureAwait(false);
-            UserEntity inspectedByUserEntity = await DbContext.Users.FindAsync(new object[] { inspection.InspectedByUser.Id }, cancellationToken).ConfigureAwait(false);
-            if (nestingBoxEntity == null || inspectedByUserEntity == null)
+            if (nestingBoxEntity == null)
                 return null;
+            UserEntity inspectedByUserEntity = inspection.InspectedByUser != null
+                ? await DbContext.Users.FindAsync(new object[] { inspection.InspectedByUser.Id }, cancellationToken).ConfigureAwait(false)
+                : null;
 
             // Create inspection entry
             InspectionEntity inspectionEntity = Entities.Add(new InspectionEntity {
@@ -95,9 +97,11 @@ namespace Nesteo.Server.Services.Implementations
 
             // Retrieve existing user entity and nesting box. Updating these this way is not supported.
             NestingBoxEntity nestingBoxEntity = await DbContext.NestingBoxes.FindAsync(new object[] { inspection.NestingBox.Id }, cancellationToken).ConfigureAwait(false);
-            UserEntity inspectedByUserEntity = await DbContext.Users.FindAsync(new object[] { inspection.InspectedByUser.Id }, cancellationToken).ConfigureAwait(false);
-            if (nestingBoxEntity == null || inspectedByUserEntity == null)
+            if (nestingBoxEntity == null)
                 return null;
+            UserEntity inspectedByUserEntity = inspection.InspectedByUser != null
+                ? await DbContext.Users.FindAsync(new object[] { inspection.InspectedByUser.Id }, cancellationToken).ConfigureAwait(false)
+                : null;
 
             // Get existing inspection entity
             InspectionEntity inspectionEntity = await Entities.FindAsync(new object[] { inspection.Id }, cancellationToken).ConfigureAwait(false);
