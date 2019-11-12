@@ -1,15 +1,15 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
+using System.IO;
 using System.Threading.Tasks;
-using Hellang.Middleware.ProblemDetails;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Nesteo.Server.Data;
-using Nesteo.Server.Data.Enums;
-using Nesteo.Server.IdGeneration;
+using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Nesteo.Server.Filters;
 using Nesteo.Server.Models;
+using Nesteo.Server.Options;
 using Nesteo.Server.Services;
 
 namespace Nesteo.Server.Controllers.Api
@@ -19,18 +19,18 @@ namespace Nesteo.Server.Controllers.Api
     {
         private readonly INestingBoxService _nestingBoxService;
         private readonly IInspectionService _inspectionService;
-        private readonly INestingBoxIdGenerator _nestingBoxIdGenerator;
-        private readonly IUserService _userService;
+        private readonly IOptions<StorageOptions> _storageOptions;
+        private readonly ILogger<NestingBoxesController> _logger;
 
         public NestingBoxesController(INestingBoxService nestingBoxService,
                                       IInspectionService inspectionService,
-                                      INestingBoxIdGenerator nestingBoxIdGenerator,
-                                      IUserService userService)
+                                      IOptions<StorageOptions> storageOptions,
+                                      ILogger<NestingBoxesController> logger)
         {
             _nestingBoxService = nestingBoxService ?? throw new ArgumentNullException(nameof(nestingBoxService));
             _inspectionService = inspectionService ?? throw new ArgumentNullException(nameof(inspectionService));
-            _nestingBoxIdGenerator = nestingBoxIdGenerator ?? throw new ArgumentNullException(nameof(nestingBoxIdGenerator));
-            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+            _storageOptions = storageOptions ?? throw new ArgumentNullException(nameof(storageOptions));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <summary>
@@ -86,12 +86,17 @@ namespace Nesteo.Server.Controllers.Api
         /// <param name="nestingBox">The modified nesting box</param>
         [HttpPatch("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public async Task<ActionResult> EditNestingBoxAsync(string id, [FromBody] NestingBox nestingBox)
+        public async Task<IActionResult> EditNestingBoxAsync(string id, [FromBody] NestingBox nestingBox)
         {
             if (nestingBox.Id == null)
+            {
                 nestingBox.Id = id;
+            }
             else if (nestingBox.Id != id)
-                return BadRequest();
+            {
+                ModelState.AddModelError("NestingBox.Id", "Nesting box ID is set but different from the resource URL.");
+                return BadRequest(ModelState);
+            }
 
             // Edit nesting box
             nestingBox = await _nestingBoxService.UpdateAsync(nestingBox, HttpContext.RequestAborted).ConfigureAwait(false);
@@ -99,6 +104,54 @@ namespace Nesteo.Server.Controllers.Api
                 return Conflict();
 
             return NoContent();
+        }
+
+        /// <summary>
+        /// Upload a new nesting box image
+        /// </summary>
+        /// <remarks>
+        /// Replaces the old one, when existing.
+        /// </remarks>
+        /// <param name="id">Nesting box id</param>
+        [HttpPost("{id}/upload-image")]
+        [DisableFormValueModelBinding]
+        [Consumes("multipart/form-data")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public async Task<IActionResult> UploadNestingBoxImageAsync(string id)
+        {
+            if (!await _nestingBoxService.ExistsIdAsync(id, HttpContext.RequestAborted).ConfigureAwait(false))
+                return NotFound();
+
+            string imageFileName = await ReceiveMultipartImageFileUploadAsync(id, HttpContext.RequestAborted).ConfigureAwait(false);
+            if (imageFileName == null)
+                return BadRequest(ModelState);
+
+            await _nestingBoxService.SetImageFileNameAsync(id, imageFileName, HttpContext.RequestAborted).ConfigureAwait(false);
+
+            return NoContent();
+        }
+
+        /// <summary>
+        /// Download a nesting box image
+        /// </summary>
+        /// <param name="id">Nesting box id</param>
+        [HttpGet("{id}/image")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetNestingBoxImageAsync(string id)
+        {
+            string imageFileName = await _nestingBoxService.GetImageFileNameAsync(id, HttpContext.RequestAborted).ConfigureAwait(false);
+            if (imageFileName == null)
+                return NotFound();
+
+            string imageFilePath = Path.Join(_storageOptions.Value.ImageUploadsDirectoryPath, imageFileName);
+            var fileInfo = new FileInfo(imageFilePath);
+            if (!fileInfo.Exists)
+                return NotFound();
+
+            string contentType = new FileExtensionContentTypeProvider().TryGetContentType(imageFilePath, out string result) ? result : "application/octet-stream";
+            FileStream fileStream = fileInfo.OpenRead();
+
+            return File(fileStream, contentType, true);
         }
 
         /// <summary>
