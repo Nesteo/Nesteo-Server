@@ -19,5 +19,9 @@ namespace Nesteo.Server.Services
         Task<Inspection> AddAsync(Inspection inspection, CancellationToken cancellationToken = default);
 
         Task<Inspection> UpdateAsync(Inspection inspection, CancellationToken cancellationToken = default);
+
+        Task<Inspection> SetImageFileNameAsync(int id, string imageFileName, CancellationToken cancellationToken = default);
+
+        Task<string> GetImageFileNameAsync(int id, CancellationToken cancellationToken = default);
     }
 }

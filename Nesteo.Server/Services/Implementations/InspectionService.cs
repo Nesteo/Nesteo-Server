@@ -55,6 +55,8 @@ namespace Nesteo.Server.Services.Implementations
 
             // Retrieve existing user entity and nesting box. Updating these this way is not supported.
             NestingBoxEntity nestingBoxEntity = await DbContext.NestingBoxes.FindAsync(new object[] { inspection.NestingBox.Id }, cancellationToken).ConfigureAwait(false);
+            if (nestingBoxEntity == null)
+                return null;
             UserEntity inspectedByUserEntity = inspection.InspectedByUser != null
                 ? await DbContext.Users.FindAsync(new object[] { inspection.InspectedByUser.Id }, cancellationToken).ConfigureAwait(false)
                 : null;
@@ -95,12 +97,16 @@ namespace Nesteo.Server.Services.Implementations
 
             // Retrieve existing user entity and nesting box. Updating these this way is not supported.
             NestingBoxEntity nestingBoxEntity = await DbContext.NestingBoxes.FindAsync(new object[] { inspection.NestingBox.Id }, cancellationToken).ConfigureAwait(false);
+            if (nestingBoxEntity == null)
+                return null;
             UserEntity inspectedByUserEntity = inspection.InspectedByUser != null
                 ? await DbContext.Users.FindAsync(new object[] { inspection.InspectedByUser.Id }, cancellationToken).ConfigureAwait(false)
                 : null;
-            
+
             // Get existing inspection entity
             InspectionEntity inspectionEntity = await Entities.FindAsync(new object[] { inspection.Id }, cancellationToken).ConfigureAwait(false);
+            if (inspectionEntity == null)
+                return null;
 
             // Update values
             inspectionEntity.NestingBox = nestingBoxEntity;
@@ -124,6 +130,30 @@ namespace Nesteo.Server.Services.Implementations
             await DbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
             return Mapper.Map<Inspection>(inspectionEntity);
+        }
+
+        public async Task<Inspection> SetImageFileNameAsync(int id, string imageFileName, CancellationToken cancellationToken = default)
+        {
+            if (id == null)
+                return null;
+
+            // Get existing nesting box entity
+            InspectionEntity inspectionEntity = await Entities.FindAsync(new object[] { id }, cancellationToken).ConfigureAwait(false);
+            if (inspectionEntity == null)
+                return null;
+
+            // Update values
+            inspectionEntity.ImageFileName = imageFileName;
+
+            // Save changes
+            await DbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+
+            return Mapper.Map<Inspection>(inspectionEntity);
+        }
+
+        public Task<string> GetImageFileNameAsync(int id, CancellationToken cancellationToken = default)
+        {
+            return Entities.AsNoTracking().Where(entity => entity.Id == id).Select(entity => entity.ImageFileName).FirstOrDefaultAsync(cancellationToken);
         }
     }
 }
