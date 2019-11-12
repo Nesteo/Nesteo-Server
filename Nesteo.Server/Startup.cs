@@ -18,6 +18,7 @@ using Nesteo.Server.Configuration;
 using Nesteo.Server.Data;
 using Nesteo.Server.Data.Entities.Identity;
 using Nesteo.Server.IdGeneration;
+using Nesteo.Server.Options;
 using Nesteo.Server.Services;
 using Nesteo.Server.Services.Implementations;
 using Nesteo.Server.Swagger;
@@ -38,6 +39,9 @@ namespace Nesteo.Server
         // This method gets called by the runtime and configures the dependency injection container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // App configuration options
+            services.AddOptions<StorageOptions>().Bind(Configuration.GetSection("Storage")).ValidateDataAnnotations();
+
             // Make accessing the http context using dependency injection possible
             services.AddHttpContextAccessor();
 
@@ -50,7 +54,7 @@ namespace Nesteo.Server
                 options.EnableSensitiveDataLogging();
             });
 
-            // Add itentity system
+            // Add identity system
             services.AddIdentityCore<UserEntity>().AddRoles<RoleEntity>().AddDefaultTokenProviders().AddEntityFrameworkStores<NesteoDbContext>();
             services.AddScoped<SignInManager<UserEntity>>();
 
