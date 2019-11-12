@@ -67,7 +67,9 @@ namespace Nesteo.Server.Services.Implementations
             OwnerEntity ownerEntity = DbContext.Owners.Update(Mapper.Map<OwnerEntity>(nestingBox.Owner)).Entity;
 
             // Retrieve existing user entity. Updating users this way is not supported.
-            UserEntity hangUpUserEntity = await DbContext.Users.FindAsync(new object[] { nestingBox.HangUpUser.Id }, cancellationToken).ConfigureAwait(false);
+            UserEntity hangUpUserEntity = nestingBox.HangUpUser != null
+                ? await DbContext.Users.FindAsync(new object[] { nestingBox.HangUpUser.Id }, cancellationToken).ConfigureAwait(false)
+                : null;
 
             // Create nesting box entry
             NestingBoxEntity nestingBoxEntity = Entities.Add(new NestingBoxEntity {
@@ -101,7 +103,9 @@ namespace Nesteo.Server.Services.Implementations
             OwnerEntity ownerEntity = DbContext.Owners.Update(Mapper.Map<OwnerEntity>(nestingBox.Owner)).Entity;
 
             // Retrieve existing user entity. Updating users this way is not supported.
-            UserEntity hangUpUserEntity = await DbContext.Users.FindAsync(new object[] { nestingBox.HangUpUser.Id }, cancellationToken).ConfigureAwait(false);
+            UserEntity hangUpUserEntity = nestingBox.HangUpUser != null
+                ? await DbContext.Users.FindAsync(new object[] { nestingBox.HangUpUser.Id }, cancellationToken).ConfigureAwait(false)
+                : null;
 
             // Get existing nesting box entity
             NestingBoxEntity nestingBoxEntity = await Entities.FindAsync(new object[] { nestingBox.Id }, cancellationToken).ConfigureAwait(false);

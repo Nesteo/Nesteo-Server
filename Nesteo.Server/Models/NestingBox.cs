@@ -78,7 +78,7 @@ namespace Nesteo.Server.Models
         /// <summary>
         /// The time this data entry has last been updated
         /// </summary>
-        public DateTime LastUpdated { get; set; }
+        public DateTime? LastUpdated { get; set; }
 
         /// <summary>
         /// Whether an image for this nesting box exists
