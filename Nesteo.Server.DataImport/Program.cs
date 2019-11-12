@@ -19,9 +19,14 @@ namespace Nesteo.Server.DataImport
         public static async Task Main(string[] args)
         {
 
+
             // Get Home Directory
             string home = Directory.GetCurrentDirectory();
             home = home.Substring(0, home.Length - 23);
+
+            // Data Prep. Change ",," to ", ,"
+            ReplaceFileNulls(home, "Stammdaten.csv");
+            ReplaceFileNulls(home, "kontrolldaten.csv");
 
             // Create host
             IHost host = Server.Program.CreateHostBuilder(args).Build();
@@ -40,11 +45,20 @@ namespace Nesteo.Server.DataImport
                 return;
             }
 
-            await ReadNestingBoxDataAsync(dbContext, user, home);
-            await SaveDatabaseAsync(dbContext);
+            //await ReadNestingBoxDataAsync(dbContext, user, home);
+            //await SaveDatabaseAsync(dbContext);
 
-            await ReadInspectionDataAsync(dbContext, user, home);
-            await SaveDatabaseAsync(dbContext);
+            //await ReadInspectionDataAsync(dbContext, user, home);
+            //await SaveDatabaseAsync(dbContext);
+        }
+
+        private static void ReplaceFileNulls(string home, string file)
+        {
+// Read csv and replace blanks, need two replace statements to catch all
+            string replacenull = File.ReadAllText(home + "/Data/" + file);
+            replacenull = replacenull.Replace(",,", ", ,");
+            replacenull = replacenull.Replace(",,", ", ,");
+            File.WriteAllText(home + "/Data/" + file, replacenull);
         }
 
         private static async Task SaveDatabaseAsync(NesteoDbContext dbContext)
@@ -293,7 +307,8 @@ namespace Nesteo.Server.DataImport
             try
             {
                 inspectionEntity = new InspectionEntity {
-                    NestingBox = nestingBox.Equals(null) ? new NestingBoxEntity{Id = "0"} : nestingBox,
+
+                    NestingBox = nestingBox ?? new NestingBoxEntity{Id = "0"},
                     InspectionDate = Convert.ToDateTime(record.Datum),
                     InspectedByUser = user,
                     HasBeenCleaned = record.Gereinigt.ToLower() == "ja",
@@ -307,7 +322,7 @@ namespace Nesteo.Server.DataImport
                     AgeInDays = record.AlterJungvogel == " " ? 0 : Convert.ToInt32(record.AlterJungvogel),
                     FemaleParentBirdDiscovery = ParentBirdDiscovery.None,
                     MaleParentBirdDiscovery = ParentBirdDiscovery.None,
-                    Species = speciesEntity.Equals(null) ? null : speciesEntity,
+                    Species = speciesEntity,
                     ImageFileName = null,
                     Comment = record.Bemerkungen
                 };
@@ -321,6 +336,14 @@ namespace Nesteo.Server.DataImport
             {
                 Console.WriteLine("An Inspection field is null");
             }
+
+            await SaveDatabaseAsync(dbContext);
         }
     }
 }
+
+
+
+// var region = new regionentity(name = ".."}
+// dbContect.Regions.Add(Region);
+// var nesting = new nesting {Region = region}
