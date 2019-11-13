@@ -55,7 +55,7 @@ namespace Nesteo.Server.SampleDataGenerator
             // Generate regions
             Console.WriteLine("Generating regions...");
             await dbContext.Regions.AddRangeAsync(
-                               Enumerable.Range(1, 20).Select(i => new RegionEntity { Name = $"Owner {i}", NestingBoxIdPrefix = ((char)('A' + (i - 1))).ToString() }))
+                               Enumerable.Range(1, 20).Select(i => new RegionEntity { Name = $"Region {i}", NestingBoxIdPrefix = ((char)('A' + (i - 1))).ToString() }))
                            .ConfigureAwait(false);
 
             // Generate owners
