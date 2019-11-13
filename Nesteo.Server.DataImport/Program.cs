@@ -11,6 +11,7 @@ using Nesteo.Server.Data.Entities.Identity;
 using Nesteo.Server.Data.Enums;
 using CsvHelper;
 using CsvHelper.Expressions;
+using Nesteo.Server.Models;
 
 namespace Nesteo.Server.DataImport
 {
@@ -37,7 +38,7 @@ namespace Nesteo.Server.DataImport
             NesteoDbContext dbContext = host.Services.GetRequiredService<NesteoDbContext>();
 
             // Clear database
-            //await ClearDatabaseAsync(dbContext);
+            // await ClearDatabaseAsync(dbContext);
 
             UserEntity user = await dbContext.Users.FirstOrDefaultAsync().ConfigureAwait(false);
             if (user == null)
@@ -46,12 +47,13 @@ namespace Nesteo.Server.DataImport
                 return;
             }
 
-           // int nestingBoxExceptions = await ReadNestingBoxDataAsync(dbContext, user, home, "Stammdaten.csv");
+//            int nestingBoxExceptions = await ReadNestingBoxDataAsync(dbContext, user, home, "Stammdaten.csv");
 
             int inspectionExceptions = await ReadInspectionDataAsync(dbContext, user, home, "kontrolldaten.csv");
 
             //Console.WriteLine("Number of NestingBox Exceptions: {0}", nestingBoxExceptions);
-            Console.WriteLine("Number of Inspection Exceptions: {0}", inspectionExceptions);
+            //Console.WriteLine("Number of Inspection Exceptions: {0}", inspectionExceptions);
+            await SaveDatabaseAsync(dbContext);
         }
 
         private static void ReplaceFileNulls(string home, string file)
@@ -79,17 +81,7 @@ namespace Nesteo.Server.DataImport
 
                  foreach (var record in records)
                  {
-                     // Import foreign data first
-                     await ImportOwnersAsync(dbContext, record);
-                     await ImportRegionsAsync(dbContext, record);
-
-                     // Import NestingBox
-                     bool valid = await ImportNestingBoxesAsync(dbContext, record, user);
-
-                     if (!valid)
-                     {
-                         nestingBoxExceptions++;
-                     }
+                     await ImportNestingBoxDataAsync(dbContext, record, user);
                  }
                 return nestingBoxExceptions;
 
@@ -108,16 +100,7 @@ namespace Nesteo.Server.DataImport
 
                 foreach (var record in records)
                 {
-                    // Import foreign data first
-                    //await ImportSpeciesAsync(dbContext, record);
-
-                    // Import Inspections
-                    bool valid = !await ImportInspectionsAsync(dbContext, record, user);
-
-                    if (!valid)
-                    {
-                        inspectionExceptions++;
-                    }
+                    await ImportInspectionDataAsync(dbContext, record, user);
                 }
                 return inspectionExceptions;
             }
@@ -144,50 +127,27 @@ namespace Nesteo.Server.DataImport
             await dbContext.SaveChangesAsync();
         }
 
-        private static async Task ImportNestingBoxData(NesteoDbContext dbContext, Stammdaten record, UserEntity user)
+        private static async Task ImportNestingBoxDataAsync (NesteoDbContext dbContext, Stammdaten record, UserEntity user)
         {
-            OwnerEntity ownerEntity;
-            RegionEntity regionEntity;
-            NestingBoxEntity nestingBoxEntity;
-            Material material;
-            HoleSize holeSize;
 
-            // If an owner does not exist, add to db, otherwise get record.
-            if (!dbContext.Owners.AsEnumerable().Any(row => row.Name == record.Eigentumer))
-            {
-                ownerEntity = new OwnerEntity { Name = record.Eigentumer };
-                dbContext.Owners.Add(ownerEntity);
-            }
-            else
-            {
-                ownerEntity = dbContext.Owners.Single(o => o.Name == record.Eigentumer);
-            }
-
-            // If a region does not exist, add to db, otherwise get record.
-            if (!dbContext.Regions.AsEnumerable().Any(row => row.Name == record.Ort))
-            {
-                regionEntity = new RegionEntity{ Name = record.Ort, NestingBoxIdPrefix = record.Ort[0].ToString()};
-                dbContext.Regions.Add(regionEntity);
-            }
-            else
-            {
-                regionEntity = dbContext.Regions.Single(r => r.Name == record.Ort);
-            }
+            // Get db record of owner and region
+            OwnerEntity owner = GetOwnerEntity(dbContext, record);
+            RegionEntity region = GetRegionEntity(dbContext, record);
 
             // Find Material and HoleSize enums
-            material = GetMaterial(record.Material);
-            holeSize = GetHoleSize(record.Loch);
+            Material material = GetMaterial(record.Material);
+            HoleSize holeSize = GetHoleSize(record.Loch);
 
-            nestingBoxEntity = new NestingBoxEntity {
+            NestingBoxEntity nestingBox = new NestingBoxEntity {
                 Id = record.NistkastenNummer,
-                Region = regionEntity,
+                Region = region,
                 OldId = null,
                 ForeignId = record.NummerFremd == " " ? null : record.NummerFremd,
                 CoordinateLongitude = Convert.ToInt32(record.UTMHoch) / 100000.0,
                 CoordinateLatitude = Convert.ToInt32(record.UTMRechts) / 100000.0,
                 HangUpDate = Convert.ToDateTime(record.AufhangDatum),
                 HangUpUser = user,
-                Owner = ownerEntity,
+                Owner = owner,
                 Material = material,
                 HoleSize = holeSize,
                 ImageFileName = null,
@@ -197,126 +157,147 @@ namespace Nesteo.Server.DataImport
             // If nesting box is new, add, otherwise update
             if (!dbContext.NestingBoxes.AsEnumerable().Any(row => row.Id == record.NistkastenNummer))
             {
-                dbContext.NestingBoxes.Add(nestingBoxEntity);
+                dbContext.NestingBoxes.Add(nestingBox);
             }
             else
             {
                 // row = nestingBoxEntity did not seem to work so each property must be assigned
-                NestingBoxEntity row = dbContext.NestingBoxes.Single(n => n.Id == nestingBoxEntity.Id);
-                row.Region = nestingBoxEntity.Region;
-                row.OldId = nestingBoxEntity.OldId;
-                row.ForeignId = nestingBoxEntity.ForeignId;
-                row.CoordinateLongitude = nestingBoxEntity.CoordinateLongitude;
-                row.CoordinateLatitude = nestingBoxEntity.CoordinateLatitude;
-                row.HangUpDate = nestingBoxEntity.HangUpDate;
-                row.HangUpUser = nestingBoxEntity.HangUpUser;
-                row.Owner = nestingBoxEntity.Owner;
-                row.Material = nestingBoxEntity.Material;
-                row.HoleSize = nestingBoxEntity.HoleSize;
-                row.ImageFileName = nestingBoxEntity.ImageFileName;
-                row.Comment = nestingBoxEntity.Comment;
+                NestingBoxEntity row = dbContext.NestingBoxes.Single(n => n.Id == nestingBox.Id);
+                row.Region = nestingBox.Region;
+                row.OldId = nestingBox.OldId;
+                row.ForeignId = nestingBox.ForeignId;
+                row.CoordinateLongitude = nestingBox.CoordinateLongitude;
+                row.CoordinateLatitude = nestingBox.CoordinateLatitude;
+                row.HangUpDate = nestingBox.HangUpDate;
+                row.HangUpUser = nestingBox.HangUpUser;
+                row.Owner = nestingBox.Owner;
+                row.Material = nestingBox.Material;
+                row.HoleSize = nestingBox.HoleSize;
+                row.ImageFileName = nestingBox.ImageFileName;
+                row.Comment = nestingBox.Comment;
             }
 
             // TODO Exception handling or counting
         }
 
-
-        private static async Task ImportRegionsAsync(NesteoDbContext dbContext, Stammdaten record)
+        private static RegionEntity GetRegionEntity(NesteoDbContext dbContext, Stammdaten record)
         {
-            if (!dbContext.Regions.AsEnumerable().Any(row => record.Ort == row.Name))
+            RegionEntity region;
+
+            // If a region does not exist, add to db, otherwise get record.
+            if (!dbContext.Regions.AsEnumerable().Any(row => row.Name == record.Ort))
             {
-                dbContext.Regions.Add(new RegionEntity { Name = record.Ort, NestingBoxIdPrefix = record.Ort[0].ToString() });
-                await SaveDatabaseAsync(dbContext);
+                region = new RegionEntity {Name = record.Ort, NestingBoxIdPrefix = record.Ort[0].ToString()};
+                dbContext.Regions.Add(region);
             }
+            else
+            {
+                region = dbContext.Regions.Single(r => r.Name == record.Ort);
+            }
+
+            return region;
         }
 
-        private static async Task ImportOwnersAsync(NesteoDbContext dbContext, Stammdaten record)
+        private static OwnerEntity GetOwnerEntity(NesteoDbContext dbContext, Stammdaten record)
         {
-            if (!dbContext.Owners.AsEnumerable().Any(row => record.Eigentumer == row.Name))
+            OwnerEntity owner;
+
+            // If an owner does not exist, add to db, otherwise get record.
+            if (!dbContext.Owners.AsEnumerable().Any(row => row.Name == record.Eigentumer))
             {
-                dbContext.Owners.Add(new OwnerEntity { Name = record.Eigentumer });
-                await SaveDatabaseAsync(dbContext);
+                owner = new OwnerEntity {Name = record.Eigentumer};
+                dbContext.Owners.Add(owner);
             }
+            else
+            {
+                owner = dbContext.Owners.Single(o => o.Name == record.Eigentumer);
+            }
+
+            return owner;
         }
 
-        private static async Task ImportSpeciesAsync(NesteoDbContext dbContext, Kontrolldaten record)
+        private static async Task<bool> ImportInspectionDataAsync (NesteoDbContext dbContext, Kontrolldaten record, UserEntity user)
         {
-            if (!dbContext.Species.AsEnumerable().Any(row => record.Vogelart == row.Name))
+
+            // Get db record of nesting box and species
+            NestingBoxEntity nestingBox = GetNestingBoxEntity(dbContext, record);
+            if (nestingBox == null)
             {
-                dbContext.Species.Add(new SpeciesEntity { Name = record.Vogelart });
-                await SaveDatabaseAsync(dbContext);
+                return false;
             }
-        }
+            SpeciesEntity species = GetSpeciesEntity(dbContext, record);
 
-        private static async Task<bool> ImportNestingBoxesAsync(NesteoDbContext dbContext, Stammdaten record, UserEntity user)
-        {
-            OwnerEntity ownerEntity;
-            RegionEntity regionEntity;
-            Material material;
-            HoleSize holeSize;
-
-            // Search for ownerId
-            ownerEntity = (from o in dbContext.Owners where o.Name == record.Eigentumer select o).FirstOrDefault();
-
-            // Search for regionId
-            regionEntity = (from r in dbContext.Regions where r.Name == record.Ort select r).FirstOrDefault();
-
-            material = GetMaterial(record.Material);
-
-            holeSize = GetHoleSize(record.Loch);
+            // Find condition enum
+            Condition condition = GetCondition(record.ZustandKasten);
 
             try
             {
-                //TODO Id is 6 digits while existing data is 1 letter and 5 digits
-//            var existing = dbContext.NestingBoxes.Find($"{regionEntity.NestingBoxIdPrefix}{record.nistkastenNummer}");
-                NestingBoxEntity nb = new NestingBoxEntity {
-                    Id = $"{record.NistkastenNummer}",
-//                Id = $"{regionEntity.NestingBoxIdPrefix}{record.nistkastenNummer}",
-                    Region = regionEntity,
-                    OldId = null,
-                    ForeignId = record.NummerFremd == " " ? null : record.NummerFremd,
-                    CoordinateLongitude = Convert.ToInt32(record.UTMHoch) / 100000.0,
-                    CoordinateLatitude = Convert.ToInt32(record.UTMRechts) / 100000.0,
-                    HangUpDate = Convert.ToDateTime(record.AufhangDatum),
-                    HangUpUser = user,
-                    Owner = ownerEntity,
-                    Material = material,
-                    HoleSize = holeSize,
+                // Create and add inspection
+                InspectionEntity inspection = new InspectionEntity {
+                    NestingBox = nestingBox,
+                    InspectionDate = Convert.ToDateTime(record.Datum),
+                    InspectedByUser = user,
+                    HasBeenCleaned = record.Gereinigt.ToLower() == "ja",
+                    Condition = condition,
+                    JustRepaired = false,
+                    Occupied = record.Besetzt.ToLower() == "ja",
+                    ContainsEggs = record.AnzahlEier != " " && record.AnzahlEier != "0",
+                    EggCount = record.AnzahlEier == " " ? 0 : Convert.ToInt32(record.AnzahlEier),
+                    ChickCount = record.AnzahlJungvogel == " " ? 0 : Convert.ToInt32(record.AnzahlJungvogel),
+                    RingedChickCount = record.Berignt == " " ? 0 : Convert.ToInt32(record.Berignt),
+                    AgeInDays = record.AlterJungvogel == " " ? 0 : Convert.ToInt32(record.AlterJungvogel),
+                    FemaleParentBirdDiscovery = ParentBirdDiscovery.None,
+                    MaleParentBirdDiscovery = ParentBirdDiscovery.None,
+                    Species = species,
                     ImageFileName = null,
                     Comment = record.Bemerkungen == " " ? null : record.Bemerkungen
                 };
-                if (dbContext.NestingBoxes.AsEnumerable().All(row => record.NistkastenNummer != row.Id))
-                {
-                    dbContext.NestingBoxes.Add(nb);
-                }
-                else
-                {
-                    // Update existing record
-                    NestingBoxEntity row = dbContext.NestingBoxes.Single(n => n.Id == nb.Id);
-                    row.Region = nb.Region;
-                    row.OldId = nb.OldId;
-                    row.ForeignId = nb.ForeignId;
-                    row.CoordinateLongitude = nb.CoordinateLongitude;
-                    row.CoordinateLatitude = nb.CoordinateLatitude;
-                    row.HangUpDate = nb.HangUpDate;
-                    row.HangUpUser = nb.HangUpUser;
-                    row.Owner = nb.Owner;
-                    row.Material = nb.Material;
-                    row.HoleSize = nb.HoleSize;
-                    row.ImageFileName = nb.ImageFileName;
-                    row.Comment = nb.Comment;
-                }
-
-                await SaveDatabaseAsync(dbContext);
                 return true;
             }
             catch (FormatException)
             {
-                Console.WriteLine("Could not convert Nesting Box field to Int");
+                Console.WriteLine("Could not convert Inspection field to Int");
+                return false;
+            }
+            catch (NullReferenceException)
+            {
+                Console.WriteLine("An Inspection field is null");
                 return false;
             }
         }
 
+        private static SpeciesEntity GetSpeciesEntity(NesteoDbContext dbContext, Kontrolldaten record)
+        {
+            SpeciesEntity species;
+
+            // If an species does not exist, add to db, otherwise get record.
+            if (!dbContext.Species.AsEnumerable().Any(row => row.Name == record.Vogelart))
+            {
+                species = new SpeciesEntity {Name = record.Vogelart};
+                dbContext.Species.Add(species);
+            }
+            else
+            {
+                species = dbContext.Species.Single(o => o.Name == record.Vogelart);
+            }
+
+            return species;
+        }
+
+        private static NestingBoxEntity GetNestingBoxEntity(NesteoDbContext dbContext, Kontrolldaten record)
+        {
+
+            // If an nesting box does not exist, return blank, otherwise get record.
+            if (!dbContext.NestingBoxes.AsEnumerable().Any(row => row.Id == record.NistkastenNummer))
+            {
+                return null;
+            }
+            else
+            {
+                return dbContext.NestingBoxes.Single(o => o.Id == record.NistkastenNummer);
+            }
+        }
+        
         private static HoleSize GetHoleSize(string data)
         {
             HoleSize holeSize;
@@ -376,79 +357,25 @@ namespace Nesteo.Server.DataImport
             return material;
         }
 
-        private static async Task<bool> ImportInspectionsAsync(NesteoDbContext dbContext, Kontrolldaten record, UserEntity user)
+        private static Condition GetCondition(string data)
         {
-            NestingBoxEntity nestingBox;
-            SpeciesEntity speciesEntity;
             Condition condition;
-            InspectionEntity inspectionEntity;
 
-            // Get nestingBoxId
-            nestingBox = (from n in dbContext.NestingBoxes where n.Id == record.NistkastenNummer select n).FirstOrDefault();
-            if (nestingBox == null)
-            {
-                // TODO log
-                return false;
-            }
-
-            // Get speciesEntity
-            speciesEntity = (from s in dbContext.Species where s.Name == record.Vogelart select s).FirstOrDefault();
-
-            // Get Condition Value
-            if (record.ZustandKasten.ToLower().StartsWith("repariert") || record.ZustandKasten.ToLower().StartsWith("in ordnung"))
+            if (data.ToLower().StartsWith("repariert") || data.ToLower().StartsWith("in ordnung"))
             {
                 condition = Condition.Good;
             }
-            else if (record.ZustandKasten.ToLower().StartsWith("leicht defekt"))
+            else if (data.ToLower().StartsWith("leicht defekt"))
             {
                 condition = Condition.NeedsRepair;
             }
             else
             {
-                Console.WriteLine(record.ZustandKasten.ToLower());
+                Console.WriteLine(data.ToLower());
                 condition = Condition.NeedsReplacement;
             }
 
-            try
-            {
-                inspectionEntity = new InspectionEntity {
-
-                    NestingBox = nestingBox,
-                    InspectionDate = Convert.ToDateTime(record.Datum),
-                    InspectedByUser = user,
-                    HasBeenCleaned = record.Gereinigt.ToLower() == "ja",
-                    Condition = condition,
-                    JustRepaired = false,
-                    Occupied = record.Besetzt.ToLower() == "ja",
-                    ContainsEggs = record.AnzahlEier != " " && record.AnzahlEier != "0",
-                    EggCount = record.AnzahlEier == " " ? 0 : Convert.ToInt32(record.AnzahlEier),
-                    ChickCount = record.AnzahlJungvogel == " " ? 0 : Convert.ToInt32(record.AnzahlJungvogel),
-                    RingedChickCount = record.Berignt == " " ? 0 : Convert.ToInt32(record.Berignt),
-                    AgeInDays = record.AlterJungvogel == " " ? 0 : Convert.ToInt32(record.AlterJungvogel),
-                    FemaleParentBirdDiscovery = ParentBirdDiscovery.None,
-                    MaleParentBirdDiscovery = ParentBirdDiscovery.None,
-                    Species = speciesEntity,
-                    ImageFileName = null,
-                    Comment = record.Bemerkungen
-                };
-                dbContext.Inspections.Add(inspectionEntity);
-                await SaveDatabaseAsync(dbContext);
-                return true;
-            }
-            catch (FormatException)
-            {
-                Console.WriteLine("Could not convert Inspection field to Int");
-                return false;
-            }
-            catch (NullReferenceException)
-            {
-                Console.WriteLine("An Inspection field is null");
-                return false;
-            }
+            return condition;
         }
     }
 }
-
-// var region = new regionentity(name = ".."}
-// dbContect.Regions.Add(Region);
-// var nesting = new nesting {Region = region}
