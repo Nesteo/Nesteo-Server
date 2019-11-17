@@ -20,15 +20,28 @@ namespace Nesteo.Server.DataImport
 
         public static async Task Main(string[] args)
         {
-
-
             // Get Home Directory
             string home = Directory.GetCurrentDirectory();
             home = home.Substring(0, home.Length - 23);
 
+            // Get Filename
+            Console.Write("Enter a filename: ");
+            string filename = Console.ReadLine();
+
             // Data Prep. Change ",," to ", ,"
-            ReplaceFileNulls(home, "Stammdaten.csv");
-            ReplaceFileNulls(home, "kontrolldaten.csv");
+            try
+            {
+                ReplaceFileNulls(home, filename);
+            }
+            catch (FileNotFoundException)
+            {
+                Console.WriteLine("File does not exist. Exiting...");
+                return;
+            }
+
+            // Get filetype
+            Console.Write("Is this a Nesting Box file? (Y?) ");
+            string filetype = Console.ReadLine();
 
             // Create host
             IHost host = Server.Program.CreateHostBuilder(args).Build();
@@ -36,16 +49,7 @@ namespace Nesteo.Server.DataImport
 
             // Request database context
             NesteoDbContext dbContext = host.Services.GetRequiredService<NesteoDbContext>();
-
-            // Clear database
-//            await ClearDatabaseAsync(dbContext);
-
-            // Get Filename
-//            Console.Write("Enter a filename: ");
-//            string filename = Console.ReadLine();
-            // Get filetype
-//            Console.Write("Is this a Nesting Box? (Y/N) ");
-//            string filetype = Console.ReadLine();
+//            ClearDatabaseAsync(dbContext);
 
             UserEntity user = await dbContext.Users.FirstOrDefaultAsync().ConfigureAwait(false);
             if (user == null)
@@ -54,13 +58,37 @@ namespace Nesteo.Server.DataImport
                 return;
             }
 
-//            int nestingBoxExceptions = await ReadNestingBoxDataAsync(dbContext, user, home, "Stammdaten.csv");
+            int exceptions = 0;
+            if (filetype == "Y")
+            {
+                exceptions = await ReadNestingBoxDataAsync(dbContext, user, home, filename);
+                Console.WriteLine("Number of NestingBox Exceptions: {0}", exceptions);
 
-            int inspectionExceptions = await ReadInspectionDataAsync(dbContext, user, home, "kontrolldaten.csv");
+                // Do not save if exceptions exist
+                if (exceptions == 0)
+                {
+                    await SaveDatabaseAsync(dbContext);
+                }
+                else
+                {
+                    Console.WriteLine("Errors exist. Cannot import {0}", filename);
+                }
+            }
+            else
+            {
+                exceptions = await ReadInspectionDataAsync(dbContext, user, home, filename);
+                Console.WriteLine("Number of Inspection Exceptions: {0}", exceptions);
 
-//            Console.WriteLine("Number of NestingBox Exceptions: {0}", nestingBoxExceptions);
-//            Console.WriteLine("Number of Inspection Exceptions: {0}", inspectionExceptions);
-            await SaveDatabaseAsync(dbContext);
+                // Do not save if exceptions exist
+                if (exceptions == 0)
+                {
+                    await SaveDatabaseAsync(dbContext);
+                }
+                else
+                {
+                    Console.WriteLine("Errors exist. Cannot import {0}", filename);
+                }
+            }
         }
 
         private static void ReplaceFileNulls(string home, string file)
@@ -85,12 +113,17 @@ namespace Nesteo.Server.DataImport
             using (var csv = new CsvReader(reader))
             {
                 int nestingBoxExceptions = 0;
+
+                Console.WriteLine("Generating Nesting Boxes...");
                 var records = csv.GetRecords<Stammdaten>();
 
-                int index = 1;
+                int index = 2;
                 foreach (var record in records)
                 {
-                    await ImportNestingBoxDataAsync(dbContext, record, user, index);
+                    if (!await ImportNestingBoxDataAsync(dbContext, record, user, index))
+                    {
+                        nestingBoxExceptions++;
+                    }
                     index++;
                 }
                 return nestingBoxExceptions;
@@ -108,11 +141,13 @@ namespace Nesteo.Server.DataImport
                 Console.WriteLine("Generating inspections...");
                 var records = csv.GetRecords<Kontrolldaten>();
 
-                int index = 1;
+                int index = 2;
                 foreach (var record in records)
                 {
-
-                    await ImportInspectionDataAsync(dbContext, record, user, index);
+                    if (!await ImportInspectionDataAsync(dbContext, record, user, index))
+                    {
+                        inspectionExceptions++;
+                    }
                     index++;
                 }
                 return inspectionExceptions;
@@ -122,10 +157,7 @@ namespace Nesteo.Server.DataImport
         private static async Task ClearDatabaseAsync(NesteoDbContext dbContext)
         {
             // Safety check
-            Console.Write("Do you want to fill the database with sample data? Please type 'yes': ");
-            if (Console.ReadLine()?.ToLower() != "yes")
-                return;
-            Console.Write("Do you really want to do this? This will DELETE all existing data! Please type 'yes': ");
+            Console.Write("Do you want to clear the database? Please type 'yes': ");
             if (Console.ReadLine()?.ToLower() != "yes")
                 return;
 
@@ -140,7 +172,7 @@ namespace Nesteo.Server.DataImport
             await dbContext.SaveChangesAsync();
         }
 
-        private static async Task ImportNestingBoxDataAsync (NesteoDbContext dbContext, Stammdaten record, UserEntity user, int index)
+        private static async Task<bool> ImportNestingBoxDataAsync (NesteoDbContext dbContext, Stammdaten record, UserEntity user, int index)
         {
 
             // Get db record of owner and region
@@ -170,7 +202,8 @@ namespace Nesteo.Server.DataImport
                 };
 
                 // If nesting box is new, add, otherwise update
-                if (!dbContext.NestingBoxes.AsEnumerable().Any(row => row.Id == record.NistkastenNummer))
+                if (!dbContext.NestingBoxes.Local.AsEnumerable().Any(row => row.Id == nestingBox.Id) &&
+                    !dbContext.NestingBoxes.AsEnumerable().Any(row => row.Id == nestingBox.Id))
                 {
                     dbContext.NestingBoxes.Add(nestingBox);
                 }
@@ -191,14 +224,20 @@ namespace Nesteo.Server.DataImport
                     row.ImageFileName = nestingBox.ImageFileName;
                     row.Comment = nestingBox.Comment;
                 }
+
+                return true;
             }
             catch (FormatException)
             {
-                Console.WriteLine("Could not convert Nesting Box field to Int {0}", index);
+                Console.WriteLine("Could not convert a Nesting Box field to Int \tRow:{0} \tId:{1} \tLocation:{2} \tOwner:{3}",
+                                  index, record.NistkastenNummer, record.Ort, record.Eigentumer);
+                return false;
             }
             catch (NullReferenceException)
             {
-                Console.WriteLine("A Nesting box field is null {0}", index);
+                Console.WriteLine("A Nesting box field is null \tRow:{0} \tId:{1} \tLocation:{2} \tOwner:{3}",
+                                  index, record.NistkastenNummer, record.Ort, record.Eigentumer);
+                return false;
             }
         }
 
@@ -206,16 +245,16 @@ namespace Nesteo.Server.DataImport
         {
             RegionEntity region;
 
-            // If a region does not exist, add to db, otherwise get record.
-            if (!dbContext.Regions.AsEnumerable().Any(row => row.Name == record.Ort))
+            // If a region does not exist in local and actual, add to db, otherwise get record.
+            if (!dbContext.Regions.Local.AsEnumerable().Any(row => row.Name == record.Ort) &&
+                !dbContext.Regions.AsEnumerable().Any(row => row.Name == record.Ort))
             {
                 region = new RegionEntity {Name = record.Ort, NestingBoxIdPrefix = record.Ort[0].ToString()};
-                dbContext.Regions.Add(region);
-//                dbContext.Regions.Update(region);
+                dbContext.Regions.Local.Add(region);
             }
             else
             {
-                region = dbContext.Regions.Single(r => r.Name == record.Ort);
+                region = dbContext.Regions.Local.Single(r => r.Name == record.Ort);
             }
 
             return region;
@@ -225,15 +264,16 @@ namespace Nesteo.Server.DataImport
         {
             OwnerEntity owner;
 
-            // If an owner does not exist, add to db, otherwise get record.
-            if (!dbContext.Owners.AsEnumerable().Any(row => row.Name == record.Eigentumer))
+            // If an owner does not exist in local and actual, add to db, otherwise get record.
+            if (!dbContext.Owners.Local.AsEnumerable().Any(row => row.Name == record.Eigentumer) &&
+                !dbContext.Owners.AsEnumerable().Any(row => row.Name == record.Eigentumer))
             {
                 owner = new OwnerEntity {Name = record.Eigentumer};
-                dbContext.Owners.Add(owner);
+                dbContext.Owners.Local.Add(owner);
             }
             else
             {
-                owner = dbContext.Owners.Single(o => o.Name == record.Eigentumer);
+                owner = dbContext.Owners.Local.Single(o => o.Name == record.Eigentumer);
             }
 
             return owner;
@@ -275,17 +315,19 @@ namespace Nesteo.Server.DataImport
                     ImageFileName = null,
                     Comment = record.Bemerkungen == " " ? null : record.Bemerkungen
                 };
-                dbContext.Inspections.Add(inspection);
+                dbContext.Inspections.Local.Add(inspection);
                 return true;
             }
             catch (FormatException)
             {
-                Console.WriteLine("Could not convert Inspection field to Int {0}", index);
+                Console.WriteLine("Could not convert an Inspection field to Int \tRow:{0} \tId:{1} \tDate:{2} \tCondition:{3} \tSpecie:{4}",
+                                  index, record.NistkastenNummer, record.Datum, record.ZustandKasten, record.Vogelart);
                 return false;
             }
             catch (NullReferenceException)
             {
-                Console.WriteLine("An Inspection field is null {0}", index);
+                Console.WriteLine("An Inspection field is null \tRow:{0} \tId:{1} \tDate:{2} \tCondition:{3} \tSpecie:{4}",
+                                  index, record.NistkastenNummer, record.Datum, record.ZustandKasten, record.Vogelart);
                 return false;
             }
         }
@@ -294,15 +336,16 @@ namespace Nesteo.Server.DataImport
         {
             SpeciesEntity species;
 
-            // If an species does not exist, add to db, otherwise get record.
-            if (!dbContext.Species.AsEnumerable().Any(row => row.Name == record.Vogelart))
+            // If an species does not exist in local and actual, add to db, otherwise get record.
+            if (!dbContext.Species.Local.AsEnumerable().Any(row => row.Name == record.Vogelart) &&
+                !dbContext.Species.AsEnumerable().Any(row => row.Name == record.Vogelart))
             {
                 species = new SpeciesEntity {Name = record.Vogelart};
-                dbContext.Species.Add(species);
+                dbContext.Species.Local.Add(species);
             }
             else
             {
-                species = dbContext.Species.Single(o => o.Name == record.Vogelart);
+                species = dbContext.Species.Local.Single(o => o.Name == record.Vogelart);
             }
 
             return species;
@@ -310,16 +353,12 @@ namespace Nesteo.Server.DataImport
 
         private static NestingBoxEntity GetNestingBoxEntity(NesteoDbContext dbContext, Kontrolldaten record)
         {
-
             // If an nesting box does not exist, return blank, otherwise get record.
             if (!dbContext.NestingBoxes.AsEnumerable().Any(row => row.Id == record.NistkastenNummer))
             {
                 return null;
             }
-            else
-            {
-                return dbContext.NestingBoxes.Single(o => o.Id == record.NistkastenNummer);
-            }
+            return dbContext.NestingBoxes.Single(o => o.Id == record.NistkastenNummer);
         }
 
         private static HoleSize GetHoleSize(string data)
@@ -377,7 +416,6 @@ namespace Nesteo.Server.DataImport
 //                Console.WriteLine(data.ToLower());
                 material = Material.Other;
             }
-
             return material;
         }
 
@@ -395,7 +433,7 @@ namespace Nesteo.Server.DataImport
             }
             else
             {
-                Console.WriteLine(data.ToLower());
+//                Console.WriteLine(data.ToLower());
                 condition = Condition.NeedsReplacement;
             }
 
