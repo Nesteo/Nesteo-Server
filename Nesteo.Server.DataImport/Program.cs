@@ -40,6 +40,13 @@ namespace Nesteo.Server.DataImport
             // Clear database
 //            await ClearDatabaseAsync(dbContext);
 
+            // Get Filename
+//            Console.Write("Enter a filename: ");
+//            string filename = Console.ReadLine();
+            // Get filetype
+//            Console.Write("Is this a Nesting Box? (Y/N) ");
+//            string filetype = Console.ReadLine();
+
             UserEntity user = await dbContext.Users.FirstOrDefaultAsync().ConfigureAwait(false);
             if (user == null)
             {
@@ -47,12 +54,12 @@ namespace Nesteo.Server.DataImport
                 return;
             }
 
-            int nestingBoxExceptions = await ReadNestingBoxDataAsync(dbContext, user, home, "Stammdaten.csv");
+//            int nestingBoxExceptions = await ReadNestingBoxDataAsync(dbContext, user, home, "Stammdaten.csv");
 
-//            int inspectionExceptions = await ReadInspectionDataAsync(dbContext, user, home, "kontrolldaten.csv");
+            int inspectionExceptions = await ReadInspectionDataAsync(dbContext, user, home, "kontrolldaten.csv");
 
-            //Console.WriteLine("Number of NestingBox Exceptions: {0}", nestingBoxExceptions);
-            //Console.WriteLine("Number of Inspection Exceptions: {0}", inspectionExceptions);
+//            Console.WriteLine("Number of NestingBox Exceptions: {0}", nestingBoxExceptions);
+//            Console.WriteLine("Number of Inspection Exceptions: {0}", inspectionExceptions);
             await SaveDatabaseAsync(dbContext);
         }
 
@@ -67,7 +74,9 @@ namespace Nesteo.Server.DataImport
 
         private static async Task SaveDatabaseAsync(NesteoDbContext dbContext)
         {
+            Console.WriteLine("Saving");
             await dbContext.SaveChangesAsync().ConfigureAwait(false);
+            Console.WriteLine("Done");
         }
 
         private static async Task<int> ReadNestingBoxDataAsync(NesteoDbContext dbContext, UserEntity user, string home, string file)
@@ -78,11 +87,12 @@ namespace Nesteo.Server.DataImport
                 int nestingBoxExceptions = 0;
                 var records = csv.GetRecords<Stammdaten>();
 
-
-                 foreach (var record in records)
-                 {
-                     await ImportNestingBoxDataAsync(dbContext, record, user);
-                 }
+                int index = 1;
+                foreach (var record in records)
+                {
+                    await ImportNestingBoxDataAsync(dbContext, record, user, index);
+                    index++;
+                }
                 return nestingBoxExceptions;
 
             }
@@ -98,9 +108,12 @@ namespace Nesteo.Server.DataImport
                 Console.WriteLine("Generating inspections...");
                 var records = csv.GetRecords<Kontrolldaten>();
 
+                int index = 1;
                 foreach (var record in records)
                 {
-                    await ImportInspectionDataAsync(dbContext, record, user);
+
+                    await ImportInspectionDataAsync(dbContext, record, user, index);
+                    index++;
                 }
                 return inspectionExceptions;
             }
@@ -127,7 +140,7 @@ namespace Nesteo.Server.DataImport
             await dbContext.SaveChangesAsync();
         }
 
-        private static async Task ImportNestingBoxDataAsync (NesteoDbContext dbContext, Stammdaten record, UserEntity user)
+        private static async Task ImportNestingBoxDataAsync (NesteoDbContext dbContext, Stammdaten record, UserEntity user, int index)
         {
 
             // Get db record of owner and region
@@ -145,9 +158,9 @@ namespace Nesteo.Server.DataImport
                     Region = region,
                     OldId = null,
                     ForeignId = record.NummerFremd == " " ? null : record.NummerFremd,
-                    CoordinateLongitude = Convert.ToInt32(record.UTMHoch) / 100000.0,
-                    CoordinateLatitude = Convert.ToInt32(record.UTMRechts) / 100000.0,
-                    HangUpDate = Convert.ToDateTime(record.AufhangDatum),
+                    CoordinateLongitude = record.UTMHoch == " "? 0.0 : Convert.ToInt32(record.UTMHoch) / 100000.0,
+                    CoordinateLatitude = record.UTMRechts == " "? 0.0 : Convert.ToInt32(record.UTMRechts) / 100000.0,
+                    HangUpDate = record.AufhangDatum == " "? Convert.ToDateTime("01/01/1901") : Convert.ToDateTime(record.AufhangDatum),
                     HangUpUser = user,
                     Owner = owner,
                     Material = material,
@@ -181,11 +194,11 @@ namespace Nesteo.Server.DataImport
             }
             catch (FormatException)
             {
-                Console.WriteLine("Could not convert Nesting Box field to Int");
+                Console.WriteLine("Could not convert Nesting Box field to Int {0}", index);
             }
             catch (NullReferenceException)
             {
-                Console.WriteLine("A Nesting box field is null");
+                Console.WriteLine("A Nesting box field is null {0}", index);
             }
         }
 
@@ -198,6 +211,7 @@ namespace Nesteo.Server.DataImport
             {
                 region = new RegionEntity {Name = record.Ort, NestingBoxIdPrefix = record.Ort[0].ToString()};
                 dbContext.Regions.Add(region);
+//                dbContext.Regions.Update(region);
             }
             else
             {
@@ -225,7 +239,7 @@ namespace Nesteo.Server.DataImport
             return owner;
         }
 
-        private static async Task<bool> ImportInspectionDataAsync (NesteoDbContext dbContext, Kontrolldaten record, UserEntity user)
+        private static async Task<bool> ImportInspectionDataAsync (NesteoDbContext dbContext, Kontrolldaten record, UserEntity user, int index)
         {
 
             // Get db record of nesting box and species
@@ -266,12 +280,12 @@ namespace Nesteo.Server.DataImport
             }
             catch (FormatException)
             {
-                Console.WriteLine("Could not convert Inspection field to Int");
+                Console.WriteLine("Could not convert Inspection field to Int {0}", index);
                 return false;
             }
             catch (NullReferenceException)
             {
-                Console.WriteLine("An Inspection field is null");
+                Console.WriteLine("An Inspection field is null {0}", index);
                 return false;
             }
         }
@@ -335,7 +349,7 @@ namespace Nesteo.Server.DataImport
             }
             else
             {
-                Console.WriteLine(data.ToLower());
+//                Console.WriteLine(data.ToLower());
                 holeSize = HoleSize.Other;
             }
 
@@ -360,7 +374,7 @@ namespace Nesteo.Server.DataImport
             }
             else
             {
-                Console.WriteLine(data.ToLower());
+//                Console.WriteLine(data.ToLower());
                 material = Material.Other;
             }
 
