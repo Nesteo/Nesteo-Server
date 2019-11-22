@@ -269,3 +269,4 @@ appsettings.Development.json
 
 # Compose env
 .env
+/Nesteo.Server.DataImport/Data/
