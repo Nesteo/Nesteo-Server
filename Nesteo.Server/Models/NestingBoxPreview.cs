@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace Nesteo.Server.Models
 {
@@ -7,12 +8,14 @@ namespace Nesteo.Server.Models
         /// <summary>
         /// Nesting box ID
         /// </summary>
+        [StringLength(Constants.NestingBoxIdLength, MinimumLength = Constants.NestingBoxIdLength)]
         public string Id { get; set; }
 
         /// <summary>
         /// Region, where the nesting box hangs
         /// </summary>
-        public Region Region { get; set; }
+        [Required]
+        public Region? Region { get; set; }
 
         /// <summary>
         /// Decimal coordinate longitude
@@ -27,11 +30,11 @@ namespace Nesteo.Server.Models
         /// <summary>
         /// How often this box has been inspected
         /// </summary>
-        public int InspectionsCount { get; set; }
+        public int? InspectionsCount { get; set; }
 
         /// <summary>
         /// The last time this box has been inspected
         /// </summary>
-        public DateTime LastInspected { get; set; }
+        public DateTime? LastInspected { get; set; }
     }
 }

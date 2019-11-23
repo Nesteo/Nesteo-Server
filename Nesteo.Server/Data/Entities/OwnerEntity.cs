@@ -5,12 +5,12 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Nesteo.Server.Data.Entities
 {
     [Table("Owners")]
-    public class OwnerEntity : IEntity<int>
+    public class OwnerEntity : IEntity<int?>
     {
         [Key]
         [Required]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
+        public int? Id { get; set; }
 
         [Required]
         [MaxLength(Constants.MaxOwnerNameLength)]

@@ -13,7 +13,7 @@ namespace Nesteo.Server.Data.Entities
         [Key]
         [Required]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        [StringLength(6, MinimumLength = 6)]
+        [StringLength(Constants.NestingBoxIdLength, MinimumLength = Constants.NestingBoxIdLength)]
         public string Id { get; set; }
 
         [Required]
@@ -43,7 +43,7 @@ namespace Nesteo.Server.Data.Entities
         [Required]
         public HoleSize HoleSize { get; set; }
 
-        [MaxLength(100)]
+        [MaxLength(Constants.MaxImageFileNameLength)]
         public string ImageFileName { get; set; }
 
         public string Comment { get; set; }

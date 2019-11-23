@@ -7,12 +7,12 @@ using Nesteo.Server.Data.Enums;
 namespace Nesteo.Server.Data.Entities
 {
     [Table("Inspections")]
-    public class InspectionEntity : IEntity<int>
+    public class InspectionEntity : IEntity<int?>
     {
         [Key]
         [Required]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
+        public int? Id { get; set; }
 
         [Required]
         public NestingBoxEntity NestingBox { get; set; }
@@ -59,7 +59,7 @@ namespace Nesteo.Server.Data.Entities
 
         public SpeciesEntity Species { get; set; }
 
-        [MaxLength(100)]
+        [MaxLength(Constants.MaxImageFileNameLength)]
         public string ImageFileName { get; set; }
 
         public string Comment { get; set; }

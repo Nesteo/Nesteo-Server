@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace Nesteo.Server.Models
 {
     public class User
@@ -10,6 +12,7 @@ namespace Nesteo.Server.Models
         /// <summary>
         /// Username
         /// </summary>
+        [Required]
         public string UserName { get; set; }
 
         /// <summary>
