@@ -13,10 +13,16 @@ namespace Nesteo.Server.Models
         public string Id { get; set; }
 
         /// <summary>
+        /// The old ID (if any)
+        /// </summary>
+        [StringLength(100, MinimumLength = 2)]
+        public string? OldId { get; set; }
+
+        /// <summary>
         /// The foreign ID (if any)
         /// </summary>
         [StringLength(100, MinimumLength = 2)]
-        public string ForeignId { get; set; }
+        public string? ForeignId { get; set; }
 
         /// <summary>
         /// Region, where the nesting box hangs
@@ -40,6 +46,11 @@ namespace Nesteo.Server.Models
         public DateTime? HangUpDate { get; set; }
 
         /// <summary>
+        /// Hang up user (if known)
+        /// </summary>
+        public User? HangUpUser { get; set; }
+
+        /// <summary>
         /// Owner of the nesting box
         /// </summary>
         [Required]
@@ -58,6 +69,11 @@ namespace Nesteo.Server.Models
         [Required]
         [EnumDataType(typeof(HoleSize))]
         public HoleSize? HoleSize { get; set; }
+
+        /// <summary>
+        /// Image file name
+        /// </summary>
+        public string ImageFilename { get; set; }
 
         /// <summary>
         /// Comment

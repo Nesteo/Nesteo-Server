@@ -173,9 +173,10 @@ namespace Nesteo.Server.Controllers.Api
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public IAsyncEnumerable<string> ExportInspectionsAsync()
         {
-            return _inspectionService.ExportAllRowsAsync().Prepend(String.Join(",", "Id", "Nesting Box", "Inspection Date", "Condition", "Has Been Cleaned",
-                                                                               "Occupied", "Egg Count", "Chick Count", "Age (days)", "Species", "Just Repaired", "Ringed Bird Count"
-                                                                               , "Comment"));
+            return _inspectionService.ExportAllRowsAsync().Prepend(String.Join(",", "Id", "Nesting Box", "Inspection Date", "Inspection By",
+                                                                               "Has Been Cleaned", "Condition", "Just Repaired",
+                                                                               "Occupied", "Contains Eggs", "Egg Count", "Chick Count", "Ringed Bird Count", "Age (days)",
+                                                                               "Female Parent", "Male Parent", "Species", "Image Filename", "Comment", "Last Updated"));
         }
     }
 }

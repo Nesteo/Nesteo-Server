@@ -207,7 +207,8 @@ namespace Nesteo.Server.Controllers.Api
         public IAsyncEnumerable<string> ExportNestingBoxAsync()
         {
             return _nestingBoxService.ExportAllRowsAsync().
-                                      Prepend(String.Join(",", "Id", "Foreign Id", "Region", "Longitude", "Latitude", "Hang Up Date", "Owner", "Material", "Hole Size","Comment", "Last Updated"));
+                                      Prepend(String.Join(",", "Id", "Old Id", "Foreign Id", "Region", "Longitude", "Latitude", "Hang Up Date", "Hung By",
+                                                          "Owner", "Material", "Hole Size", "Image Filename", "Comment", "Last Updated"));
         }
     }
 }

@@ -49,8 +49,10 @@ namespace Nesteo.Server.Services.Implementations
         {
             return Entities.AsNoTracking().OrderBy(entity => entity.Id).
                             ProjectTo<InspectionExportRow>(Mapper.ConfigurationProvider).
-                            Select(row => String.Join(",", row.Id, row.NestingBox, row.InspectionDate, row.Condition, row.HasBeenCleaned, row.Occupied,
-                                                      row.EggCount, row.ChickCount, row.AgeInDays, row.Species, row.JustRepaired, row.RingedChickCount, row.Comment)).
+                            Select(row => String.Join(",", row.Id, row.NestingBoxId, row.InspectionDate, row.InspectionUser.UserName,
+                                                      row.HasBeenCleaned, row.Condition, row.JustRepaired, row.Occupied, row.ContainsEggs,
+                                                      row.EggCount, row.ChickCount, row.RingedChickCount, row.AgeInDays, row.FemaleParent,
+                                                      row.MaleParent, row.Species, row.ImageFilename, row.Comment, row.LastUpdated)).
                             AsAsyncEnumerable();
         }
 

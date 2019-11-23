@@ -29,7 +29,12 @@ namespace Nesteo.Server.MappingProfiles
             CreateMap<NestingBoxEntity, NestingBoxExportRow>();
             CreateMap<InspectionEntity, Inspection>().ForMember(dest => dest.HasImage, options => options.MapFrom(inspection => inspection.ImageFileName != null));
             CreateMap<InspectionEntity, InspectionPreview>();
-            CreateMap<InspectionEntity, InspectionExportRow>();
+            CreateMap<InspectionEntity, InspectionExportRow>().ForMember(dest => dest.InspectionUser,
+                                                                         options => options.MapFrom(inspection => inspection.InspectedByUser))
+                                                              .ForMember(dest => dest.FemaleParent,
+                                                                         options => options.MapFrom(inspections => inspections.FemaleParentBirdDiscovery))
+                                                              .ForMember(dest => dest.MaleParent,
+                                                                         options => options.MapFrom(inspections => inspections.MaleParentBirdDiscovery));
         }
     }
 }
