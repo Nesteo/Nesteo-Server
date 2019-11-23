@@ -26,8 +26,10 @@ namespace Nesteo.Server.MappingProfiles
                                                                                                                 .Inspections
                                                                                                                 .OrderByDescending(inspection => inspection.InspectionDate)
                                                                                                                 .FirstOrDefault().InspectionDate));
+            CreateMap<NestingBoxEntity, NestingBoxExportRow>();
             CreateMap<InspectionEntity, Inspection>().ForMember(dest => dest.HasImage, options => options.MapFrom(inspection => inspection.ImageFileName != null));
             CreateMap<InspectionEntity, InspectionPreview>();
+            CreateMap<InspectionEntity, InspectionExportRow>();
         }
     }
 }
