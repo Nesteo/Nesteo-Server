@@ -255,6 +255,8 @@ namespace Nesteo.Server.DataImport
 
             // Map nesting box condition
             (Condition condition, bool justRepaired) = GetCondition(inspectionRecord.Condition);
+            if (condition != Condition.Good)
+                comments.Add($"Kasten-Zustand: {inspectionRecord.Condition}");
 
             // Analyze ringing activity
             (ParentBirdDiscovery femaleParentBirdDiscovery, ParentBirdDiscovery maleParentBirdDiscovery, int ringedChickCount) =
