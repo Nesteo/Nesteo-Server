@@ -26,7 +26,6 @@ namespace Nesteo.Server.Models
         /// <summary>
         /// The user who inspected the nesting box (if known)
         /// </summary>
-        [Required]
         public User InspectedByUser { get; set; }
 
         /// <summary>

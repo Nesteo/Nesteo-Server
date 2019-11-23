@@ -21,7 +21,6 @@ namespace Nesteo.Server.Data.Entities
         [DataType(DataType.DateTime)]
         public DateTime InspectionDate { get; set; }
 
-        [Required]
         public UserEntity InspectedByUser { get; set; }
 
         [Required]
