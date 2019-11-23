@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -163,6 +164,18 @@ namespace Nesteo.Server.Controllers.Api
                 return NotFound();
 
             return inspectionPreview;
+        }
+
+        /// <summary>
+        /// Export all inspections
+        /// </summary>
+        [HttpPatch("export")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public IAsyncEnumerable<string> ExportInspectionsAsync()
+        {
+            return _inspectionService.ExportAllRowsAsync().Prepend(String.Join(",", "Id", "Nesting Box", "Inspection Date", "Condition", "Has Been Cleaned",
+                                                                               "Occupied", "Egg Count", "Chick Count", "Age (days)", "Species", "Just Repaired", "Ringed Bird Count"
+                                                                               , "Comment"));
         }
     }
 }

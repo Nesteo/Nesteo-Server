@@ -25,11 +25,6 @@ namespace Nesteo.Server.Models
         public Region? Region { get; set; }
 
         /// <summary>
-        /// Region details
-        /// </summary>
-        public string? RegionDetails { get; set; }
-
-        /// <summary>
         /// Decimal coordinate longitude
         /// </summary>
         public double? CoordinateLongitude { get; set; }

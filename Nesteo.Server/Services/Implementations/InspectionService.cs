@@ -47,7 +47,11 @@ namespace Nesteo.Server.Services.Implementations
 
         public IAsyncEnumerable<string> ExportAllRowsAsync()
         {
-            return Entities.AsNoTracking().OrderBy(entity => entity.Id).Select(entity => entity.ToString()).AsAsyncEnumerable();
+            return Entities.AsNoTracking().OrderBy(entity => entity.Id).
+                            ProjectTo<InspectionExportRow>(Mapper.ConfigurationProvider).
+                            Select(row => String.Join(",", row.Id, row.NestingBox, row.InspectionDate, row.Condition, row.HasBeenCleaned, row.Occupied,
+                                                      row.EggCount, row.ChickCount, row.AgeInDays, row.Species, row.JustRepaired, row.RingedChickCount, row.Comment)).
+                            AsAsyncEnumerable();
         }
 
         public async Task<Inspection> AddAsync(Inspection inspection, CancellationToken cancellationToken = default)

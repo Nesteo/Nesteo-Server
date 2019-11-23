@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -196,6 +197,17 @@ namespace Nesteo.Server.Controllers.Api
         public IAsyncEnumerable<InspectionPreview> GetInspectionPreviewsByNestingBoxIdAsync(string id)
         {
             return _inspectionService.GetAllPreviewsForNestingBoxIdAsync(id);
+        }
+
+        /// <summary>
+        /// Export all nesting boxes
+        /// </summary>
+        [HttpPatch("export")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public IAsyncEnumerable<string> ExportNestingBoxAsync()
+        {
+            return _nestingBoxService.ExportAllRowsAsync().
+                                      Prepend(String.Join(",", "Id", "Foreign Id", "Region", "Longitude", "Latitude", "Hang Up Date", "Owner", "Material", "Hole Size","Comment", "Last Updated"));
         }
     }
 }
