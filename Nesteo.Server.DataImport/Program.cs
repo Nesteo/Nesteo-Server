@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -339,7 +339,20 @@ namespace Nesteo.Server.DataImport
                 "in ordnung" => (Condition.Good, false),
                 "repariert" => (Condition.Good, true),
                 "leicht defekt" => (Condition.NeedsRepair, false),
+                "aufhängung defekt" => (Condition.NeedsRepair, false),
+                "vorderfront gebrochen" => (Condition.NeedsRepair, false),
+                "lässt sich nicht öffnen" => (Condition.NeedsRepair, false),
+                "kann nicht geöffnet werden" => (Condition.NeedsRepair, false),
                 "defekt" => (Condition.NeedsReplacement, false),
+                "stark defekt" => (Condition.NeedsReplacement, false),
+                "dach defekt" => (Condition.NeedsReplacement, false),
+                "deckel defekt" => (Condition.NeedsReplacement, false),
+                "front defekt" => (Condition.NeedsReplacement, false),
+                "klappe war ab" => (Condition.NeedsReplacement, false),
+                "front fehlt" => (Condition.NeedsReplacement, false),
+                "frontplatte fehlt" => (Condition.NeedsReplacement, false),
+                "boden fehlt" => (Condition.NeedsReplacement, false),
+                "boden fehlt, abgenommen" => (Condition.NeedsReplacement, false),
                 "kaputt" => (Condition.NeedsReplacement, false),
                 _ => throw new InvalidCsvRecordException($"Unrecognized condition: {value}")
             };
@@ -377,7 +390,8 @@ namespace Nesteo.Server.DataImport
 
         private static (ParentBirdDiscovery femaleParentBirdDiscovery, ParentBirdDiscovery maleParentBirdDiscovery, int ringedChickCount) AnalyzeRingingActivity(string value)
         {
-            value = value.ToLower().Replace("+", string.Empty).Replace(",", string.Empty);
+            value = value.ToLower();
+            value = new[] { "+", ",", "und", "&", "juv" }.Aggregate(value, (current, str) => current.Replace(str, string.Empty));
 
             ParentBirdDiscovery femaleParentBirdDiscovery = ParentBirdDiscovery.None;
             ParentBirdDiscovery maleParentBirdDiscovery = ParentBirdDiscovery.None;
