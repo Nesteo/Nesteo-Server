@@ -16,6 +16,8 @@ namespace Nesteo.Server.Services
 
         IAsyncEnumerable<InspectionPreview> GetAllPreviewsForNestingBoxIdAsync(string nestingBoxId);
 
+        IAsyncEnumerable<string> ExportAllRowsAsync();
+
         Task<Inspection> AddAsync(Inspection inspection, CancellationToken cancellationToken = default);
 
         Task<Inspection> UpdateAsync(Inspection inspection, CancellationToken cancellationToken = default);

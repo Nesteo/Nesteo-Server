@@ -45,6 +45,11 @@ namespace Nesteo.Server.Services.Implementations
                            .ProjectTo<InspectionPreview>(Mapper.ConfigurationProvider).AsAsyncEnumerable();
         }
 
+        public IAsyncEnumerable<string> ExportAllRowsAsync()
+        {
+            return Entities.AsNoTracking().OrderBy(entity => entity.Id).Select(entity => entity.ToString()).AsAsyncEnumerable();
+        }
+
         public async Task<Inspection> AddAsync(Inspection inspection, CancellationToken cancellationToken = default)
         {
             if (inspection.Id != null)

@@ -47,6 +47,11 @@ namespace Nesteo.Server.Services.Implementations
                            .AsAsyncEnumerable();
         }
 
+        public IAsyncEnumerable<string> ExportAllRowsAsync()
+        {
+            return Entities.AsNoTracking().OrderBy(entity => entity.Id).Select(entity => entity.ToString()).AsAsyncEnumerable();
+        }
+
         public async Task<NestingBox> AddAsync(NestingBox nestingBox, CancellationToken cancellationToken = default)
         {
             if (nestingBox.Id == null)

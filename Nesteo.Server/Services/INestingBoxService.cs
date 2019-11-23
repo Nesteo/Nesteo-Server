@@ -15,6 +15,8 @@ namespace Nesteo.Server.Services
 
         IAsyncEnumerable<string> GetAllTakenIdsWithPrefixAsync(string regionPrefix);
 
+        IAsyncEnumerable<string> ExportAllRowsAsync();
+
         Task<NestingBox> AddAsync(NestingBox nestingBox, CancellationToken cancellationToken = default);
 
         Task<NestingBox> UpdateAsync(NestingBox nestingBox, CancellationToken cancellationToken = default);
