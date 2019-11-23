@@ -41,9 +41,9 @@ namespace Nesteo.Server.Models
         public bool JustRepaired { get; set; }
 
         /// <summary>
-        /// Was the nesting box occupied by any bird?
+        /// Was the nesting box occupied by any bird (if known)?
         /// </summary>
-        public bool Occupied { get; set; }
+        public bool? Occupied { get; set; }
 
         /// <summary>
         /// Were any eggs in there?
@@ -56,9 +56,9 @@ namespace Nesteo.Server.Models
         public int? EggCount { get; set; }
 
         /// <summary>
-        /// Number of slipped chicks
+        /// Number of slipped chicks (or null when unknown)
         /// </summary>
-        public int ChickCount { get; set; }
+        public int? ChickCount { get; set; }
 
         /// <summary>
         /// Number of ringed chicks
