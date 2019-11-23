@@ -101,7 +101,6 @@ namespace Nesteo.Server.Models
         /// The bird species
         /// </summary>
         [Required]
-        [EnumDataType(typeof(Species))]
         public Species? Species { get; set; }
 
         /// <summary>
