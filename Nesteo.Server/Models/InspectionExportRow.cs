@@ -15,7 +15,7 @@ namespace Nesteo.Server.Models
         /// The inspected nesting box Id
         /// </summary>
         [Required]
-        public string NestingBoxId { get; set; }
+        public string NestingBox { get; set; }
 
         /// <summary>
         /// Date and time of the inspection
@@ -27,7 +27,7 @@ namespace Nesteo.Server.Models
         /// Inspection User
         /// </summary>
         [Required]
-        public User InspectionUser { get; set; }
+        public string InspectedByUser { get; set; }
 
         /// <summary>
         /// Whether the nesting box has been cleaned during the inspection
@@ -40,7 +40,7 @@ namespace Nesteo.Server.Models
         /// </summary>
         [Required]
         [EnumDataType(typeof(Condition))]
-        public Condition? Condition { get; set; }
+        public string Condition { get; set; }
 
         /// <summary>
         /// Whether the nesting box has been repaired during the inspection
@@ -90,20 +90,20 @@ namespace Nesteo.Server.Models
         /// Does the nesting box contain a female parent?
         /// </summary>
         [Required]
-        public ParentBirdDiscovery? FemaleParent { get; set; }
+        public string FemaleParentBirdDiscovery { get; set; }
 
         /// <summary>
         /// Does the nesting box contain a male parent?
         /// </summary>
         [Required]
-        public ParentBirdDiscovery? MaleParent { get; set; }
+        public string MaleParentBirdDiscovery { get; set; }
 
         /// <summary>
         /// The bird species
         /// </summary>
         [Required]
         [EnumDataType(typeof(Species))]
-        public Species? Species { get; set; }
+        public string Species { get; set; }
 
         /// <summary>
         /// Image file name
@@ -119,6 +119,5 @@ namespace Nesteo.Server.Models
         /// The time this data entry has last been updated
         /// </summary>
         public DateTime? LastUpdated { get; set; }
-
     }
 }

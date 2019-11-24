@@ -49,11 +49,15 @@ namespace Nesteo.Server.Services.Implementations
         {
             return Entities.AsNoTracking().OrderBy(entity => entity.Id).
                             ProjectTo<InspectionExportRow>(Mapper.ConfigurationProvider).
-                            Select(row => String.Join(",", row.Id, row.NestingBoxId, row.InspectionDate, row.InspectionUser.UserName,
+                            Select(row => string.Join(",", row.Id, row.NestingBox, row.InspectionDate, row.InspectedByUser,
                                                       row.HasBeenCleaned, row.Condition, row.JustRepaired, row.Occupied, row.ContainsEggs,
-                                                      row.EggCount, row.ChickCount, row.RingedChickCount, row.AgeInDays, row.FemaleParent,
-                                                      row.MaleParent, row.Species, row.ImageFilename, row.Comment, row.LastUpdated)).
-                            AsAsyncEnumerable();
+                                                      row.EggCount, row.ChickCount, row.RingedChickCount, row.AgeInDays, row.FemaleParentBirdDiscovery,
+                                                      row.MaleParentBirdDiscovery, row.Species, row.ImageFilename, row.Comment, row.LastUpdated)).
+                            AsAsyncEnumerable().
+                            Prepend(string.Join(",", "Id", "Nesting Box", "Inspection Date", "Inspection By",
+                                                        "Has Been Cleaned", "Condition", "Just Repaired",
+                                                        "Occupied", "Contains Eggs", "Egg Count", "Chick Count", "Ringed Bird Count", "Age (days)",
+                                                        "Female Parent", "Male Parent", "Species", "Image Filename", "Comment", "Last Updated"));
         }
 
         public async Task<Inspection> AddAsync(Inspection inspection, CancellationToken cancellationToken = default)

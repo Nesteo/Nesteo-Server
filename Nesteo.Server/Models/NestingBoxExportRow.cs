@@ -28,7 +28,7 @@ namespace Nesteo.Server.Models
         /// Region, where the nesting box hangs
         /// </summary>
         [Required]
-        public Region? Region { get; set; }
+        public string Region { get; set; }
 
         /// <summary>
         /// Decimal coordinate longitude
@@ -48,27 +48,27 @@ namespace Nesteo.Server.Models
         /// <summary>
         /// Hang up user (if known)
         /// </summary>
-        public User? HangUpUser { get; set; }
+        public string HangUpUser { get; set; }
 
         /// <summary>
         /// Owner of the nesting box
         /// </summary>
         [Required]
-        public Owner Owner { get; set; }
+        public string Owner { get; set; }
 
         /// <summary>
         /// Material
         /// </summary>
         [Required]
         [EnumDataType(typeof(Material))]
-        public Material Material { get; set; }
+        public string Material { get; set; }
 
         /// <summary>
         /// Size of the hole
         /// </summary>
         [Required]
         [EnumDataType(typeof(HoleSize))]
-        public HoleSize? HoleSize { get; set; }
+        public string HoleSize { get; set; }
 
         /// <summary>
         /// Image file name

@@ -200,15 +200,13 @@ namespace Nesteo.Server.Controllers.Api
         }
 
         /// <summary>
-        /// Export all nesting boxes
+        /// Download nesting boxes csv
         /// </summary>
-        [HttpPatch("export")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [HttpPatch("csv")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public IAsyncEnumerable<string> ExportNestingBoxAsync()
         {
-            return _nestingBoxService.ExportAllRowsAsync().
-                                      Prepend(String.Join(",", "Id", "Old Id", "Foreign Id", "Region", "Longitude", "Latitude", "Hang Up Date", "Hung By",
-                                                          "Owner", "Material", "Hole Size", "Image Filename", "Comment", "Last Updated"));
+            return _nestingBoxService.ExportAllRowsAsync();
         }
     }
 }

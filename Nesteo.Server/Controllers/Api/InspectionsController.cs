@@ -167,16 +167,13 @@ namespace Nesteo.Server.Controllers.Api
         }
 
         /// <summary>
-        /// Export all inspections
+        /// Download inspections csv
         /// </summary>
-        [HttpPatch("export")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [HttpPatch("csv")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public IAsyncEnumerable<string> ExportInspectionsAsync()
         {
-            return _inspectionService.ExportAllRowsAsync().Prepend(String.Join(",", "Id", "Nesting Box", "Inspection Date", "Inspection By",
-                                                                               "Has Been Cleaned", "Condition", "Just Repaired",
-                                                                               "Occupied", "Contains Eggs", "Egg Count", "Chick Count", "Ringed Bird Count", "Age (days)",
-                                                                               "Female Parent", "Male Parent", "Species", "Image Filename", "Comment", "Last Updated"));
+            return _inspectionService.ExportAllRowsAsync();
         }
     }
 }

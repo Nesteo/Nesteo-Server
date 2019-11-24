@@ -26,14 +26,17 @@ namespace Nesteo.Server.MappingProfiles
                                                                                                                 .Inspections
                                                                                                                 .OrderByDescending(inspection => inspection.InspectionDate)
                                                                                                                 .FirstOrDefault().InspectionDate));
-            CreateMap<NestingBoxEntity, NestingBoxExportRow>();
+            CreateMap<NestingBoxEntity, NestingBoxExportRow>().ForMember(dest => dest.Region,
+                                                                         options => options.MapFrom(nestingBox => nestingBox.Region.Name))
+                                                              .ForMember(dest => dest.Owner,
+                                                                         options => options.MapFrom(nestingBox => nestingBox.Owner.Name));
             CreateMap<InspectionEntity, Inspection>().ForMember(dest => dest.HasImage, options => options.MapFrom(inspection => inspection.ImageFileName != null));
             CreateMap<InspectionEntity, InspectionPreview>();
-            CreateMap<InspectionEntity, InspectionExportRow>().ForMember(dest => dest.InspectionUser,
-                                                                         options => options.MapFrom(inspection => inspection.InspectedByUser))
-                                                              .ForMember(dest => dest.FemaleParent,
+            CreateMap<InspectionEntity, InspectionExportRow>().ForMember(dest => dest.InspectedByUser,
+                                                                         options => options.MapFrom(inspection => inspection.InspectedByUser.UserName))
+                                                              .ForMember(dest => dest.FemaleParentBirdDiscovery,
                                                                          options => options.MapFrom(inspections => inspections.FemaleParentBirdDiscovery))
-                                                              .ForMember(dest => dest.MaleParent,
+                                                              .ForMember(dest => dest.MaleParentBirdDiscovery,
                                                                          options => options.MapFrom(inspections => inspections.MaleParentBirdDiscovery));
         }
     }
