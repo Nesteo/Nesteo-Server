@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Nesteo.Server.Data;
 
 namespace Nesteo.Server.Migrations
 {
     [DbContext(typeof(NesteoDbContext))]
-    partial class NesteoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20191123000600_AllowUnknownForMoreInspectionFields")]
+    partial class AllowUnknownForMoreInspectionFields
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -219,7 +221,7 @@ namespace Nesteo.Server.Migrations
 
             modelBuilder.Entity("Nesteo.Server.Data.Entities.InspectionEntity", b =>
                 {
-                    b.Property<int?>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
@@ -252,6 +254,7 @@ namespace Nesteo.Server.Migrations
                         .HasMaxLength(100);
 
                     b.Property<string>("InspectedByUserId")
+                        .IsRequired()
                         .HasColumnType("varchar(255)");
 
                     b.Property<DateTime>("InspectionDate")
@@ -355,7 +358,7 @@ namespace Nesteo.Server.Migrations
 
             modelBuilder.Entity("Nesteo.Server.Data.Entities.OwnerEntity", b =>
                 {
-                    b.Property<int?>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
@@ -371,7 +374,7 @@ namespace Nesteo.Server.Migrations
 
             modelBuilder.Entity("Nesteo.Server.Data.Entities.RegionEntity", b =>
                 {
-                    b.Property<int?>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
@@ -391,7 +394,7 @@ namespace Nesteo.Server.Migrations
 
             modelBuilder.Entity("Nesteo.Server.Data.Entities.ReservedIdSpaceEntity", b =>
                 {
-                    b.Property<int?>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
@@ -422,7 +425,7 @@ namespace Nesteo.Server.Migrations
 
             modelBuilder.Entity("Nesteo.Server.Data.Entities.SpeciesEntity", b =>
                 {
-                    b.Property<int?>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
@@ -491,7 +494,9 @@ namespace Nesteo.Server.Migrations
                 {
                     b.HasOne("Nesteo.Server.Data.Entities.Identity.UserEntity", "InspectedByUser")
                         .WithMany()
-                        .HasForeignKey("InspectedByUserId");
+                        .HasForeignKey("InspectedByUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Nesteo.Server.Data.Entities.NestingBoxEntity", "NestingBox")
                         .WithMany("Inspections")

@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nesteo.Server.SampleDataGen
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nesteo.Server.IntegrationTests", "Nesteo.Server.IntegrationTests\Nesteo.Server.IntegrationTests.csproj", "{EE43B095-AF96-4C20-90DF-A6E2E6359EED}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nesteo.Server.DataImport", "Nesteo.Server.DataImport\Nesteo.Server.DataImport.csproj", "{9B7D30EE-682C-4C67-ACFF-AE740E3BF392}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,9 +45,9 @@ Global
 		{EE43B095-AF96-4C20-90DF-A6E2E6359EED}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EE43B095-AF96-4C20-90DF-A6E2E6359EED}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EE43B095-AF96-4C20-90DF-A6E2E6359EED}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4DE12E6F-9C91-440A-BDE4-7DA37FFE7F20}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4DE12E6F-9C91-440A-BDE4-7DA37FFE7F20}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4DE12E6F-9C91-440A-BDE4-7DA37FFE7F20}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4DE12E6F-9C91-440A-BDE4-7DA37FFE7F20}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9B7D30EE-682C-4C67-ACFF-AE740E3BF392}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B7D30EE-682C-4C67-ACFF-AE740E3BF392}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B7D30EE-682C-4C67-ACFF-AE740E3BF392}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B7D30EE-682C-4C67-ACFF-AE740E3BF392}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

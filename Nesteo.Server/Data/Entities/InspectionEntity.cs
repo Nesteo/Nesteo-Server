@@ -21,7 +21,6 @@ namespace Nesteo.Server.Data.Entities
         [DataType(DataType.DateTime)]
         public DateTime InspectionDate { get; set; }
 
-        [Required]
         public UserEntity InspectedByUser { get; set; }
 
         [Required]
@@ -33,8 +32,7 @@ namespace Nesteo.Server.Data.Entities
         [Required]
         public bool JustRepaired { get; set; }
 
-        [Required]
-        public bool Occupied { get; set; }
+        public bool? Occupied { get; set; }
 
         [Required]
         public bool ContainsEggs { get; set; }
@@ -42,9 +40,8 @@ namespace Nesteo.Server.Data.Entities
         [Range(0, 100)]
         public int? EggCount { get; set; }
 
-        [Required]
         [Range(0, 100)]
-        public int ChickCount { get; set; }
+        public int? ChickCount { get; set; }
 
         [Required]
         [Range(0, 100)]
