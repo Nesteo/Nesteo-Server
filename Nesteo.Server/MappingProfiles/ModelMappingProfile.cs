@@ -26,18 +26,11 @@ namespace Nesteo.Server.MappingProfiles
                                                                                                                 .Inspections
                                                                                                                 .OrderByDescending(inspection => inspection.InspectionDate)
                                                                                                                 .FirstOrDefault().InspectionDate));
-            CreateMap<NestingBoxEntity, NestingBoxExportRow>().ForMember(dest => dest.Region,
-                                                                         options => options.MapFrom(nestingBox => nestingBox.Region.Name))
-                                                              .ForMember(dest => dest.Owner,
-                                                                         options => options.MapFrom(nestingBox => nestingBox.Owner.Name));
+            CreateMap<NestingBoxEntity, NestingBoxExportRow>().ForMember(dest => dest.HangUpUserName, options => options.MapFrom(nestingBox => nestingBox.HangUpUser.UserName));
             CreateMap<InspectionEntity, Inspection>().ForMember(dest => dest.HasImage, options => options.MapFrom(inspection => inspection.ImageFileName != null));
             CreateMap<InspectionEntity, InspectionPreview>();
-            CreateMap<InspectionEntity, InspectionExportRow>().ForMember(dest => dest.InspectedByUser,
-                                                                         options => options.MapFrom(inspection => inspection.InspectedByUser.UserName))
-                                                              .ForMember(dest => dest.FemaleParentBirdDiscovery,
-                                                                         options => options.MapFrom(inspections => inspections.FemaleParentBirdDiscovery))
-                                                              .ForMember(dest => dest.MaleParentBirdDiscovery,
-                                                                         options => options.MapFrom(inspections => inspections.MaleParentBirdDiscovery));
+            CreateMap<InspectionEntity, InspectionExportRow>().ForMember(dest => dest.InspectedByUserName,
+                                                                         options => options.MapFrom(inspection => inspection.InspectedByUser.UserName));
         }
     }
 }

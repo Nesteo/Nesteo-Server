@@ -202,7 +202,7 @@ namespace Nesteo.Server.Controllers.Api
         /// <summary>
         /// Download nesting boxes csv
         /// </summary>
-        [HttpPatch("csv")]
+        [HttpGet("csv")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public IAsyncEnumerable<string> ExportNestingBoxAsync()
         {

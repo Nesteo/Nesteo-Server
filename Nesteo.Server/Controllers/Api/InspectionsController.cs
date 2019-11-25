@@ -169,7 +169,7 @@ namespace Nesteo.Server.Controllers.Api
         /// <summary>
         /// Download inspections csv
         /// </summary>
-        [HttpPatch("csv")]
+        [HttpGet("csv")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public IAsyncEnumerable<string> ExportInspectionsAsync()
         {

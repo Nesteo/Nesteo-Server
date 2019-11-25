@@ -12,10 +12,10 @@ namespace Nesteo.Server.Models
         public int? Id { get; set; }
 
         /// <summary>
-        /// The inspected nesting box Id
+        /// Id of the inspected nesting box
         /// </summary>
         [Required]
-        public string NestingBox { get; set; }
+        public string NestingBoxId { get; set; }
 
         /// <summary>
         /// Date and time of the inspection
@@ -24,10 +24,9 @@ namespace Nesteo.Server.Models
         public DateTime? InspectionDate { get; set; }
 
         /// <summary>
-        /// Inspection User
+        /// The user who inspected the nesting box (if known)
         /// </summary>
-        [Required]
-        public string InspectedByUser { get; set; }
+        public string InspectedByUserName { get; set; }
 
         /// <summary>
         /// Whether the nesting box has been cleaned during the inspection
@@ -40,7 +39,7 @@ namespace Nesteo.Server.Models
         /// </summary>
         [Required]
         [EnumDataType(typeof(Condition))]
-        public string Condition { get; set; }
+        public Condition? Condition { get; set; }
 
         /// <summary>
         /// Whether the nesting box has been repaired during the inspection
@@ -49,13 +48,12 @@ namespace Nesteo.Server.Models
         public bool? JustRepaired { get; set; }
 
         /// <summary>
-        /// Was the nesting box occupied by any bird?
+        /// Was the nesting box occupied by any bird (if known)?
         /// </summary>
-        [Required]
         public bool? Occupied { get; set; }
 
         /// <summary>
-        /// Does the nesting box contain eggs?
+        /// Were any eggs in there?
         /// </summary>
         [Required]
         public bool? ContainsEggs { get; set; }
@@ -67,9 +65,8 @@ namespace Nesteo.Server.Models
         public int? EggCount { get; set; }
 
         /// <summary>
-        /// Number of chicks
+        /// Number of slipped chicks (or null when unknown)
         /// </summary>
-        [Required]
         [Range(0, 100)]
         public int? ChickCount { get; set; }
 
@@ -87,23 +84,24 @@ namespace Nesteo.Server.Models
         public int? AgeInDays { get; set; }
 
         /// <summary>
-        /// Does the nesting box contain a female parent?
+        /// Information about the presence of the female parent bird
         /// </summary>
         [Required]
-        public string FemaleParentBirdDiscovery { get; set; }
+        [EnumDataType(typeof(ParentBirdDiscovery))]
+        public ParentBirdDiscovery? FemaleParentBirdDiscovery { get; set; }
 
         /// <summary>
-        /// Does the nesting box contain a male parent?
+        /// Information about the presence of the male parent bird
         /// </summary>
         [Required]
-        public string MaleParentBirdDiscovery { get; set; }
+        [EnumDataType(typeof(ParentBirdDiscovery))]
+        public ParentBirdDiscovery? MaleParentBirdDiscovery { get; set; }
 
         /// <summary>
         /// The bird species
         /// </summary>
         [Required]
-        [EnumDataType(typeof(Species))]
-        public string Species { get; set; }
+        public string SpeciesName { get; set; }
 
         /// <summary>
         /// Image file name

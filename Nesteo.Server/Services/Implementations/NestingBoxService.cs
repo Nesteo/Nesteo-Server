@@ -51,8 +51,8 @@ namespace Nesteo.Server.Services.Implementations
         {
             return Entities.AsNoTracking().OrderBy(entity => entity.Id).
                             ProjectTo<NestingBoxExportRow>(Mapper.ConfigurationProvider).
-                            Select(row => string.Join(",", row.Id, row.OldId, row.ForeignId, row.Region, row.CoordinateLongitude, row.CoordinateLatitude,
-                                                      row.HangUpDate, row.HangUpUser, row.Owner, row.Material, row.HoleSize, row.ImageFilename, row.Comment, row.LastUpdated)).
+                            Select(row => string.Join(",", row.Id, row.OldId, row.ForeignId, row.RegionName, row.CoordinateLongitude, row.CoordinateLatitude,
+                                                      row.HangUpDate, row.HangUpUserName, row.OwnerName, row.Material, row.HoleSize, row.ImageFilename, row.Comment, row.LastUpdated)).
                             AsAsyncEnumerable().
                             Prepend(string.Join(",", "Id", "Old Id", "Foreign Id", "Region", "Longitude", "Latitude", "Hang Up Date", "Hung By",
                                                                    "Owner", "Material", "Hole Size", "Image Filename", "Comment", "Last Updated"));
