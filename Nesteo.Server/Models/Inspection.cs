@@ -101,7 +101,7 @@ namespace Nesteo.Server.Models
         /// The bird species
         /// </summary>
         [Required]
-        public Species? Species { get; set; }
+        public Species Species { get; set; }
 
         /// <summary>
         /// Comment

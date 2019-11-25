@@ -149,9 +149,6 @@ namespace Nesteo.Server.Services.Implementations
 
         public async Task<Inspection> SetImageFileNameAsync(int id, string imageFileName, CancellationToken cancellationToken = default)
         {
-            if (id == null)
-                return null;
-
             // Get existing nesting box entity
             InspectionEntity inspectionEntity = await Entities.FindAsync(new object[] { id }, cancellationToken).ConfigureAwait(false);
             if (inspectionEntity == null)

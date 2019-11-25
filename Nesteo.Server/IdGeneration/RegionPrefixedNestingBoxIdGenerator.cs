@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Nesteo.Server.Models;
@@ -11,7 +12,10 @@ namespace Nesteo.Server.IdGeneration
 {
     public class RegionPrefixedNestingBoxIdGenerator : INestingBoxIdGenerator
     {
-        public async IAsyncEnumerable<string> GetNextIdsAsync(INestingBoxService nestingBoxService, Region region, int count, CancellationToken cancellationToken = default)
+        public async IAsyncEnumerable<string> GetNextIdsAsync(INestingBoxService nestingBoxService,
+                                                              Region region,
+                                                              int count,
+                                                              [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
             if (nestingBoxService == null)
                 throw new ArgumentNullException(nameof(nestingBoxService));
@@ -33,7 +37,8 @@ namespace Nesteo.Server.IdGeneration
             cancellationToken.ThrowIfCancellationRequested();
 
             // Query taken nesting box ids and get the enumerator for more efficient manual iteration
-            await using IAsyncEnumerator<string> takenNestingBoxIds = nestingBoxService.GetAllTakenIdsWithPrefixAsync(region.NestingBoxIdPrefix).GetAsyncEnumerator(cancellationToken);
+            await using IAsyncEnumerator<string> takenNestingBoxIds =
+                nestingBoxService.GetAllTakenIdsWithPrefixAsync(region.NestingBoxIdPrefix).GetAsyncEnumerator(cancellationToken);
             await takenNestingBoxIds.MoveNextAsync().ConfigureAwait(false);
 
             // Find next IDs

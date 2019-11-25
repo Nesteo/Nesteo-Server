@@ -16,7 +16,7 @@ namespace Nesteo.Server.Models
         /// Region, where the nesting box hangs
         /// </summary>
         [Required]
-        public Region? Region { get; set; }
+        public Region Region { get; set; }
 
         /// <summary>
         /// The old ID (if any)
