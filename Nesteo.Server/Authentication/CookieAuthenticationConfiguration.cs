@@ -12,7 +12,7 @@ namespace Nesteo.Server.Authentication
         public void Configure(string name, CookieAuthenticationOptions options)
         {
             if (name != IdentityConstants.ApplicationScheme)
-                throw new InvalidOperationException($"Cannot configure unknown cookie authentication scheme {name}");
+                return;
 
             options.Cookie.Name = "sessionToken";
             options.Cookie.HttpOnly = true;
