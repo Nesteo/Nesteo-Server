@@ -35,7 +35,7 @@ namespace Nesteo.Server.Result
             try
             {
                 // Write CSV records to response stream
-                await using var streamWriter = new StreamWriter(response.Body, Encoding.UTF8, -1, true);
+                await using var streamWriter = new StreamWriter(response.Body, Encoding.UTF8, 1024, true);
                 await foreach (string record in _records)
                     await streamWriter.WriteLineAsync(record);
             }
