@@ -14,12 +14,4 @@
       <PackageReference Include="CsvHelper" Version="12.1.3" />
     </ItemGroup>
 
-    <ItemGroup>
-      <None Remove="Data\kontrolldaten.csv" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Content Include="Data\Kontrolldaten.csv" />
-    </ItemGroup>
-
 </Project>

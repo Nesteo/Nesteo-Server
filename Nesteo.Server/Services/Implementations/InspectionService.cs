@@ -11,6 +11,7 @@ using Nesteo.Server.Data;
 using Nesteo.Server.Data.Entities;
 using Nesteo.Server.Data.Entities.Identity;
 using Nesteo.Server.Models;
+using Nesteo.Server.Utils;
 
 namespace Nesteo.Server.Services.Implementations
 {
@@ -47,17 +48,19 @@ namespace Nesteo.Server.Services.Implementations
 
         public IAsyncEnumerable<string> ExportAllRowsAsync()
         {
+            string header = CsvSerializationHelper.SerializeCsvRow("Id", "Nesting Box", "Inspection Date", "Inspection By",
+                                        "Has Been Cleaned", "Condition", "Just Repaired",
+                                        "Occupied", "Contains Eggs", "Egg Count", "Chick Count", "Ringed Bird Count", "Age (days)",
+                                        "Female Parent", "Male Parent", "Species", "Image Filename", "Comment", "Last Updated");
+
             return Entities.AsNoTracking().OrderBy(entity => entity.Id).
                             ProjectTo<InspectionExportRow>(Mapper.ConfigurationProvider).
                             AsAsyncEnumerable().
-                            Select(row => string.Join(",", row.Id, row.NestingBoxId, row.InspectionDate, row.InspectedByUserName,
+                            Select(row => CsvSerializationHelper.SerializeCsvRow(row.Id, row.NestingBoxId, row.InspectionDate, row.InspectedByUserName,
                                                       row.HasBeenCleaned, row.Condition, row.JustRepaired, row.Occupied, row.ContainsEggs,
                                                       row.EggCount, row.ChickCount, row.RingedChickCount, row.AgeInDays, row.FemaleParentBirdDiscovery,
                                                       row.MaleParentBirdDiscovery, row.SpeciesName, row.ImageFilename, row.Comment, row.LastUpdated)).
-                            Prepend(string.Join(",", "Id", "Nesting Box", "Inspection Date", "Inspection By",
-                                                        "Has Been Cleaned", "Condition", "Just Repaired",
-                                                        "Occupied", "Contains Eggs", "Egg Count", "Chick Count", "Ringed Bird Count", "Age (days)",
-                                                        "Female Parent", "Male Parent", "Species", "Image Filename", "Comment", "Last Updated"));
+                            Prepend(header);
         }
 
         public async Task<Inspection> AddAsync(Inspection inspection, CancellationToken cancellationToken = default)

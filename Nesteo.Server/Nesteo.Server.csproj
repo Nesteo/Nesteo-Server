@@ -17,7 +17,6 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="7.0.0" />
-    <PackageReference Include="CsvHelper" Version="12.2.1" />
     <PackageReference Include="Hellang.Middleware.ProblemDetails" Version="3.1.0" />
     <PackageReference Include="MarcusW.SharpUtils.Core" Version="1.0.7" />
     <PackageReference Include="MarcusW.SharpUtils.DependencyInjection" Version="1.0.7" />
@@ -28,7 +27,6 @@
     <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="3.0.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.0.0" />
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="3.0.0-rc1.final" />
-    <PackageReference Include="ServiceStack.Text" Version="5.7.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.0.0-rc4" />
     <PackageReference Include="Swashbuckle.AspNetCore.ReDoc" Version="5.0.0-rc4" />
     <PackageReference Include="ZNetCS.AspNetCore.Authentication.Basic" Version="3.0.2" />

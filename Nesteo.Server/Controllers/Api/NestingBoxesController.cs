@@ -1,12 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Threading.Tasks;
-using CsvHelper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
@@ -15,6 +10,7 @@ using Microsoft.Extensions.Options;
 using Nesteo.Server.Filters;
 using Nesteo.Server.Models;
 using Nesteo.Server.Options;
+using Nesteo.Server.Result;
 using Nesteo.Server.Services;
 
 namespace Nesteo.Server.Controllers.Api
@@ -208,9 +204,12 @@ namespace Nesteo.Server.Controllers.Api
         /// </summary>
         [HttpGet("csv")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public IAsyncEnumerable<string> ExportNestingBoxAsync()
+        public Task<IActionResult> ExportNestingBoxAsync()
         {
-            return _nestingBoxService.ExportAllRowsAsync();
+            string fileDownloadName = $"nesting-boxes-export-{DateTime.Now}.csv";
+            IAsyncEnumerable<string> records = _nestingBoxService.ExportAllRowsAsync();
+
+            return Task.FromResult<IActionResult>(new CsvFileResult(records, fileDownloadName));
         }
     }
 }

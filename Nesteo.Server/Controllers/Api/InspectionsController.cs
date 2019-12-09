@@ -10,6 +10,7 @@ using Microsoft.Extensions.Options;
 using Nesteo.Server.Filters;
 using Nesteo.Server.Models;
 using Nesteo.Server.Options;
+using Nesteo.Server.Result;
 using Nesteo.Server.Services;
 
 namespace Nesteo.Server.Controllers.Api
@@ -171,9 +172,11 @@ namespace Nesteo.Server.Controllers.Api
         /// </summary>
         [HttpGet("csv")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public IAsyncEnumerable<string> ExportInspectionsAsync()
+        public Task<IActionResult> ExportInspectionsAsync()
         {
-            return _inspectionService.ExportAllRowsAsync();
-        }
+            string fileDownloadName = $"inspections-export-{DateTime.Now}.csv";
+            IAsyncEnumerable<string> records = _inspectionService.ExportAllRowsAsync();
+
+            return Task.FromResult<IActionResult>(new CsvFileResult(records, fileDownloadName));        }
     }
 }

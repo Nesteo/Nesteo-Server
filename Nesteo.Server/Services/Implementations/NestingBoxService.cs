@@ -1,21 +1,17 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
-using CsvHelper;
-using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.EntityFrameworkCore;
 using Nesteo.Server.Data;
 using Nesteo.Server.Data.Entities;
 using Nesteo.Server.Data.Entities.Identity;
 using Nesteo.Server.IdGeneration;
 using Nesteo.Server.Models;
-using ServiceStack;
+using Nesteo.Server.Utils;
 
 namespace Nesteo.Server.Services.Implementations
 {
@@ -54,42 +50,15 @@ namespace Nesteo.Server.Services.Implementations
 
         public IAsyncEnumerable<string> ExportAllRowsAsync()
         {
-            return Entities.AsNoTracking().OrderBy(entity => entity.Id).ProjectTo<NestingBoxExportRow>(Mapper.ConfigurationProvider)
-                           .Select( row =>
-                                   row.Id.ToCsvField() +
-                                   row.OldId.ToCsvField() +
-                                   row.ForeignId.ToCsvField() +
-                                   row.RegionName.ToCsvField() +
-                                   row.CoordinateLongitude.ToCsvField() +
-                                   row.CoordinateLatitude.ToCsvField() +
-                                   row.HangUpDate.ToCsvField() +
-                                   row.HangUpUserName.ToCsvField() +
-                                   row.OwnerName.ToCsvField() +
-                                   row.Material.ToCsvField() +
-                                   row.HoleSize.ToCsvField() +
-                                   row.ImageFilename.ToCsvField() +
-                                   row.Comment.ToCsvField() +
-                                   row.LastUpdated.ToCsvField())
-                           .AsAsyncEnumerable()
-                           .Prepend(string.Join(",", "Id", "Old Id", "Foreign Id", "Region", "Longitude", "Latitude", "Hang Up Date", "Hung By",
-                                                "Owner", "Material", "Hole Size", "Image Filename", "Comment", "Last Updated"));
-//            return Entities.AsNoTracking().OrderBy(entity => entity.Id).ProjectTo<NestingBoxExportRow>(Mapper.ConfigurationProvider).AsAsyncEnumerable()
-//                           .Select(row => new string[]{
-//                row.Id, row.OldId, row.ForeignId, row.RegionName, row.CoordinateLongitude.ToString(), row.CoordinateLatitude.ToString(),
-//                row.HangUpDate.ToString(), row.HangUpUserName, row.OwnerName, row.Material.ToString(), row.HoleSize.ToString(),
-//                row.ImageFilename, row.Comment, row.LastUpdated.ToString() }.ToCsv()).AsAsyncEnumerable()
-//                           .Prepend(new string[] {"Id", "Old Id", "Foreign Id", "Region", "Longitude", "Latitude", "Hang Up Date", "Hung By",
-//                                                                   "Owner", "Material", "Hole Size", "Image Filename", "Comment", "Last Updated"}.ToCsv());
-        }
+            string header = CsvSerializationHelper.SerializeCsvRow("Id", "Old Id", "Foreign Id", "Region", "Longitude", "Latitude", "Hang Up Date", "Hung By",
+                                                                    "Owner", "Material", "Hole Size", "Image Filename", "Comment", "Last Updated");
 
-        private string DelimiterReplace(string field)
-        {
-            if (field == null)
-                return field;
-
-            field.Replace(',', '.');
-            field.Replace(';', '.');
-            return field;
+            return Entities.AsNoTracking().OrderBy(entity => entity.Id).
+                            ProjectTo<NestingBoxExportRow>(Mapper.ConfigurationProvider).
+                            AsAsyncEnumerable().
+                            Select(row => CsvSerializationHelper.SerializeCsvRow(row.Id, row.OldId, row.ForeignId, row.RegionName, row.CoordinateLongitude, row.CoordinateLatitude,
+                                                      row.HangUpDate, row.HangUpUserName, row.OwnerName, row.Material, row.HoleSize, row.ImageFilename, row.Comment, row.LastUpdated)).
+                            Prepend(header);
         }
 
         public async Task<NestingBox> AddAsync(NestingBox nestingBox, CancellationToken cancellationToken = default)
