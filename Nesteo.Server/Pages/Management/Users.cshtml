@@ -1,0 +1,71 @@
+@page "/users"
+@using Nesteo.Server.Data.Entities.Identity
+@using Nesteo.Server.Models
+@model UsersModel
+@{
+    ViewData["Title"] = "Users";
+}
+
+<h4 class="mb-3">@ViewData["Title"]</h4>
+
+@await Html.PartialAsync("_StatusAlert", (Model.StatusMessage, "success")).ConfigureAwait(false)
+
+<form method="post" asp-page-handler="Create">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Username</th>
+                <th scope="col">First name</th>
+                <th scope="col">Last name</th>
+                <th scope="col">E-Mail</th>
+                <th scope="col">Phone</th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (UserEntity user in Model.Users)
+            {
+                <tr>
+                    <th scope="row">@user.UserName</th>
+                    <td>@user.FirstName</td>
+                    <td>@user.LastName</td>
+                    <td>@(user.Email ?? "-")</td>
+                    <td>@(user.PhoneNumber ?? "-")</td>
+                    <td>ACTIONS</td>
+                </tr>
+            }
+            <tr>
+                <td>
+                    <input asp-for="CreateInput.UserName" class="form-control"/>
+                    <span asp-validation-for="CreateInput.UserName" class="text-danger"></span>
+                </td>
+                <td>
+                    <input asp-for="CreateInput.FirstName" class="form-control"/>
+                    <span asp-validation-for="CreateInput.FirstName" class="text-danger"></span>
+                </td>
+                <td>
+                    <input asp-for="CreateInput.LastName" class="form-control"/>
+                    <span asp-validation-for="CreateInput.LastName" class="text-danger"></span>
+                </td>
+                <td>
+                    <input asp-for="CreateInput.Email" class="form-control"/>
+                    <span asp-validation-for="CreateInput.Email" class="text-danger"></span>
+                </td>
+                <td>
+                    <input asp-for="CreateInput.PhoneNumber" class="form-control"/>
+                    <span asp-validation-for="CreateInput.PhoneNumber" class="text-danger"></span>
+                </td>
+                <td>
+                    <div class="d-flex flex-row flex-nowrap">
+                        <div class="mr-2">
+                            <input asp-for="CreateInput.Password" class="form-control"/>
+                            <span asp-validation-for="CreateInput.Password" class="text-danger"></span>
+                        </div>
+                        <button type="submit" class="btn btn-primary align-self-start">Add</button>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</form>

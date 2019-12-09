@@ -1,0 +1,11 @@
+@model (string message, string type)
+
+@if (!string.IsNullOrEmpty(Model.message))
+{
+    <div class="alert alert-@(Model.type ?? "info") alert-dismissible" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        @Model.message
+    </div>
+}

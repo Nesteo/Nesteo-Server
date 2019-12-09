@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="de" class="h-100">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        @if (!(ViewData["Title"] is string title) || string.IsNullOrEmpty(title))
+        {
+            <title>Nesteo Management Interface</title>
+        }
+        else
+        {
+            <title>@title - Nesteo Management Interface</title>
+        }
+
+        <link href="~/css/main.css" rel="stylesheet">
+    </head>
+    <body>
+        @RenderBody()
+
+        <script type="text/javascript" src="~/js/jquery.min.js"></script>
+        <script type="text/javascript" src="~/js/bootstrap.bundle.min.js"></script>
+    </body>
+</html>

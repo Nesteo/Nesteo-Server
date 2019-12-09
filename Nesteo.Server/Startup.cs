@@ -55,17 +55,13 @@ namespace Nesteo.Server
             });
 
             // Add identity system
-            services.AddIdentityCore<UserEntity>().AddRoles<RoleEntity>().AddDefaultTokenProviders().AddEntityFrameworkStores<NesteoDbContext>();
-            services.AddScoped<SignInManager<UserEntity>>();
+            services.AddIdentity<UserEntity, RoleEntity>().AddDefaultTokenProviders().AddEntityFrameworkStores<NesteoDbContext>();
 
             // Add authentication
             AuthenticationBuilder authenticationBuilder = services.AddAuthentication(options => {
                 options.DefaultAuthenticateScheme = IdentityConstants.ApplicationScheme;
                 options.DefaultChallengeScheme = IdentityConstants.ApplicationScheme;
             });
-
-            // Add cookie for the identity system authentication
-            authenticationBuilder.AddApplicationCookie();
 
             // Add basic auth for the API endpoints
             authenticationBuilder.AddBasicAuthentication();
@@ -97,7 +93,9 @@ namespace Nesteo.Server
             });
 
             // Add support for razor pages
-            services.AddRazorPages();
+            services.AddRazorPages().AddRazorPagesOptions(options => {
+                options.Conventions.AuthorizeFolder("/Management");
+            });
 
             // Add health checks
             services.AddHealthChecks().AddDbContextCheck<NesteoDbContext>();

@@ -1,0 +1,11 @@
+﻿@page "/logout"
+@model LogoutModel
+@{
+    ViewData["Title"] = "Logged out";
+}
+
+<header>
+    <h2>@ViewData["Title"]</h2>
+    <p>You sucessfully logged out.</p>
+    <a class="btn btn-primary" asp-page="./Login">Go back to login</a>
+</header>

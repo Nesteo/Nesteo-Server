@@ -10,7 +10,7 @@ namespace Nesteo.Server.MappingProfiles
     {
         public ModelMappingProfile()
         {
-            CreateMap<UserEntity, User>();
+            CreateMap<UserEntity, User>().ReverseMap();
             CreateMap<RegionEntity, Region>().ReverseMap();
             CreateMap<OwnerEntity, Owner>().ReverseMap();
             CreateMap<SpeciesEntity, Species>().ReverseMap();
