@@ -27,12 +27,14 @@
             @foreach (UserEntity user in Model.Users)
             {
                 <tr>
-                    <th scope="row">@user.UserName</th>
-                    <td>@user.FirstName</td>
-                    <td>@user.LastName</td>
-                    <td>@(user.Email ?? "-")</td>
-                    <td>@(user.PhoneNumber ?? "-")</td>
-                    <td>ACTIONS</td>
+                    <th class="align-middle" scope="row">@user.UserName</th>
+                    <td class="align-middle">@user.FirstName</td>
+                    <td class="align-middle">@user.LastName</td>
+                    <td class="align-middle">@(user.Email ?? "-")</td>
+                    <td class="align-middle">@(user.PhoneNumber ?? "-")</td>
+                    <td class="align-middle">
+                        <a class="btn btn-primary btn-sm" asp-page="/Management/EditUser" asp-route-userName="@user.UserName">Edit</a>
+                    </td>
                 </tr>
             }
             <tr>

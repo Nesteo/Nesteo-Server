@@ -204,7 +204,7 @@ namespace Nesteo.Server.Controllers.Api
         /// </summary>
         [HttpGet("csv")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public Task<IActionResult> ExportNestingBoxAsync()
+        public Task<IActionResult> ExportNestingBoxesAsync()
         {
             string fileDownloadName = $"nesting-boxes-export-{DateTime.Now}.csv";
             IAsyncEnumerable<string> records = _nestingBoxService.ExportAllRowsAsync();

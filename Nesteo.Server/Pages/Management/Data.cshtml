@@ -1,0 +1,11 @@
+@page "/data"
+@model DataModel
+@{
+    ViewData["Title"] = "Data";
+}
+
+<p>Use the buttons below to download all nesting boxes or inspections as CSV file for use with other tools.</p>
+
+<a class="btn btn-primary" asp-controller="NestingBoxes" asp-action="ExportNestingBoxesAsync">Download nesting boxes</a>
+<a class="btn btn-primary" asp-controller="Inspections" asp-action="ExportInspectionsAsync">Download inspections</a>
+

@@ -24,7 +24,7 @@ COPY . /src
 WORKDIR /src/Nesteo.Server
 
 # Restore packages
-RUN npm install --with-dev
+RUN npm install
 
 # Run build task
 RUN npx grunt default
