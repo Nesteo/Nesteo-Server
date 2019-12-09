@@ -20,8 +20,8 @@ RUN dotnet publish /src/Nesteo.Server.SampleDataGenerator/Nesteo.Server.SampleDa
 FROM node:latest AS build-web
 
 # Copy source code to /src
-WORKDIR /src
-COPY . .
+COPY . /src
+WORKDIR /src/Nesteo.Server
 
 # Restore packages
 RUN npm install --with-dev
@@ -38,7 +38,7 @@ FROM mcr.microsoft.com/dotnet/core/runtime-deps:3.0-buster-slim
 # Copy self contained app to /app
 WORKDIR /app
 COPY --from=build /app .
-COPY --from=build-web /src/wwwroot ./wwwroot/
+COPY --from=build-web /src/Nesteo.Server/wwwroot ./wwwroot/
 
 # Add curl for health check execution
 RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
