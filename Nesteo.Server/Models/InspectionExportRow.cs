@@ -4,7 +4,7 @@ using Nesteo.Server.Data.Enums;
 
 namespace Nesteo.Server.Models
 {
-    public class Inspection
+    public class InspectionExportRow
     {
         /// <summary>
         /// Inspection-ID
@@ -12,10 +12,10 @@ namespace Nesteo.Server.Models
         public int? Id { get; set; }
 
         /// <summary>
-        /// The inspected nesting box
+        /// Id of the inspected nesting box
         /// </summary>
         [Required]
-        public NestingBox NestingBox { get; set; }
+        public string NestingBoxId { get; set; }
 
         /// <summary>
         /// Date and time of the inspection
@@ -26,7 +26,7 @@ namespace Nesteo.Server.Models
         /// <summary>
         /// The user who inspected the nesting box (if known)
         /// </summary>
-        public User InspectedByUser { get; set; }
+        public string InspectedByUserName { get; set; }
 
         /// <summary>
         /// Whether the nesting box has been cleaned during the inspection
@@ -101,7 +101,12 @@ namespace Nesteo.Server.Models
         /// The bird species
         /// </summary>
         [Required]
-        public Species Species { get; set; }
+        public string SpeciesName { get; set; }
+
+        /// <summary>
+        /// Image file name
+        /// </summary>
+        public string ImageFilename { get; set; }
 
         /// <summary>
         /// Comment
@@ -112,10 +117,5 @@ namespace Nesteo.Server.Models
         /// The time this data entry has last been updated
         /// </summary>
         public DateTime? LastUpdated { get; set; }
-
-        /// <summary>
-        /// Whether an image for this inspection exists
-        /// </summary>
-        public bool? HasImage { get; set; }
     }
 }

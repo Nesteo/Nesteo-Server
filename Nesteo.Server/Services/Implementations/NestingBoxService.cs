@@ -11,6 +11,7 @@ using Nesteo.Server.Data.Entities;
 using Nesteo.Server.Data.Entities.Identity;
 using Nesteo.Server.IdGeneration;
 using Nesteo.Server.Models;
+using Nesteo.Server.Utils;
 
 namespace Nesteo.Server.Services.Implementations
 {
@@ -45,6 +46,19 @@ namespace Nesteo.Server.Services.Implementations
         {
             return Entities.AsNoTracking().Where(entity => entity.Region.NestingBoxIdPrefix == regionPrefix).OrderBy(entity => entity.Id).Select(entity => entity.Id)
                            .AsAsyncEnumerable();
+        }
+
+        public IAsyncEnumerable<string> ExportAllRowsAsync()
+        {
+            string header = CsvSerializationHelper.SerializeCsvRow("Id", "Old Id", "Foreign Id", "Region", "Longitude", "Latitude", "Hang Up Date", "Hung By",
+                                                                    "Owner", "Material", "Hole Size", "Image Filename", "Comment", "Last Updated");
+
+            return Entities.AsNoTracking().OrderBy(entity => entity.Id).
+                            ProjectTo<NestingBoxExportRow>(Mapper.ConfigurationProvider).
+                            AsAsyncEnumerable().
+                            Select(row => CsvSerializationHelper.SerializeCsvRow(row.Id, row.OldId, row.ForeignId, row.RegionName, row.CoordinateLongitude, row.CoordinateLatitude,
+                                                      row.HangUpDate, row.HangUpUserName, row.OwnerName, row.Material, row.HoleSize, row.ImageFilename, row.Comment, row.LastUpdated)).
+                            Prepend(header);
         }
 
         public async Task<NestingBox> AddAsync(NestingBox nestingBox, CancellationToken cancellationToken = default)

@@ -4,19 +4,13 @@ using Nesteo.Server.Data.Enums;
 
 namespace Nesteo.Server.Models
 {
-    public class NestingBox
+    public class NestingBoxExportRow
     {
         /// <summary>
         /// Nesting box ID
         /// </summary>
         [StringLength(Constants.NestingBoxIdLength, MinimumLength = Constants.NestingBoxIdLength)]
         public string Id { get; set; }
-
-        /// <summary>
-        /// Region, where the nesting box hangs
-        /// </summary>
-        [Required]
-        public Region Region { get; set; }
 
         /// <summary>
         /// The old ID (if any)
@@ -29,6 +23,12 @@ namespace Nesteo.Server.Models
         /// </summary>
         [StringLength(100, MinimumLength = 2)]
         public string ForeignId { get; set; }
+
+        /// <summary>
+        /// Region, where the nesting box hangs
+        /// </summary>
+        [Required]
+        public string RegionName { get; set; }
 
         /// <summary>
         /// Decimal coordinate longitude
@@ -46,15 +46,15 @@ namespace Nesteo.Server.Models
         public DateTime? HangUpDate { get; set; }
 
         /// <summary>
-        /// User who hung the nesting box up (if known)
+        /// Hang up user (if known)
         /// </summary>
-        public User HangUpUser { get; set; }
+        public string HangUpUserName { get; set; }
 
         /// <summary>
         /// Owner of the nesting box
         /// </summary>
         [Required]
-        public Owner Owner { get; set; }
+        public string OwnerName { get; set; }
 
         /// <summary>
         /// Material
@@ -71,6 +71,11 @@ namespace Nesteo.Server.Models
         public HoleSize? HoleSize { get; set; }
 
         /// <summary>
+        /// Image file name
+        /// </summary>
+        public string ImageFilename { get; set; }
+
+        /// <summary>
         /// Comment
         /// </summary>
         public string Comment { get; set; }
@@ -79,20 +84,5 @@ namespace Nesteo.Server.Models
         /// The time this data entry has last been updated
         /// </summary>
         public DateTime? LastUpdated { get; set; }
-
-        /// <summary>
-        /// Whether an image for this nesting box exists
-        /// </summary>
-        public bool? HasImage { get; set; }
-
-        /// <summary>
-        /// How often this box has been inspected
-        /// </summary>
-        public int? InspectionsCount { get; set; }
-
-        /// <summary>
-        /// The last time this box has been inspected
-        /// </summary>
-        public DateTime? LastInspected { get; set; }
     }
 }

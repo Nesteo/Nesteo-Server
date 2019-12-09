@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -9,6 +10,7 @@ using Microsoft.Extensions.Options;
 using Nesteo.Server.Filters;
 using Nesteo.Server.Models;
 using Nesteo.Server.Options;
+using Nesteo.Server.Result;
 using Nesteo.Server.Services;
 
 namespace Nesteo.Server.Controllers.Api
@@ -164,5 +166,17 @@ namespace Nesteo.Server.Controllers.Api
 
             return inspectionPreview;
         }
+
+        /// <summary>
+        /// Download inspections csv
+        /// </summary>
+        [HttpGet("csv")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public Task<IActionResult> ExportInspectionsAsync()
+        {
+            string fileDownloadName = $"inspections-export-{DateTime.Now}.csv";
+            IAsyncEnumerable<string> records = _inspectionService.ExportAllRowsAsync();
+
+            return Task.FromResult<IActionResult>(new CsvFileResult(records, fileDownloadName));        }
     }
 }

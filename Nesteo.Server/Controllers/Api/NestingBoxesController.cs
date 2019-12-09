@@ -10,6 +10,7 @@ using Microsoft.Extensions.Options;
 using Nesteo.Server.Filters;
 using Nesteo.Server.Models;
 using Nesteo.Server.Options;
+using Nesteo.Server.Result;
 using Nesteo.Server.Services;
 
 namespace Nesteo.Server.Controllers.Api
@@ -196,6 +197,19 @@ namespace Nesteo.Server.Controllers.Api
         public IAsyncEnumerable<InspectionPreview> GetInspectionPreviewsByNestingBoxIdAsync(string id)
         {
             return _inspectionService.GetAllPreviewsForNestingBoxIdAsync(id);
+        }
+
+        /// <summary>
+        /// Download nesting boxes csv
+        /// </summary>
+        [HttpGet("csv")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public Task<IActionResult> ExportNestingBoxAsync()
+        {
+            string fileDownloadName = $"nesting-boxes-export-{DateTime.Now}.csv";
+            IAsyncEnumerable<string> records = _nestingBoxService.ExportAllRowsAsync();
+
+            return Task.FromResult<IActionResult>(new CsvFileResult(records, fileDownloadName));
         }
     }
 }

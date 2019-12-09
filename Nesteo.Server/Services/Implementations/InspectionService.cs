@@ -11,6 +11,7 @@ using Nesteo.Server.Data;
 using Nesteo.Server.Data.Entities;
 using Nesteo.Server.Data.Entities.Identity;
 using Nesteo.Server.Models;
+using Nesteo.Server.Utils;
 
 namespace Nesteo.Server.Services.Implementations
 {
@@ -43,6 +44,23 @@ namespace Nesteo.Server.Services.Implementations
         {
             return Entities.AsNoTracking().OrderBy(entity => entity.Id).Where(entity => entity.NestingBox.Id == nestingBoxId)
                            .ProjectTo<InspectionPreview>(Mapper.ConfigurationProvider).AsAsyncEnumerable();
+        }
+
+        public IAsyncEnumerable<string> ExportAllRowsAsync()
+        {
+            string header = CsvSerializationHelper.SerializeCsvRow("Id", "Nesting Box", "Inspection Date", "Inspection By",
+                                        "Has Been Cleaned", "Condition", "Just Repaired",
+                                        "Occupied", "Contains Eggs", "Egg Count", "Chick Count", "Ringed Bird Count", "Age (days)",
+                                        "Female Parent", "Male Parent", "Species", "Image Filename", "Comment", "Last Updated");
+
+            return Entities.AsNoTracking().OrderBy(entity => entity.Id).
+                            ProjectTo<InspectionExportRow>(Mapper.ConfigurationProvider).
+                            AsAsyncEnumerable().
+                            Select(row => CsvSerializationHelper.SerializeCsvRow(row.Id, row.NestingBoxId, row.InspectionDate, row.InspectedByUserName,
+                                                      row.HasBeenCleaned, row.Condition, row.JustRepaired, row.Occupied, row.ContainsEggs,
+                                                      row.EggCount, row.ChickCount, row.RingedChickCount, row.AgeInDays, row.FemaleParentBirdDiscovery,
+                                                      row.MaleParentBirdDiscovery, row.SpeciesName, row.ImageFilename, row.Comment, row.LastUpdated)).
+                            Prepend(header);
         }
 
         public async Task<Inspection> AddAsync(Inspection inspection, CancellationToken cancellationToken = default)
@@ -134,9 +152,6 @@ namespace Nesteo.Server.Services.Implementations
 
         public async Task<Inspection> SetImageFileNameAsync(int id, string imageFileName, CancellationToken cancellationToken = default)
         {
-            if (id == null)
-                return null;
-
             // Get existing nesting box entity
             InspectionEntity inspectionEntity = await Entities.FindAsync(new object[] { id }, cancellationToken).ConfigureAwait(false);
             if (inspectionEntity == null)
