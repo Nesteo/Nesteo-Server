@@ -13,14 +13,13 @@ namespace Nesteo.Server.Swagger
     {
         public void Configure(SwaggerGenOptions options)
         {
-            options.SwaggerDoc("v1",
-                               new OpenApiInfo {
-                                   Title = "Nesteo API",
-                                   Version = "v1",
-                                   Description = "Server API of the Nesteo nesting box management application for ringing associations.",
-                                   Contact = new OpenApiContact { Name = "Nesteo Team", Url = new Uri("https://github.com/Nesteo/") },
-                                   License = new OpenApiLicense { Name = "MIT", Url = new Uri("https://github.com/Nesteo/Nesteo-Server/blob/master/LICENSE") }
-                               });
+            options.SwaggerDoc("v1", new OpenApiInfo {
+                Title = "Nesteo API",
+                Version = "v1",
+                Description = "Server API of the Nesteo nesting box management application for ringing associations.",
+                Contact = new OpenApiContact { Name = "Nesteo Team", Url = new Uri("https://github.com/Nesteo/") },
+                License = new OpenApiLicense { Name = "MIT", Url = new Uri("https://github.com/Nesteo/Nesteo-Server/blob/master/LICENSE") }
+            });
 
             // Tell the swagger generator where the comments file is stored
             string xmlPath = Path.Combine(AppContext.BaseDirectory, $"{Assembly.GetExecutingAssembly().GetName().Name}.xml");

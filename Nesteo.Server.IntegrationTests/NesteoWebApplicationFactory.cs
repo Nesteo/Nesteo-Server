@@ -28,7 +28,7 @@ namespace Nesteo.Server.IntegrationTests
 
                 // Aquire a db context
                 using IServiceScope scope = serviceProvider.CreateScope();
-                NesteoDbContext dbContext = scope.ServiceProvider.GetRequiredService<NesteoDbContext>();
+                var dbContext = scope.ServiceProvider.GetRequiredService<NesteoDbContext>();
 
                 // Ensure the database is created
                 dbContext.Database.Migrate();

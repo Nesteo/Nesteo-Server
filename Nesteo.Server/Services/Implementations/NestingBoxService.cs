@@ -34,7 +34,8 @@ namespace Nesteo.Server.Services.Implementations
             if (id == null)
                 throw new ArgumentNullException(nameof(id));
 
-            return Entities.AsNoTracking().Where(entity => entity.Id == id).ProjectTo<NestingBoxPreview>(Mapper.ConfigurationProvider).FirstOrDefaultAsync(cancellationToken);
+            return Entities.AsNoTracking().Where(entity => entity.Id == id).ProjectTo<NestingBoxPreview>(Mapper.ConfigurationProvider)
+                .FirstOrDefaultAsync(cancellationToken);
         }
 
         public IAsyncEnumerable<string> GetAllTakenIdsAsync()
@@ -44,21 +45,20 @@ namespace Nesteo.Server.Services.Implementations
 
         public IAsyncEnumerable<string> GetAllTakenIdsWithPrefixAsync(string regionPrefix)
         {
-            return Entities.AsNoTracking().Where(entity => entity.Region.NestingBoxIdPrefix == regionPrefix).OrderBy(entity => entity.Id).Select(entity => entity.Id)
-                           .AsAsyncEnumerable();
+            return Entities.AsNoTracking().Where(entity => entity.Region.NestingBoxIdPrefix == regionPrefix).OrderBy(entity => entity.Id)
+                .Select(entity => entity.Id).AsAsyncEnumerable();
         }
 
         public IAsyncEnumerable<string> ExportAllRowsAsync()
         {
             string header = CsvSerializationHelper.SerializeCsvRow("Id", "Old Id", "Foreign Id", "Region", "Longitude", "Latitude", "Hang Up Date", "Hung By",
-                                                                    "Owner", "Material", "Hole Size", "Image Filename", "Comment", "Last Updated");
+                "Owner", "Material", "Hole Size", "Image Filename", "Comment", "Last Updated");
 
-            return Entities.AsNoTracking().OrderBy(entity => entity.Id).
-                            ProjectTo<NestingBoxExportRow>(Mapper.ConfigurationProvider).
-                            AsAsyncEnumerable().
-                            Select(row => CsvSerializationHelper.SerializeCsvRow(row.Id, row.OldId, row.ForeignId, row.RegionName, row.CoordinateLongitude, row.CoordinateLatitude,
-                                                      row.HangUpDate, row.HangUpUserName, row.OwnerName, row.Material, row.HoleSize, row.ImageFilename, row.Comment, row.LastUpdated)).
-                            Prepend(header);
+            return Entities.AsNoTracking().OrderBy(entity => entity.Id).ProjectTo<NestingBoxExportRow>(Mapper.ConfigurationProvider).AsAsyncEnumerable().Select(
+                    row => CsvSerializationHelper.SerializeCsvRow(row.Id, row.OldId, row.ForeignId, row.RegionName, row.CoordinateLongitude,
+                        row.CoordinateLatitude,
+                        row.HangUpDate, row.HangUpUserName, row.OwnerName, row.Material, row.HoleSize, row.ImageFilename, row.Comment, row.LastUpdated))
+                .Prepend(header);
         }
 
         public async Task<NestingBox> AddAsync(NestingBox nestingBox, CancellationToken cancellationToken = default)
@@ -66,8 +66,8 @@ namespace Nesteo.Server.Services.Implementations
             if (nestingBox.Id == null)
             {
                 // Generate a new ID
-                nestingBox.Id = await _nestingBoxIdGenerator.GetNextIdsAsync(this, nestingBox.Region, 1, cancellationToken).SingleOrDefaultAsync(cancellationToken)
-                                                            .ConfigureAwait(false);
+                nestingBox.Id = await _nestingBoxIdGenerator.GetNextIdsAsync(this, nestingBox.Region, 1, cancellationToken)
+                    .SingleOrDefaultAsync(cancellationToken).ConfigureAwait(false);
             }
             else
             {

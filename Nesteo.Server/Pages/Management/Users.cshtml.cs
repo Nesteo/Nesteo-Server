@@ -75,13 +75,12 @@ namespace Nesteo.Server.Pages.Management
                 return Page();
 
             IdentityResult result = await _userManager.CreateAsync(new UserEntity {
-                                                                       UserName = CreateInput.UserName,
-                                                                       FirstName = CreateInput.FirstName,
-                                                                       LastName = CreateInput.LastName,
-                                                                       Email = CreateInput.Email,
-                                                                       PhoneNumber = CreateInput.PhoneNumber
-                                                                   },
-                                                                   CreateInput.Password).ConfigureAwait(false);
+                UserName = CreateInput.UserName,
+                FirstName = CreateInput.FirstName,
+                LastName = CreateInput.LastName,
+                Email = CreateInput.Email,
+                PhoneNumber = CreateInput.PhoneNumber
+            }, CreateInput.Password).ConfigureAwait(false);
             if (!result.Succeeded)
             {
                 foreach (IdentityError error in result.Errors)

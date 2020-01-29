@@ -6,46 +6,22 @@ namespace Nesteo.Server.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_Inspections_Users_InspectedByUserId",
-                table: "Inspections");
+            migrationBuilder.DropForeignKey("FK_Inspections_Users_InspectedByUserId", "Inspections");
 
-            migrationBuilder.AlterColumn<string>(
-                name: "InspectedByUserId",
-                table: "Inspections",
-                nullable: true,
-                oldClrType: typeof(string),
-                oldType: "varchar(255)");
+            migrationBuilder.AlterColumn<string>("InspectedByUserId", "Inspections", nullable: true, oldClrType: typeof(string), oldType: "varchar(255)");
 
-            migrationBuilder.AddForeignKey(
-                name: "FK_Inspections_Users_InspectedByUserId",
-                table: "Inspections",
-                column: "InspectedByUserId",
-                principalTable: "Users",
-                principalColumn: "Id",
+            migrationBuilder.AddForeignKey("FK_Inspections_Users_InspectedByUserId", "Inspections", "InspectedByUserId", "Users", principalColumn: "Id",
                 onDelete: ReferentialAction.Restrict);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_Inspections_Users_InspectedByUserId",
-                table: "Inspections");
+            migrationBuilder.DropForeignKey("FK_Inspections_Users_InspectedByUserId", "Inspections");
 
-            migrationBuilder.AlterColumn<string>(
-                name: "InspectedByUserId",
-                table: "Inspections",
-                type: "varchar(255)",
-                nullable: false,
-                oldClrType: typeof(string),
+            migrationBuilder.AlterColumn<string>("InspectedByUserId", "Inspections", "varchar(255)", nullable: false, oldClrType: typeof(string),
                 oldNullable: true);
 
-            migrationBuilder.AddForeignKey(
-                name: "FK_Inspections_Users_InspectedByUserId",
-                table: "Inspections",
-                column: "InspectedByUserId",
-                principalTable: "Users",
-                principalColumn: "Id",
+            migrationBuilder.AddForeignKey("FK_Inspections_Users_InspectedByUserId", "Inspections", "InspectedByUserId", "Users", principalColumn: "Id",
                 onDelete: ReferentialAction.Cascade);
         }
     }

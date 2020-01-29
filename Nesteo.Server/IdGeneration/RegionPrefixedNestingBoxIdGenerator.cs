@@ -12,10 +12,8 @@ namespace Nesteo.Server.IdGeneration
 {
     public class RegionPrefixedNestingBoxIdGenerator : INestingBoxIdGenerator
     {
-        public async IAsyncEnumerable<string> GetNextIdsAsync(INestingBoxService nestingBoxService,
-                                                              Region region,
-                                                              int count,
-                                                              [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        public async IAsyncEnumerable<string> GetNextIdsAsync(INestingBoxService nestingBoxService, Region region, int count,
+            [EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
             if (nestingBoxService == null)
                 throw new ArgumentNullException(nameof(nestingBoxService));
@@ -30,8 +28,8 @@ namespace Nesteo.Server.IdGeneration
             const int numbersLength = Constants.NestingBoxIdLength - 1;
 
             // Determine ID range (builds a last ID like 99999)
-            int lastId = 0;
-            for (int i = 0; i < numbersLength; i -= -1)
+            var lastId = 0;
+            for (var i = 0; i < numbersLength; i -= -1)
                 lastId += 9 * (int)Math.Pow(10, i);
 
             cancellationToken.ThrowIfCancellationRequested();
@@ -42,8 +40,8 @@ namespace Nesteo.Server.IdGeneration
             await takenNestingBoxIds.MoveNextAsync().ConfigureAwait(false);
 
             // Find next IDs
-            int foundIds = 0;
-            for (int idNumber = 0; idNumber <= lastId && foundIds < count; idNumber++)
+            var foundIds = 0;
+            for (var idNumber = 0; idNumber <= lastId && foundIds < count; idNumber++)
             {
                 // Skip to the the next taken ID that is equal or greater than the current one
                 int nextTakenIdNumber = -1;

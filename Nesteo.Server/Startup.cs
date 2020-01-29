@@ -47,10 +47,9 @@ namespace Nesteo.Server
 
             // Add database access
             services.AddDbContextPool<NesteoDbContext>(options => {
-                options.UseMySql(Configuration.GetConnectionString("DefaultConnection"),
-                                 mySqlOptions => {
-                                     mySqlOptions.ServerVersion(new Version(10, 3), ServerType.MariaDb);
-                                 });
+                options.UseMySql(Configuration.GetConnectionString("DefaultConnection"), mySqlOptions => {
+                    mySqlOptions.ServerVersion(new Version(10, 3), ServerType.MariaDb);
+                });
                 options.EnableSensitiveDataLogging();
             });
 
@@ -74,9 +73,9 @@ namespace Nesteo.Server
             services.AddAuthorization(options => {
                 // Configure authorization policies
                 options.AddPolicy(PolicyNames.ApiUserSignedIn,
-                                  policy => policy.AddAuthenticationSchemes(BasicAuthenticationDefaults.AuthenticationScheme).RequireAuthenticatedUser());
+                    policy => policy.AddAuthenticationSchemes(BasicAuthenticationDefaults.AuthenticationScheme).RequireAuthenticatedUser());
                 options.AddPolicy(PolicyNames.ManagementInterfaceUserSignedIn,
-                                  policy => policy.AddAuthenticationSchemes(IdentityConstants.ApplicationScheme).RequireAuthenticatedUser());
+                    policy => policy.AddAuthenticationSchemes(IdentityConstants.ApplicationScheme).RequireAuthenticatedUser());
             });
 
             // Add response compression
@@ -135,31 +134,29 @@ namespace Nesteo.Server
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             // Error handling for API requests
-            app.UseWhen(IsApiRequest,
-                        appBuilder => {
-                            // Return RFC 7807 problem details
-                            appBuilder.UseProblemDetails();
-                        });
+            app.UseWhen(IsApiRequest, appBuilder => {
+                // Return RFC 7807 problem details
+                appBuilder.UseProblemDetails();
+            });
 
             // Error handling for all other requests
-            app.UseWhen(context => !IsApiRequest(context),
-                        appBuilder => {
-                            // Differentiate by execution environment
-                            if (env.IsDevelopment())
-                            {
-                                // Configure development error handling
-                                appBuilder.UseDeveloperExceptionPage();
-                                appBuilder.UseDatabaseErrorPage();
-                            }
-                            else
-                            {
-                                // Redirect to error page on errors
-                                appBuilder.UseExceptionHandler("/Error");
-                            }
+            app.UseWhen(context => !IsApiRequest(context), appBuilder => {
+                // Differentiate by execution environment
+                if (env.IsDevelopment())
+                {
+                    // Configure development error handling
+                    appBuilder.UseDeveloperExceptionPage();
+                    appBuilder.UseDatabaseErrorPage();
+                }
+                else
+                {
+                    // Redirect to error page on errors
+                    appBuilder.UseExceptionHandler("/Error");
+                }
 
-                            // Status code pages
-                            appBuilder.UseStatusCodePages();
-                        });
+                // Status code pages
+                appBuilder.UseStatusCodePages();
+            });
 
             // Compress responses
             app.UseResponseCompression();

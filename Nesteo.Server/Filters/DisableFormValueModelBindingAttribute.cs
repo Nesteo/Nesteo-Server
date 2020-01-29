@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
@@ -10,7 +11,7 @@ namespace Nesteo.Server.Filters
     {
         public void OnResourceExecuting(ResourceExecutingContext context)
         {
-            var factories = context.ValueProviderFactories;
+            IList<IValueProviderFactory> factories = context.ValueProviderFactories;
             factories.RemoveType<FormValueProviderFactory>();
             factories.RemoveType<FormFileValueProviderFactory>();
             factories.RemoveType<JQueryFormValueProviderFactory>();

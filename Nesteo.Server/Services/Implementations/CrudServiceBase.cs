@@ -39,7 +39,8 @@ namespace Nesteo.Server.Services.Implementations
                 throw new ArgumentNullException(nameof(id));
 
             // Search for the entry with the given ID and map it to the model type
-            return Entities.AsNoTracking().Where(entity => entity.Id.Equals(id)).ProjectTo<TModel>(Mapper.ConfigurationProvider).FirstOrDefaultAsync(cancellationToken);
+            return Entities.AsNoTracking().Where(entity => entity.Id.Equals(id)).ProjectTo<TModel>(Mapper.ConfigurationProvider)
+                .FirstOrDefaultAsync(cancellationToken);
         }
 
         public virtual Task<bool> ExistsIdAsync(TKey id, CancellationToken cancellationToken = default)

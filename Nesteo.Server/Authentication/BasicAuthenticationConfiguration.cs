@@ -28,8 +28,9 @@ namespace Nesteo.Server.Authentication
         private async Task ValidatePrincipalAsync(ValidatePrincipalContext context)
         {
             // Try sign in
-            SignInResult result = await SignInAsync(context.HttpContext, context.UserName, context.Password, true, BasicAuthenticationDefaults.AuthenticationScheme)
-                .ConfigureAwait(false);
+            SignInResult result =
+                await SignInAsync(context.HttpContext, context.UserName, context.Password, true, BasicAuthenticationDefaults.AuthenticationScheme)
+                    .ConfigureAwait(false);
 
             // Check result
             if (result.Succeeded)
@@ -40,10 +41,11 @@ namespace Nesteo.Server.Authentication
                 context.AuthenticationFailMessage = "Authentication failed.";
         }
 
-        private async Task<SignInResult> SignInAsync(HttpContext httpContext, string userName, string password, bool lockoutOnFailure, string authenticationScheme)
+        private async Task<SignInResult> SignInAsync(HttpContext httpContext, string userName, string password, bool lockoutOnFailure,
+            string authenticationScheme)
         {
             // Get user manager
-            UserManager<UserEntity> userManager = httpContext.RequestServices.GetRequiredService<UserManager<UserEntity>>();
+            var userManager = httpContext.RequestServices.GetRequiredService<UserManager<UserEntity>>();
 
             // Get user
             UserEntity userEntity = await userManager.FindByNameAsync(userName).ConfigureAwait(false);
@@ -51,7 +53,7 @@ namespace Nesteo.Server.Authentication
                 return SignInResult.Failed;
 
             // Get sign in manager. We can't use most of it's methods, because they are quite cookie-specific, but a few of them are useful here.
-            SignInManager<UserEntity> signInManager = httpContext.RequestServices.GetRequiredService<SignInManager<UserEntity>>();
+            var signInManager = httpContext.RequestServices.GetRequiredService<SignInManager<UserEntity>>();
 
             // Check password
             SignInResult checkPasswordResult = await signInManager.CheckPasswordSignInAsync(userEntity, password, lockoutOnFailure).ConfigureAwait(false);

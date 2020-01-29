@@ -14,60 +14,60 @@
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
     <table class="table">
         <thead>
-            <tr>
-                <th scope="col">Username</th>
-                <th scope="col">First name</th>
-                <th scope="col">Last name</th>
-                <th scope="col">E-Mail</th>
-                <th scope="col">Phone</th>
-                <th scope="col"></th>
-            </tr>
+        <tr>
+            <th scope="col">Username</th>
+            <th scope="col">First name</th>
+            <th scope="col">Last name</th>
+            <th scope="col">E-Mail</th>
+            <th scope="col">Phone</th>
+            <th scope="col"></th>
+        </tr>
         </thead>
         <tbody>
-            @foreach (UserEntity user in Model.Users)
-            {
-                <tr>
-                    <th class="align-middle" scope="row">@user.UserName</th>
-                    <td class="align-middle">@user.FirstName</td>
-                    <td class="align-middle">@user.LastName</td>
-                    <td class="align-middle">@(user.Email ?? "-")</td>
-                    <td class="align-middle">@(user.PhoneNumber ?? "-")</td>
-                    <td class="align-middle">
-                        <a class="btn btn-primary btn-sm" asp-page="/Management/EditUser" asp-route-userName="@user.UserName">Edit</a>
-                    </td>
-                </tr>
-            }
+        @foreach (UserEntity user in Model.Users)
+        {
             <tr>
-                <td>
-                    <input asp-for="CreateInput.UserName" class="form-control"/>
-                    <span asp-validation-for="CreateInput.UserName" class="text-danger"></span>
-                </td>
-                <td>
-                    <input asp-for="CreateInput.FirstName" class="form-control"/>
-                    <span asp-validation-for="CreateInput.FirstName" class="text-danger"></span>
-                </td>
-                <td>
-                    <input asp-for="CreateInput.LastName" class="form-control"/>
-                    <span asp-validation-for="CreateInput.LastName" class="text-danger"></span>
-                </td>
-                <td>
-                    <input asp-for="CreateInput.Email" class="form-control"/>
-                    <span asp-validation-for="CreateInput.Email" class="text-danger"></span>
-                </td>
-                <td>
-                    <input asp-for="CreateInput.PhoneNumber" class="form-control"/>
-                    <span asp-validation-for="CreateInput.PhoneNumber" class="text-danger"></span>
-                </td>
-                <td>
-                    <div class="d-flex flex-row flex-nowrap">
-                        <div class="mr-2">
-                            <input asp-for="CreateInput.Password" class="form-control"/>
-                            <span asp-validation-for="CreateInput.Password" class="text-danger"></span>
-                        </div>
-                        <button type="submit" class="btn btn-primary align-self-start">Add</button>
-                    </div>
+                <th class="align-middle" scope="row">@user.UserName</th>
+                <td class="align-middle">@user.FirstName</td>
+                <td class="align-middle">@user.LastName</td>
+                <td class="align-middle">@(user.Email ?? "-")</td>
+                <td class="align-middle">@(user.PhoneNumber ?? "-")</td>
+                <td class="align-middle">
+                    <a class="btn btn-primary btn-sm" asp-page="/Management/EditUser" asp-route-userName="@user.UserName">Edit</a>
                 </td>
             </tr>
+        }
+        <tr>
+            <td>
+                <input asp-for="CreateInput.UserName" class="form-control"/>
+                <span asp-validation-for="CreateInput.UserName" class="text-danger"></span>
+            </td>
+            <td>
+                <input asp-for="CreateInput.FirstName" class="form-control"/>
+                <span asp-validation-for="CreateInput.FirstName" class="text-danger"></span>
+            </td>
+            <td>
+                <input asp-for="CreateInput.LastName" class="form-control"/>
+                <span asp-validation-for="CreateInput.LastName" class="text-danger"></span>
+            </td>
+            <td>
+                <input asp-for="CreateInput.Email" class="form-control"/>
+                <span asp-validation-for="CreateInput.Email" class="text-danger"></span>
+            </td>
+            <td>
+                <input asp-for="CreateInput.PhoneNumber" class="form-control"/>
+                <span asp-validation-for="CreateInput.PhoneNumber" class="text-danger"></span>
+            </td>
+            <td>
+                <div class="d-flex flex-row flex-nowrap">
+                    <div class="mr-2">
+                        <input asp-for="CreateInput.Password" class="form-control"/>
+                        <span asp-validation-for="CreateInput.Password" class="text-danger"></span>
+                    </div>
+                    <button type="submit" class="btn btn-primary align-self-start">Add</button>
+                </div>
+            </td>
+        </tr>
         </tbody>
     </table>
 </form>

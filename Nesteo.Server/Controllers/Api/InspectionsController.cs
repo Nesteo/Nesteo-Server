@@ -31,10 +31,7 @@ namespace Nesteo.Server.Controllers.Api
         /// Retrieve all inspections
         /// </summary>
         [HttpGet]
-        public IAsyncEnumerable<Inspection> GetInspectionsAsync()
-        {
-            return _inspectionService.GetAllAsync();
-        }
+        public IAsyncEnumerable<Inspection> GetInspectionsAsync() => _inspectionService.GetAllAsync();
 
         /// <summary>
         /// Retrieve an inspection by id
@@ -138,7 +135,9 @@ namespace Nesteo.Server.Controllers.Api
             if (!fileInfo.Exists)
                 return NotFound();
 
-            string contentType = new FileExtensionContentTypeProvider().TryGetContentType(imageFilePath, out string result) ? result : "application/octet-stream";
+            string contentType = new FileExtensionContentTypeProvider().TryGetContentType(imageFilePath, out string result)
+                ? result
+                : "application/octet-stream";
             FileStream fileStream = fileInfo.OpenRead();
 
             return File(fileStream, contentType, true);
@@ -148,10 +147,7 @@ namespace Nesteo.Server.Controllers.Api
         /// Preview all inspections with a reduced set of data
         /// </summary>
         [HttpGet("previews")]
-        public IAsyncEnumerable<InspectionPreview> GetInspectionPreviewsAsync()
-        {
-            return _inspectionService.GetAllPreviewsAsync();
-        }
+        public IAsyncEnumerable<InspectionPreview> GetInspectionPreviewsAsync() => _inspectionService.GetAllPreviewsAsync();
 
         /// <summary>
         /// Preview an inspection by id with a reduced set of data
@@ -177,6 +173,7 @@ namespace Nesteo.Server.Controllers.Api
             string fileDownloadName = $"inspections-export-{DateTime.Now}.csv";
             IAsyncEnumerable<string> records = _inspectionService.ExportAllRowsAsync();
 
-            return Task.FromResult<IActionResult>(new CsvFileResult(records, fileDownloadName));        }
+            return Task.FromResult<IActionResult>(new CsvFileResult(records, fileDownloadName));
+        }
     }
 }

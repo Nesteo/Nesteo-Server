@@ -42,13 +42,14 @@ namespace Nesteo.Server.DataImport
             {
                 Console.Write("What's in this file? n:nesting-boxes / i:inspections > ");
                 isNestingBoxesFile = Console.ReadLine() switch {
-                    "n" => true,
+                    "n"             => true,
                     "nesting-boxes" => true,
-                    "i" => false,
-                    "inspections" => false,
-                    _ => (bool?)null
+                    "i"             => false,
+                    "inspections"   => false,
+                    var _           => (bool?)null
                 };
-            } while (isNestingBoxesFile == null);
+            }
+            while (isNestingBoxesFile == null);
 
             // Create host
             IHost host = Server.Program.CreateHostBuilder(args).ConfigureLogging(builder => {
@@ -58,7 +59,7 @@ namespace Nesteo.Server.DataImport
             await Server.Program.PrepareHostAsync(host).ConfigureAwait(false);
 
             // Request database context
-            NesteoDbContext dbContext = host.Services.GetRequiredService<NesteoDbContext>();
+            var dbContext = host.Services.GetRequiredService<NesteoDbContext>();
 
             int importExceptions;
             if ((bool)isNestingBoxesFile)
@@ -113,8 +114,8 @@ namespace Nesteo.Server.DataImport
 
             Console.WriteLine($"Importing data from {filePath} ...");
 
-            int exceptions = 0;
-            int fileLineNumber = 1;
+            var exceptions = 0;
+            var fileLineNumber = 1;
             foreach (TRecord record in csvReader.GetRecords<TRecord>())
             {
                 fileLineNumber++;
@@ -130,8 +131,7 @@ namespace Nesteo.Server.DataImport
                         case InspectionRecord inspectionRecord:
                             await ImportInspectionRecordAsync(dbContext, inspectionRecord).ConfigureAwait(false);
                             break;
-                        default:
-                            throw new InvalidOperationException($"Unexpected record type: {record.GetType()}");
+                        default: throw new InvalidOperationException($"Unexpected record type: {record.GetType()}");
                     }
                 }
                 catch (Exception ex)
@@ -162,19 +162,17 @@ namespace Nesteo.Server.DataImport
                 comments.AddRange(nestingBoxRecord.Comments.Split(',').Select(c => c.Trim()).Where(c => !string.IsNullOrEmpty(c)));
 
             // Ensure the owner entity exists
-            OwnerEntity ownerEntity = await GetOrCreateEntityAsync(dbContext,
-                                                                   owner => owner.Name == nestingBoxRecord.OwnerName,
-                                                                   () => new OwnerEntity { Name = nestingBoxRecord.OwnerName }).ConfigureAwait(false);
+            OwnerEntity ownerEntity = await GetOrCreateEntityAsync(dbContext, owner => owner.Name == nestingBoxRecord.OwnerName,
+                () => new OwnerEntity { Name = nestingBoxRecord.OwnerName }).ConfigureAwait(false);
 
             // Ensure the region entity exists
             string regionName = $"{nestingBoxRecord.RegionCityName} - {nestingBoxRecord.RegionDetailedName}";
             string ExtractIdPrefix() => nestingBoxRecord.Id[0].ToString();
-            RegionEntity regionEntity = await GetOrCreateEntityAsync(dbContext,
-                                                                     region => region.Name == regionName,
-                                                                     () => new RegionEntity { Name = regionName, NestingBoxIdPrefix = ExtractIdPrefix() }).ConfigureAwait(false);
+            RegionEntity regionEntity = await GetOrCreateEntityAsync(dbContext, region => region.Name == regionName,
+                () => new RegionEntity { Name = regionName, NestingBoxIdPrefix = ExtractIdPrefix() }).ConfigureAwait(false);
 
             // Map material type
-            Material material = Material.Other;
+            var material = Material.Other;
             if (!string.IsNullOrWhiteSpace(nestingBoxRecord.Material))
             {
                 material = GetMaterial(nestingBoxRecord.Material);
@@ -183,7 +181,7 @@ namespace Nesteo.Server.DataImport
             }
 
             // Map hole size
-            HoleSize holeSize = HoleSize.Other;
+            var holeSize = HoleSize.Other;
             if (!string.IsNullOrWhiteSpace(nestingBoxRecord.HoleSize))
             {
                 holeSize = GetHoleSize(nestingBoxRecord.HoleSize);
@@ -223,7 +221,9 @@ namespace Nesteo.Server.DataImport
                 HoleSize = holeSize,
                 ImageFileName = null,
                 Comment = comments.Any() ? string.Join(", ", comments) : null,
-                LastUpdated = string.IsNullOrWhiteSpace(nestingBoxRecord.DataUpdateDate) ? (hangUpDate ?? DateTime.UtcNow) : ParseDate(nestingBoxRecord.DataUpdateDate)
+                LastUpdated = string.IsNullOrWhiteSpace(nestingBoxRecord.DataUpdateDate)
+                    ? hangUpDate ?? DateTime.UtcNow
+                    : ParseDate(nestingBoxRecord.DataUpdateDate)
             });
         }
 
@@ -241,12 +241,10 @@ namespace Nesteo.Server.DataImport
 
             // Ensure the species entity exists
             SpeciesEntity speciesEntity = null;
-            if (!string.IsNullOrWhiteSpace(inspectionRecord.SpeciesName) && !new[] { "unbestimmt", "unbekannt" }.Contains(inspectionRecord.SpeciesName.ToLower()))
-            {
-                speciesEntity = await GetOrCreateEntityAsync(dbContext,
-                                                             species => species.Name == inspectionRecord.SpeciesName,
-                                                             () => new SpeciesEntity { Name = inspectionRecord.SpeciesName }).ConfigureAwait(false);
-            }
+            if (!string.IsNullOrWhiteSpace(inspectionRecord.SpeciesName)
+                && !new[] { "unbestimmt", "unbekannt" }.Contains(inspectionRecord.SpeciesName.ToLower()))
+                speciesEntity = await GetOrCreateEntityAsync(dbContext, species => species.Name == inspectionRecord.SpeciesName,
+                    () => new SpeciesEntity { Name = inspectionRecord.SpeciesName }).ConfigureAwait(false);
 
             // Analyze date info
             DateTime inspectionDate = string.IsNullOrWhiteSpace(inspectionRecord.Date)
@@ -285,8 +283,8 @@ namespace Nesteo.Server.DataImport
             });
         }
 
-        private static async Task<TEntity> GetOrCreateEntityAsync<TEntity>(NesteoDbContext dbContext, Expression<Func<TEntity, bool>> predicate, Func<TEntity> factoryFunc)
-            where TEntity : class
+        private static async Task<TEntity> GetOrCreateEntityAsync<TEntity>(NesteoDbContext dbContext, Expression<Func<TEntity, bool>> predicate,
+            Func<TEntity> factoryFunc) where TEntity : class
         {
             // Get db set
             DbSet<TEntity> dbSet = dbContext.Set<TEntity>();
@@ -311,52 +309,52 @@ namespace Nesteo.Server.DataImport
         private static Material GetMaterial(string value)
         {
             return value.ToLower() switch {
-                "holzbeton" => Material.WoodConcrete,
+                "holzbeton"             => Material.WoodConcrete,
                 "holzbetonludgeruswerk" => Material.WoodConcrete,
-                "holz unbeschichtet" => Material.UntreatedWood,
-                "holz beschichtet" => Material.TreatedWood,
-                _ => throw new InvalidCsvRecordException($"Unrecognized material type: {value}")
+                "holz unbeschichtet"    => Material.UntreatedWood,
+                "holz beschichtet"      => Material.TreatedWood,
+                var _                   => throw new InvalidCsvRecordException($"Unrecognized material type: {value}")
             };
         }
 
         private static HoleSize GetHoleSize(string value)
         {
             return value.ToLower() switch {
-                "sehr groß" => HoleSize.VeryLarge,
-                "groß" => HoleSize.Large,
-                "mittel" => HoleSize.Medium,
-                "klein" => HoleSize.Small,
-                "halbhöhle" => HoleSize.OpenFronted,
-                "oval" => HoleSize.Oval,
-                "zwei oval" => HoleSize.Oval,
+                "sehr groß"  => HoleSize.VeryLarge,
+                "groß"       => HoleSize.Large,
+                "mittel"     => HoleSize.Medium,
+                "klein"      => HoleSize.Small,
+                "halbhöhle"  => HoleSize.OpenFronted,
+                "oval"       => HoleSize.Oval,
+                "zwei oval"  => HoleSize.Oval,
                 "baumläufer" => HoleSize.Other,
-                "sonstiges" => HoleSize.Other,
-                _ => throw new InvalidCsvRecordException($"Unrecognized hole size: {value}")
+                "sonstiges"  => HoleSize.Other,
+                var _        => throw new InvalidCsvRecordException($"Unrecognized hole size: {value}")
             };
         }
 
         private static (Condition condition, bool justRepaired) GetCondition(string value)
         {
             return value.ToLower() switch {
-                "in ordnung" => (Condition.Good, false),
-                "repariert" => (Condition.Good, true),
-                "leicht defekt" => (Condition.NeedsRepair, false),
-                "aufhängung defekt" => (Condition.NeedsRepair, false),
-                "vorderfront gebrochen" => (Condition.NeedsRepair, false),
-                "lässt sich nicht öffnen" => (Condition.NeedsRepair, false),
+                "in ordnung"                 => (Condition.Good, false),
+                "repariert"                  => (Condition.Good, true),
+                "leicht defekt"              => (Condition.NeedsRepair, false),
+                "aufhängung defekt"          => (Condition.NeedsRepair, false),
+                "vorderfront gebrochen"      => (Condition.NeedsRepair, false),
+                "lässt sich nicht öffnen"    => (Condition.NeedsRepair, false),
                 "kann nicht geöffnet werden" => (Condition.NeedsRepair, false),
-                "defekt" => (Condition.NeedsReplacement, false),
-                "stark defekt" => (Condition.NeedsReplacement, false),
-                "dach defekt" => (Condition.NeedsReplacement, false),
-                "deckel defekt" => (Condition.NeedsReplacement, false),
-                "front defekt" => (Condition.NeedsReplacement, false),
-                "klappe war ab" => (Condition.NeedsReplacement, false),
-                "front fehlt" => (Condition.NeedsReplacement, false),
-                "frontplatte fehlt" => (Condition.NeedsReplacement, false),
-                "boden fehlt" => (Condition.NeedsReplacement, false),
-                "boden fehlt, abgenommen" => (Condition.NeedsReplacement, false),
-                "kaputt" => (Condition.NeedsReplacement, false),
-                _ => throw new InvalidCsvRecordException($"Unrecognized condition: {value}")
+                "defekt"                     => (Condition.NeedsReplacement, false),
+                "stark defekt"               => (Condition.NeedsReplacement, false),
+                "dach defekt"                => (Condition.NeedsReplacement, false),
+                "deckel defekt"              => (Condition.NeedsReplacement, false),
+                "front defekt"               => (Condition.NeedsReplacement, false),
+                "klappe war ab"              => (Condition.NeedsReplacement, false),
+                "front fehlt"                => (Condition.NeedsReplacement, false),
+                "frontplatte fehlt"          => (Condition.NeedsReplacement, false),
+                "boden fehlt"                => (Condition.NeedsReplacement, false),
+                "boden fehlt, abgenommen"    => (Condition.NeedsReplacement, false),
+                "kaputt"                     => (Condition.NeedsReplacement, false),
+                var _                        => throw new InvalidCsvRecordException($"Unrecognized condition: {value}")
             };
         }
 
@@ -364,16 +362,16 @@ namespace Nesteo.Server.DataImport
         {
             return value.ToLower() switch {
                 "unbekannt" => (bool?)null,
-                _ => GetYesNo(value)
+                var _       => GetYesNo(value)
             };
         }
 
         private static bool GetYesNo(string value)
         {
             return value.ToLower() switch {
-                "ja" => true,
+                "ja"   => true,
                 "nein" => false,
-                _ => throw new InvalidCsvRecordException($"Unrecognized yes/no answer: {value}")
+                var _  => throw new InvalidCsvRecordException($"Unrecognized yes/no answer: {value}")
             };
         }
 
@@ -384,19 +382,20 @@ namespace Nesteo.Server.DataImport
                 return 0;
 
             return value.ToLower() switch {
-                "ja" => (int?)null,
+                "ja"        => (int?)null,
                 "unbekannt" => (int?)null,
-                _ => int.Parse(value)
+                var _       => int.Parse(value)
             };
         }
 
-        private static (ParentBirdDiscovery femaleParentBirdDiscovery, ParentBirdDiscovery maleParentBirdDiscovery, int ringedChickCount) AnalyzeRingingActivity(string value)
+        private static (ParentBirdDiscovery femaleParentBirdDiscovery, ParentBirdDiscovery maleParentBirdDiscovery, int ringedChickCount)
+            AnalyzeRingingActivity(string value)
         {
             value = value.ToLower();
             value = new[] { "+", ",", "und", "&", "juv" }.Aggregate(value, (current, str) => current.Replace(str, string.Empty));
 
-            ParentBirdDiscovery femaleParentBirdDiscovery = ParentBirdDiscovery.None;
-            ParentBirdDiscovery maleParentBirdDiscovery = ParentBirdDiscovery.None;
+            var femaleParentBirdDiscovery = ParentBirdDiscovery.None;
+            var maleParentBirdDiscovery = ParentBirdDiscovery.None;
 
             // Check for parent bird discoveries and remove these information from the string
             if (value.Contains("weibchen"))

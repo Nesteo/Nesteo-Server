@@ -21,10 +21,7 @@ namespace Nesteo.Server.Controllers.Api
         /// Retrieve all species
         /// </summary>
         [HttpGet]
-        public IAsyncEnumerable<Species> GetSpeciesAsync()
-        {
-            return _speciesService.GetAllAsync();
-        }
+        public IAsyncEnumerable<Species> GetSpeciesAsync() => _speciesService.GetAllAsync();
 
         /// <summary>
         /// Retrieve a species by id

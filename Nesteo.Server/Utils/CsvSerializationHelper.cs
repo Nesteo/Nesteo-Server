@@ -11,7 +11,7 @@ namespace Nesteo.Server.Utils
         {
             if (fields == null)
                 throw new ArgumentNullException(nameof(fields));
-            
+
             // Convert field values to strings
             IEnumerable<string> encodedFieldValues = fields.Select(value => value?.ToString() ?? string.Empty);
 

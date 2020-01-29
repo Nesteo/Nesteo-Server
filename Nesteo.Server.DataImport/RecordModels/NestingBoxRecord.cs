@@ -26,7 +26,7 @@ namespace Nesteo.Server.DataImport.RecordModels
         public string HangUpDate { get; set; }
 
         [Name("eigentümer")]
-        public string OwnerName{ get; set; }
+        public string OwnerName { get; set; }
 
         [Name("material")]
         public string Material { get; set; }

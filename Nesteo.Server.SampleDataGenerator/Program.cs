@@ -21,7 +21,7 @@ namespace Nesteo.Server.SampleDataGenerator
             await Server.Program.PrepareHostAsync(host).ConfigureAwait(false);
 
             // Request database context
-            NesteoDbContext dbContext = host.Services.GetRequiredService<NesteoDbContext>();
+            var dbContext = host.Services.GetRequiredService<NesteoDbContext>();
 
             // Safety check
             Console.Write("Do you want to fill the database with sample data? Please type 'yes': ");
@@ -55,8 +55,8 @@ namespace Nesteo.Server.SampleDataGenerator
             // Generate regions
             Console.WriteLine("Generating regions...");
             await dbContext.Regions.AddRangeAsync(
-                               Enumerable.Range(1, 20).Select(i => new RegionEntity { Name = $"Region {i}", NestingBoxIdPrefix = ((char)('A' + (i - 1))).ToString() }))
-                           .ConfigureAwait(false);
+                    Enumerable.Range(1, 20).Select(i => new RegionEntity { Name = $"Region {i}", NestingBoxIdPrefix = ((char)('A' + (i - 1))).ToString() }))
+                .ConfigureAwait(false);
 
             // Generate owners
             Console.WriteLine("Generating owners...");

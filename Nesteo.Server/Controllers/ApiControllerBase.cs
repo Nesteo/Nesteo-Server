@@ -22,8 +22,8 @@ namespace Nesteo.Server.Controllers
 
         protected async Task<string> ReceiveMultipartImageFileUploadAsync(string namePrefix, CancellationToken cancellationToken = default)
         {
-            IOptions<StorageOptions> storageOptions = HttpContext.RequestServices.GetRequiredService<IOptions<StorageOptions>>();
-            ILogger<ApiControllerBase> logger = HttpContext.RequestServices.GetRequiredService<ILogger<ApiControllerBase>>();
+            var storageOptions = HttpContext.RequestServices.GetRequiredService<IOptions<StorageOptions>>();
+            var logger = HttpContext.RequestServices.GetRequiredService<ILogger<ApiControllerBase>>();
 
             if (!MultipartRequestHelper.IsMultipartContentType(Request.ContentType))
             {
@@ -58,7 +58,8 @@ namespace Nesteo.Server.Controllers
 
             if (string.IsNullOrEmpty(fileExtension) || !ValidImageFileExtensions.Contains(fileExtension))
             {
-                ModelState.AddModelError("File", $"File extension {fileExtension} is not allowed. Valid extensions are: {string.Join(", ", ValidImageFileExtensions)}");
+                ModelState.AddModelError("File",
+                    $"File extension {fileExtension} is not allowed. Valid extensions are: {string.Join(", ", ValidImageFileExtensions)}");
                 return null;
             }
 

@@ -21,10 +21,7 @@ namespace Nesteo.Server.Controllers.Api
         /// Retrieve all users
         /// </summary>
         [HttpGet]
-        public IAsyncEnumerable<User> GetUsersAsync()
-        {
-            return _userService.GetAllAsync();
-        }
+        public IAsyncEnumerable<User> GetUsersAsync() => _userService.GetAllAsync();
 
         /// <summary>
         /// Retrieve a user by id

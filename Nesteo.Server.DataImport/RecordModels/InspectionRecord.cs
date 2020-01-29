@@ -37,5 +37,4 @@ namespace Nesteo.Server.DataImport.RecordModels
         [Name("bemerkungen")]
         public string Comments { get; set; }
     }
-
 }

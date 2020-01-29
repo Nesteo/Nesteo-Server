@@ -20,8 +20,8 @@ namespace Nesteo.Server
             await host.RunAsync().ConfigureAwait(false);
         }
 
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args).ConfigureWebHostDefaults(webBuilder => {
+        public static IHostBuilder CreateHostBuilder(string[] args)
+            => Host.CreateDefaultBuilder(args).ConfigureWebHostDefaults(webBuilder => {
                 webBuilder.ConfigureKestrel(options => {
                     options.Limits.MaxRequestBodySize = null;
                 });
@@ -31,7 +31,7 @@ namespace Nesteo.Server
         public static Task PrepareHostAsync(IHost host)
         {
             // Validate and prepare the AutoMapper configuration
-            IConfigurationProvider mapperConfigurationProvider = host.Services.GetRequiredService<IConfigurationProvider>();
+            var mapperConfigurationProvider = host.Services.GetRequiredService<IConfigurationProvider>();
 #if DEBUG
             mapperConfigurationProvider.AssertConfigurationIsValid();
 #endif

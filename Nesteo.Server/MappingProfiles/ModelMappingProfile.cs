@@ -14,23 +14,24 @@ namespace Nesteo.Server.MappingProfiles
             CreateMap<RegionEntity, Region>().ReverseMap();
             CreateMap<OwnerEntity, Owner>().ReverseMap();
             CreateMap<SpeciesEntity, Species>().ReverseMap();
-            CreateMap<NestingBoxEntity, NestingBox>().ForMember(dest => dest.InspectionsCount, options => options.MapFrom(nestingBox => nestingBox.Inspections.Count)).ForMember(
-                                                         dest => dest.LastInspected,
-                                                         options => options.MapFrom(nestingBox => nestingBox
-                                                                                                  .Inspections.OrderByDescending(inspection => inspection.InspectionDate)
-                                                                                                  .FirstOrDefault().InspectionDate))
-                                                     .ForMember(dest => dest.HasImage, options => options.MapFrom(nestingBox => nestingBox.ImageFileName != null));
-            CreateMap<NestingBoxEntity, NestingBoxPreview>().ForMember(dest => dest.InspectionsCount, options => options.MapFrom(nestingBox => nestingBox.Inspections.Count))
-                                                            .ForMember(dest => dest.LastInspected,
-                                                                       options => options.MapFrom(nestingBox => nestingBox
-                                                                                                                .Inspections
-                                                                                                                .OrderByDescending(inspection => inspection.InspectionDate)
-                                                                                                                .FirstOrDefault().InspectionDate));
-            CreateMap<NestingBoxEntity, NestingBoxExportRow>().ForMember(dest => dest.HangUpUserName, options => options.MapFrom(nestingBox => nestingBox.HangUpUser.UserName));
-            CreateMap<InspectionEntity, Inspection>().ForMember(dest => dest.HasImage, options => options.MapFrom(inspection => inspection.ImageFileName != null));
+            CreateMap<NestingBoxEntity, NestingBox>()
+                .ForMember(dest => dest.InspectionsCount, options => options.MapFrom(nestingBox => nestingBox.Inspections.Count))
+                .ForMember(dest => dest.LastInspected,
+                    options => options.MapFrom(nestingBox => nestingBox
+                        .Inspections.OrderByDescending(inspection => inspection.InspectionDate).FirstOrDefault().InspectionDate))
+                .ForMember(dest => dest.HasImage, options => options.MapFrom(nestingBox => nestingBox.ImageFileName != null));
+            CreateMap<NestingBoxEntity, NestingBoxPreview>()
+                .ForMember(dest => dest.InspectionsCount, options => options.MapFrom(nestingBox => nestingBox.Inspections.Count)).ForMember(
+                    dest => dest.LastInspected,
+                    options => options.MapFrom(nestingBox => nestingBox
+                        .Inspections.OrderByDescending(inspection => inspection.InspectionDate).FirstOrDefault().InspectionDate));
+            CreateMap<NestingBoxEntity, NestingBoxExportRow>()
+                .ForMember(dest => dest.HangUpUserName, options => options.MapFrom(nestingBox => nestingBox.HangUpUser.UserName));
+            CreateMap<InspectionEntity, Inspection>()
+                .ForMember(dest => dest.HasImage, options => options.MapFrom(inspection => inspection.ImageFileName != null));
             CreateMap<InspectionEntity, InspectionPreview>();
             CreateMap<InspectionEntity, InspectionExportRow>().ForMember(dest => dest.InspectedByUserName,
-                                                                         options => options.MapFrom(inspection => inspection.InspectedByUser.UserName));
+                options => options.MapFrom(inspection => inspection.InspectedByUser.UserName));
         }
     }
 }

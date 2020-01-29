@@ -22,18 +22,15 @@ namespace Nesteo.Server.Services.Implementations
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-        public IAsyncEnumerable<User> GetAllAsync()
-        {
-            return _userManager.Users.AsNoTracking().ProjectTo<User>(_mapper.ConfigurationProvider).AsAsyncEnumerable();
-        }
+        public IAsyncEnumerable<User> GetAllAsync() => _userManager.Users.AsNoTracking().ProjectTo<User>(_mapper.ConfigurationProvider).AsAsyncEnumerable();
 
         public async Task<User> FindByIdAsync(string id, CancellationToken cancellationToken = default)
         {
             if (id == null)
                 throw new ArgumentNullException(nameof(id));
 
-            return await _userManager.Users.AsNoTracking().ProjectTo<User>(_mapper.ConfigurationProvider).FirstOrDefaultAsync(u => u.Id == id, cancellationToken)
-                                     .ConfigureAwait(false);
+            return await _userManager.Users.AsNoTracking().ProjectTo<User>(_mapper.ConfigurationProvider)
+                .FirstOrDefaultAsync(u => u.Id == id, cancellationToken).ConfigureAwait(false);
         }
 
         public Task<bool> ExistsIdAsync(string id, CancellationToken cancellationToken = default)

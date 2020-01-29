@@ -19,7 +19,8 @@ namespace Nesteo.Server.Services.Implementations
     {
         private readonly ILateDependency<INestingBoxService> _nestingBoxServiceDependency;
 
-        public InspectionService(NesteoDbContext dbContext, IMapper mapper, ILateDependency<INestingBoxService> nestingBoxServiceDependency) : base(dbContext, mapper)
+        public InspectionService(NesteoDbContext dbContext, IMapper mapper, ILateDependency<INestingBoxService> nestingBoxServiceDependency) : base(dbContext,
+            mapper)
         {
             _nestingBoxServiceDependency = nestingBoxServiceDependency ?? throw new ArgumentNullException(nameof(nestingBoxServiceDependency));
         }
@@ -31,36 +32,33 @@ namespace Nesteo.Server.Services.Implementations
 
         public Task<InspectionPreview> FindPreviewByIdAsync(int id, CancellationToken cancellationToken = default)
         {
-            return Entities.AsNoTracking().Where(entity => entity.Id == id).ProjectTo<InspectionPreview>(Mapper.ConfigurationProvider).FirstOrDefaultAsync(cancellationToken);
+            return Entities.AsNoTracking().Where(entity => entity.Id == id).ProjectTo<InspectionPreview>(Mapper.ConfigurationProvider)
+                .FirstOrDefaultAsync(cancellationToken);
         }
 
         public IAsyncEnumerable<Inspection> GetAllForNestingBoxIdAsync(string nestingBoxId)
         {
-            return Entities.AsNoTracking().OrderBy(entity => entity.Id).Where(entity => entity.NestingBox.Id == nestingBoxId).ProjectTo<Inspection>(Mapper.ConfigurationProvider)
-                           .AsAsyncEnumerable();
+            return Entities.AsNoTracking().OrderBy(entity => entity.Id).Where(entity => entity.NestingBox.Id == nestingBoxId)
+                .ProjectTo<Inspection>(Mapper.ConfigurationProvider).AsAsyncEnumerable();
         }
 
         public IAsyncEnumerable<InspectionPreview> GetAllPreviewsForNestingBoxIdAsync(string nestingBoxId)
         {
             return Entities.AsNoTracking().OrderBy(entity => entity.Id).Where(entity => entity.NestingBox.Id == nestingBoxId)
-                           .ProjectTo<InspectionPreview>(Mapper.ConfigurationProvider).AsAsyncEnumerable();
+                .ProjectTo<InspectionPreview>(Mapper.ConfigurationProvider).AsAsyncEnumerable();
         }
 
         public IAsyncEnumerable<string> ExportAllRowsAsync()
         {
-            string header = CsvSerializationHelper.SerializeCsvRow("Id", "Nesting Box", "Inspection Date", "Inspection By",
-                                        "Has Been Cleaned", "Condition", "Just Repaired",
-                                        "Occupied", "Contains Eggs", "Egg Count", "Chick Count", "Ringed Bird Count", "Age (days)",
-                                        "Female Parent", "Male Parent", "Species", "Image Filename", "Comment", "Last Updated");
+            string header = CsvSerializationHelper.SerializeCsvRow("Id", "Nesting Box", "Inspection Date", "Inspection By", "Has Been Cleaned", "Condition",
+                "Just Repaired", "Occupied", "Contains Eggs", "Egg Count", "Chick Count", "Ringed Bird Count", "Age (days)", "Female Parent", "Male Parent",
+                "Species", "Image Filename", "Comment", "Last Updated");
 
-            return Entities.AsNoTracking().OrderBy(entity => entity.Id).
-                            ProjectTo<InspectionExportRow>(Mapper.ConfigurationProvider).
-                            AsAsyncEnumerable().
-                            Select(row => CsvSerializationHelper.SerializeCsvRow(row.Id, row.NestingBoxId, row.InspectionDate, row.InspectedByUserName,
-                                                      row.HasBeenCleaned, row.Condition, row.JustRepaired, row.Occupied, row.ContainsEggs,
-                                                      row.EggCount, row.ChickCount, row.RingedChickCount, row.AgeInDays, row.FemaleParentBirdDiscovery,
-                                                      row.MaleParentBirdDiscovery, row.SpeciesName, row.ImageFilename, row.Comment, row.LastUpdated)).
-                            Prepend(header);
+            return Entities.AsNoTracking().OrderBy(entity => entity.Id).ProjectTo<InspectionExportRow>(Mapper.ConfigurationProvider).AsAsyncEnumerable().Select(
+                    row => CsvSerializationHelper.SerializeCsvRow(row.Id, row.NestingBoxId, row.InspectionDate, row.InspectedByUserName, row.HasBeenCleaned,
+                        row.Condition, row.JustRepaired, row.Occupied, row.ContainsEggs, row.EggCount, row.ChickCount, row.RingedChickCount, row.AgeInDays,
+                        row.FemaleParentBirdDiscovery, row.MaleParentBirdDiscovery, row.SpeciesName, row.ImageFilename, row.Comment, row.LastUpdated))
+                .Prepend(header);
         }
 
         public async Task<Inspection> AddAsync(Inspection inspection, CancellationToken cancellationToken = default)
@@ -72,7 +70,8 @@ namespace Nesteo.Server.Services.Implementations
             SpeciesEntity speciesEntity = DbContext.Species.Update(Mapper.Map<SpeciesEntity>(inspection.Species)).Entity;
 
             // Retrieve existing user entity and nesting box. Updating these this way is not supported.
-            NestingBoxEntity nestingBoxEntity = await DbContext.NestingBoxes.FindAsync(new object[] { inspection.NestingBox.Id }, cancellationToken).ConfigureAwait(false);
+            NestingBoxEntity nestingBoxEntity =
+                await DbContext.NestingBoxes.FindAsync(new object[] { inspection.NestingBox.Id }, cancellationToken).ConfigureAwait(false);
             if (nestingBoxEntity == null)
                 return null;
             UserEntity inspectedByUserEntity = inspection.InspectedByUser != null
@@ -114,7 +113,8 @@ namespace Nesteo.Server.Services.Implementations
             SpeciesEntity speciesEntity = DbContext.Species.Update(Mapper.Map<SpeciesEntity>(inspection.Species)).Entity;
 
             // Retrieve existing user entity and nesting box. Updating these this way is not supported.
-            NestingBoxEntity nestingBoxEntity = await DbContext.NestingBoxes.FindAsync(new object[] { inspection.NestingBox.Id }, cancellationToken).ConfigureAwait(false);
+            NestingBoxEntity nestingBoxEntity =
+                await DbContext.NestingBoxes.FindAsync(new object[] { inspection.NestingBox.Id }, cancellationToken).ConfigureAwait(false);
             if (nestingBoxEntity == null)
                 return null;
             UserEntity inspectedByUserEntity = inspection.InspectedByUser != null

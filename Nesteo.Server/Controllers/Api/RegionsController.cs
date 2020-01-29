@@ -21,10 +21,7 @@ namespace Nesteo.Server.Controllers.Api
         /// Retrieve all regions
         /// </summary>
         [HttpGet]
-        public IAsyncEnumerable<Region> GetRegionsAsync()
-        {
-            return _regionService.GetAllAsync();
-        }
+        public IAsyncEnumerable<Region> GetRegionsAsync() => _regionService.GetAllAsync();
 
         /// <summary>
         /// Retrieve a region by id

@@ -23,10 +23,8 @@ namespace Nesteo.Server.Controllers.Api
         private readonly IOptions<StorageOptions> _storageOptions;
         private readonly ILogger<NestingBoxesController> _logger;
 
-        public NestingBoxesController(INestingBoxService nestingBoxService,
-                                      IInspectionService inspectionService,
-                                      IOptions<StorageOptions> storageOptions,
-                                      ILogger<NestingBoxesController> logger)
+        public NestingBoxesController(INestingBoxService nestingBoxService, IInspectionService inspectionService, IOptions<StorageOptions> storageOptions,
+            ILogger<NestingBoxesController> logger)
         {
             _nestingBoxService = nestingBoxService ?? throw new ArgumentNullException(nameof(nestingBoxService));
             _inspectionService = inspectionService ?? throw new ArgumentNullException(nameof(inspectionService));
@@ -38,10 +36,7 @@ namespace Nesteo.Server.Controllers.Api
         /// Retrieve all nesting boxes
         /// </summary>
         [HttpGet]
-        public IAsyncEnumerable<NestingBox> GetNestingBoxesAsync()
-        {
-            return _nestingBoxService.GetAllAsync();
-        }
+        public IAsyncEnumerable<NestingBox> GetNestingBoxesAsync() => _nestingBoxService.GetAllAsync();
 
         /// <summary>
         /// Retrieve a nesting box by id
@@ -149,7 +144,9 @@ namespace Nesteo.Server.Controllers.Api
             if (!fileInfo.Exists)
                 return NotFound();
 
-            string contentType = new FileExtensionContentTypeProvider().TryGetContentType(imageFilePath, out string result) ? result : "application/octet-stream";
+            string contentType = new FileExtensionContentTypeProvider().TryGetContentType(imageFilePath, out string result)
+                ? result
+                : "application/octet-stream";
             FileStream fileStream = fileInfo.OpenRead();
 
             return File(fileStream, contentType, true);
@@ -159,10 +156,7 @@ namespace Nesteo.Server.Controllers.Api
         /// Preview all nesting boxes with a reduced set of data
         /// </summary>
         [HttpGet("previews")]
-        public IAsyncEnumerable<NestingBoxPreview> GetNestingBoxPreviewsAsync()
-        {
-            return _nestingBoxService.GetAllPreviewsAsync();
-        }
+        public IAsyncEnumerable<NestingBoxPreview> GetNestingBoxPreviewsAsync() => _nestingBoxService.GetAllPreviewsAsync();
 
         /// <summary>
         /// Preview a nesting box by id with a reduced set of data
@@ -185,19 +179,14 @@ namespace Nesteo.Server.Controllers.Api
         /// Return all inspections for a nesting box
         /// </summary>
         [HttpGet("{id}/inspections")]
-        public IAsyncEnumerable<Inspection> GetInspectionsByNestingBoxIdAsync(string id)
-        {
-            return _inspectionService.GetAllForNestingBoxIdAsync(id);
-        }
+        public IAsyncEnumerable<Inspection> GetInspectionsByNestingBoxIdAsync(string id) => _inspectionService.GetAllForNestingBoxIdAsync(id);
 
         /// <summary>
         /// Return all inspection previews for a nesting box
         /// </summary>
         [HttpGet("{id}/inspections/previews")]
         public IAsyncEnumerable<InspectionPreview> GetInspectionPreviewsByNestingBoxIdAsync(string id)
-        {
-            return _inspectionService.GetAllPreviewsForNestingBoxIdAsync(id);
-        }
+            => _inspectionService.GetAllPreviewsForNestingBoxIdAsync(id);
 
         /// <summary>
         /// Download nesting boxes csv

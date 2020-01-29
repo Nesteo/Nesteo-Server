@@ -32,7 +32,7 @@ namespace Nesteo.Server.BackgroundTasks
             using IServiceScope scope = _serviceProvider.CreateScope();
 
             // Get user manager
-            UserManager<UserEntity> userManager = scope.ServiceProvider.GetRequiredService<UserManager<UserEntity>>();
+            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<UserEntity>>();
 
             // Check if any users exist.
             if (!await userManager.Users.AnyAsync(cancellationToken).ConfigureAwait(false))
@@ -42,8 +42,8 @@ namespace Nesteo.Server.BackgroundTasks
                 try
                 {
                     // Create a new default user
-                    await userManager.CreateAsync(new UserEntity { UserName = DefaultUserName, FirstName = DefaultFirstName, LastName = DefaultLastName }, DefaultPassword)
-                                     .ConfigureAwait(false);
+                    await userManager.CreateAsync(new UserEntity { UserName = DefaultUserName, FirstName = DefaultFirstName, LastName = DefaultLastName },
+                        DefaultPassword).ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {
@@ -52,9 +52,6 @@ namespace Nesteo.Server.BackgroundTasks
             }
         }
 
-        public Task StopAsync(CancellationToken cancellationToken = default)
-        {
-            return Task.CompletedTask;
-        }
+        public Task StopAsync(CancellationToken cancellationToken = default) => Task.CompletedTask;
     }
 }

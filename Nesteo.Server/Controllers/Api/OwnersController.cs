@@ -21,10 +21,7 @@ namespace Nesteo.Server.Controllers.Api
         /// Retrieve all owners
         /// </summary>
         [HttpGet]
-        public IAsyncEnumerable<Owner> GetOwnersAsync()
-        {
-            return _ownerService.GetAllAsync();
-        }
+        public IAsyncEnumerable<Owner> GetOwnersAsync() => _ownerService.GetAllAsync();
 
         /// <summary>
         /// Retrieve an owner by id

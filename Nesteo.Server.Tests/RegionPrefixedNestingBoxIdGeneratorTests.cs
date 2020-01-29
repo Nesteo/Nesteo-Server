@@ -22,8 +22,9 @@ namespace Nesteo.Server.Tests
 
             var generator = new RegionPrefixedNestingBoxIdGenerator();
 
-            List<string> ids = await generator.GetNextIdsAsync(nestingBoxServiceMock.Object, new Region { Id = 0, Name = "Test Region", NestingBoxIdPrefix = prefix }, count).ToListAsync()
-                                              .ConfigureAwait(false);
+            List<string> ids = await generator
+                .GetNextIdsAsync(nestingBoxServiceMock.Object, new Region { Id = 0, Name = "Test Region", NestingBoxIdPrefix = prefix }, count).ToListAsync()
+                .ConfigureAwait(false);
             Assert.Equal(expectedNextIds, ids);
         }
     }

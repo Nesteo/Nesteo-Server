@@ -17,48 +17,42 @@ namespace Nesteo.Server.Swagger.OperationFilters
             OpenApiSchema statusCodeProblemDetailsSchema = context.SchemaGenerator.GenerateSchema(typeof(StatusCodeProblemDetails), context.SchemaRepository);
 
             // Add possible operation responses
-            operation.Responses.TryAdd(StatusCodes.Status400BadRequest.ToString(),
-                                       new OpenApiResponse {
-                                           Description = "Bad Request",
-                                           Content = new Dictionary<string, OpenApiMediaType> {
-                                               { "application/json", new OpenApiMediaType { Schema = validationProblemDetailsSchema } }
-                                           }
-                                       });
-            operation.Responses.TryAdd(StatusCodes.Status401Unauthorized.ToString(),
-                                       new OpenApiResponse {
-                                           Description = "Unauthorized",
-                                           Content = new Dictionary<string, OpenApiMediaType> {
-                                               { "application/json", new OpenApiMediaType { Schema = statusCodeProblemDetailsSchema } }
-                                           }
-                                       });
-            operation.Responses.TryAdd(StatusCodes.Status403Forbidden.ToString(),
-                                       new OpenApiResponse {
-                                           Description = "Forbidden",
-                                           Content = new Dictionary<string, OpenApiMediaType> {
-                                               { "application/json", new OpenApiMediaType { Schema = statusCodeProblemDetailsSchema } }
-                                           }
-                                       });
-            operation.Responses.TryAdd(StatusCodes.Status404NotFound.ToString(),
-                                       new OpenApiResponse {
-                                           Description = "NotFound",
-                                           Content = new Dictionary<string, OpenApiMediaType> {
-                                               { "application/json", new OpenApiMediaType { Schema = statusCodeProblemDetailsSchema } }
-                                           }
-                                       });
-            operation.Responses.TryAdd(StatusCodes.Status409Conflict.ToString(),
-                                       new OpenApiResponse {
-                                           Description = "Conflict",
-                                           Content = new Dictionary<string, OpenApiMediaType> {
-                                               { "application/json", new OpenApiMediaType { Schema = statusCodeProblemDetailsSchema } }
-                                           }
-                                       });
-            operation.Responses.TryAdd(StatusCodes.Status500InternalServerError.ToString(),
-                                       new OpenApiResponse {
-                                           Description = "Internal Server Error",
-                                           Content = new Dictionary<string, OpenApiMediaType> {
-                                               { "application/json", new OpenApiMediaType { Schema = exceptionProblemDetailsSchema } }
-                                           }
-                                       });
+            operation.Responses.TryAdd(StatusCodes.Status400BadRequest.ToString(), new OpenApiResponse {
+                Description = "Bad Request",
+                Content = new Dictionary<string, OpenApiMediaType> {
+                    { "application/json", new OpenApiMediaType { Schema = validationProblemDetailsSchema } }
+                }
+            });
+            operation.Responses.TryAdd(StatusCodes.Status401Unauthorized.ToString(), new OpenApiResponse {
+                Description = "Unauthorized",
+                Content = new Dictionary<string, OpenApiMediaType> {
+                    { "application/json", new OpenApiMediaType { Schema = statusCodeProblemDetailsSchema } }
+                }
+            });
+            operation.Responses.TryAdd(StatusCodes.Status403Forbidden.ToString(), new OpenApiResponse {
+                Description = "Forbidden",
+                Content = new Dictionary<string, OpenApiMediaType> {
+                    { "application/json", new OpenApiMediaType { Schema = statusCodeProblemDetailsSchema } }
+                }
+            });
+            operation.Responses.TryAdd(StatusCodes.Status404NotFound.ToString(), new OpenApiResponse {
+                Description = "NotFound",
+                Content = new Dictionary<string, OpenApiMediaType> {
+                    { "application/json", new OpenApiMediaType { Schema = statusCodeProblemDetailsSchema } }
+                }
+            });
+            operation.Responses.TryAdd(StatusCodes.Status409Conflict.ToString(), new OpenApiResponse {
+                Description = "Conflict",
+                Content = new Dictionary<string, OpenApiMediaType> {
+                    { "application/json", new OpenApiMediaType { Schema = statusCodeProblemDetailsSchema } }
+                }
+            });
+            operation.Responses.TryAdd(StatusCodes.Status500InternalServerError.ToString(), new OpenApiResponse {
+                Description = "Internal Server Error",
+                Content = new Dictionary<string, OpenApiMediaType> {
+                    { "application/json", new OpenApiMediaType { Schema = exceptionProblemDetailsSchema } }
+                }
+            });
         }
     }
 }
